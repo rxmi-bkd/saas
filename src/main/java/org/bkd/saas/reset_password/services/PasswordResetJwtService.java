@@ -63,6 +63,15 @@ public class PasswordResetJwtService {
     }
   }
 
+  public boolean isValidJwt(String jwt) {
+    try {
+      readJwt(jwt);
+      return true;
+    } catch (org.bkd.saas.shared.exception.JwtException e) {
+      return false;
+    }
+  }
+
   public boolean isValidJwt(String jwt, String currentPasswordHash) {
     try {
       Claims claims = readJwt(jwt);

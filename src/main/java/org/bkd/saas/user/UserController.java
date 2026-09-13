@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.bkd.saas.user.requests.RegisterRequest;
 import org.bkd.saas.user.requests.UpdateEmailRequest;
 import org.bkd.saas.user.requests.UpdatePasswordRequest;
-import org.bkd.saas.user.requests.responses.UserResponse;
+import org.bkd.saas.user.responses.UserResponse;
+import org.bkd.saas.user.services.UserPasswordService;
 import org.bkd.saas.user.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +24,7 @@ import java.util.UUID;
 public class UserController {
 
   private final UserService userService;
+  private final UserPasswordService userPasswordService;
 
   @GetMapping("/api/users/me")
   public UserResponse me(@AuthenticationPrincipal UUID userId) {
@@ -38,7 +40,7 @@ public class UserController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PutMapping("/api/users/password")
   public void updatePassword(@AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdatePasswordRequest request) {
-    userService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
+    userPasswordService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)

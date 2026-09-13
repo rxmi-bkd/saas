@@ -3,7 +3,7 @@ package org.bkd.saas.user.services;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.user.UserMapper;
 import org.bkd.saas.user.UserRepository;
-import org.bkd.saas.user.requests.responses.UserResponse;
+import org.bkd.saas.user.responses.UserResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -2,9 +2,9 @@ package org.bkd.saas.authentication;
 
 import org.bkd.saas.authentication.services.AccessJwtService;
 import org.bkd.saas.authentication.services.AuthenticationService;
-import org.bkd.saas.user.services.CredentialsService;
 import org.bkd.saas.user.Role;
-import org.bkd.saas.user.requests.responses.UserResponse;
+import org.bkd.saas.user.responses.UserResponse;
+import org.bkd.saas.user.services.CredentialsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

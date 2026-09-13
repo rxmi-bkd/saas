@@ -1,7 +1,7 @@
 package org.bkd.saas.user;
 
-import org.bkd.saas.user.requests.responses.UserResponse;
-import org.bkd.saas.user.requests.responses.UserWithPasswordResponse;
+import org.bkd.saas.user.responses.UserResponse;
+import org.bkd.saas.user.responses.UserWithPasswordResponse;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

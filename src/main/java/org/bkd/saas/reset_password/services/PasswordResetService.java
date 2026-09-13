@@ -3,8 +3,9 @@ package org.bkd.saas.reset_password.services;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bkd.saas.user.responses.UserWithPasswordResponse;
+import org.bkd.saas.user.services.UserPasswordService;
 import org.bkd.saas.user.services.UserService;
-import org.bkd.saas.user.requests.responses.UserWithPasswordResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class PasswordResetService {
 
   private final UserService userService;
+  private final UserPasswordService userPasswordService;
   private final PasswordResetJwtService passwordResetJwtService;
 
   public void forgotPassword(String email) {
@@ -29,6 +31,9 @@ public class PasswordResetService {
     Claims claims = passwordResetJwtService.readJwt(jwt);
     UUID userId = UUID.fromString(claims.getSubject());
     UserWithPasswordResponse user = userService.readUserWithPassword(userId);
-    if (passwordResetJwtService.isValidJwt(jwt, user.password())) userService.updateUserPassword(userId, newPassword);
+
+    if (passwordResetJwtService.isValidJwt(jwt, user.password())) {
+      userPasswordService.updateUserPassword(userId, newPassword);
+    }
   }
 }

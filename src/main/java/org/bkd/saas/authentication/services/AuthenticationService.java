@@ -3,8 +3,8 @@ package org.bkd.saas.authentication.services;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.authentication.InvalidCredentialsException;
 import org.bkd.saas.authentication.LoginResponse;
+import org.bkd.saas.user.responses.UserResponse;
 import org.bkd.saas.user.services.CredentialsService;
-import org.bkd.saas.user.requests.responses.UserResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

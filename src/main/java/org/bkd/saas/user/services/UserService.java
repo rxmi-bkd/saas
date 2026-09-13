@@ -6,10 +6,9 @@ import org.bkd.saas.user.Role;
 import org.bkd.saas.user.UserMapper;
 import org.bkd.saas.user.UserRepository;
 import org.bkd.saas.user.exceptions.EmailAlreadyUsedException;
-import org.bkd.saas.user.exceptions.PasswordMismatchException;
 import org.bkd.saas.user.exceptions.UserNotFoundException;
-import org.bkd.saas.user.requests.responses.UserResponse;
-import org.bkd.saas.user.requests.responses.UserWithPasswordResponse;
+import org.bkd.saas.user.responses.UserResponse;
+import org.bkd.saas.user.responses.UserWithPasswordResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,19 +46,6 @@ public class UserService {
 
   public UserWithPasswordResponse readUserWithPassword(String email) {
     return userRepository.findByEmail(email).map(userMapper::toUserWithPasswordResponse).orElseThrow(UserNotFoundException::new);
-  }
-
-  public void updateUserPassword(UUID userId, String newPassword) {
-    AppUser user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-    user.setPassword(passwordEncoder.encode(newPassword));
-    userRepository.save(user);
-  }
-
-  public void updateUserPassword(UUID userId, String oldPassword, String newPassword) {
-    AppUser user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-    if (!passwordEncoder.matches(oldPassword, user.getPassword())) throw new PasswordMismatchException("Passwords don't match");
-    user.setPassword(passwordEncoder.encode(newPassword));
-    userRepository.save(user);
   }
 
   public void updateUserEmail(UUID userId, String email) {

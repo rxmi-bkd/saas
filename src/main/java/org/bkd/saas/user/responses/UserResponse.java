@@ -1,4 +1,4 @@
-package org.bkd.saas.user.requests.responses;
+package org.bkd.saas.user.responses;
 
 import org.bkd.saas.user.Role;
 

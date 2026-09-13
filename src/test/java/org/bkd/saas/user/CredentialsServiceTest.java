@@ -1,6 +1,6 @@
 package org.bkd.saas.user;
 
-import org.bkd.saas.user.requests.responses.UserResponse;
+import org.bkd.saas.user.responses.UserResponse;
 import org.bkd.saas.user.services.CredentialsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
