@@ -26,25 +26,28 @@ public class UserController {
   private final UserService userService;
   private final UserPasswordService userPasswordService;
 
-  @GetMapping("/api/users/me")
+  public static final String PRIVATE_ENDPOINT = "/api/users";
+  public static final String PUBLIC_ENDPOINT = "/api/public/users";
+
+  @GetMapping(PRIVATE_ENDPOINT + "/me")
   public UserResponse me(@AuthenticationPrincipal UUID userId) {
     return userService.readUser(userId);
   }
 
   @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/api/public/users")
+  @PostMapping(PUBLIC_ENDPOINT)
   public UserResponse register(@Valid @RequestBody RegisterRequest request) {
     return userService.createUser(request.email(), request.password());
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PutMapping("/api/users/password")
+  @PutMapping(PRIVATE_ENDPOINT + "/password")
   public void updatePassword(@AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdatePasswordRequest request) {
     userPasswordService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PutMapping("/api/users/email")
+  @PutMapping(PRIVATE_ENDPOINT + "/email")
   public void updateEmail(@AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateEmailRequest request) {
     userService.updateUserEmail(userId, request.email());
   }
