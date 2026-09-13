@@ -1,4 +1,4 @@
-package org.bkd.saas.reset_password.requests;
+package org.bkd.saas.password_reset.requests;
 
 import jakarta.validation.constraints.NotBlank;
 

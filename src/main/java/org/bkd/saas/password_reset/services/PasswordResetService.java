@@ -1,4 +1,4 @@
-package org.bkd.saas.reset_password.services;
+package org.bkd.saas.password_reset.services;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;

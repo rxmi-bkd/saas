@@ -1,4 +1,4 @@
-package org.bkd.saas.reset_password.services;
+package org.bkd.saas.password_reset.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -60,15 +60,6 @@ public class PasswordResetJwtService {
       return Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt).getPayload();
     } catch (JwtException e) {
       throw new org.bkd.saas.shared.exception.JwtException(e.getMessage());
-    }
-  }
-
-  public boolean isValidJwt(String jwt) {
-    try {
-      readJwt(jwt);
-      return true;
-    } catch (org.bkd.saas.shared.exception.JwtException e) {
-      return false;
     }
   }
 
