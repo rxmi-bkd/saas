@@ -12,7 +12,7 @@ public class AuthenticationController {
 
   private final AuthenticationService authenticationService;
 
-  @PostMapping("/public/api/authentication/login")
+  @PostMapping("/api/public/authentication/login")
   public LoginResponse login(@Valid @RequestBody LoginRequest request) {
     return authenticationService.login(request.email(), request.password());
   }
