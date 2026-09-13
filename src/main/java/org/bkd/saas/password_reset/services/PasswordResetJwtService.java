@@ -67,7 +67,7 @@ public class PasswordResetJwtService {
     try {
       Claims claims = readJwt(jwt);
       String pwh = claims.get(PASSWORD_HASH_CLAIM, String.class);
-      return pwh != null && passwordEncoder.matches(pwh, currentPasswordHash);
+      return pwh != null && passwordEncoder.matches(currentPasswordHash, pwh);
     } catch (org.bkd.saas.shared.exception.JwtException e) {
       return false;
     }

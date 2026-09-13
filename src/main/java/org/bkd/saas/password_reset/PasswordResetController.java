@@ -16,14 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class PasswordResetController {
   private final PasswordResetService passwordResetService;
 
+  public static final String PUBLIC_ENDPOINT = "/api/public/password";
+
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PostMapping("/api/public/authentication/forgot-password")
+  @PostMapping(PUBLIC_ENDPOINT + "/forgot")
   public void forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
     passwordResetService.forgotPassword(request.email());
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PostMapping("/api/public/authentication/reset-password")
+  @PostMapping(PUBLIC_ENDPOINT + "/reset")
   public void resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
     passwordResetService.resetPassword(request.jwt(), request.newPassword());
   }
