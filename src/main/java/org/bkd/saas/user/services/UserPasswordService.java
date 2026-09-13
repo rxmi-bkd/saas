@@ -14,7 +14,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class PasswordService {
+public class UserPasswordService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;

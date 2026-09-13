@@ -2,7 +2,7 @@ package org.bkd.saas.user;
 
 import org.bkd.saas.user.exceptions.PasswordMismatchException;
 import org.bkd.saas.user.exceptions.UserNotFoundException;
-import org.bkd.saas.user.services.PasswordService;
+import org.bkd.saas.user.services.UserPasswordService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class PasswordServiceTest {
+class UserPasswordServiceTest {
 
   @Mock
   private UserRepository userRepository;
@@ -30,7 +30,7 @@ class PasswordServiceTest {
   private PasswordEncoder passwordEncoder;
 
   @InjectMocks
-  private PasswordService passwordService;
+  private UserPasswordService userPasswordService;
 
   private static final UUID USER_ID = UUID.randomUUID();
   private static final String USER_EMAIL = "user@example.com";
@@ -51,7 +51,7 @@ class PasswordServiceTest {
     String newEncodedPassword = "new_encoded_password";
     when(userRepository.findById(USER_ID)).thenReturn(Optional.of(appUser));
     when(passwordEncoder.encode(newPassword)).thenReturn(newEncodedPassword);
-    passwordService.updateUserPassword(USER_ID, newPassword);
+    userPasswordService.updateUserPassword(USER_ID, newPassword);
     verify(userRepository).save(any(AppUser.class));
   }
 
@@ -62,7 +62,7 @@ class PasswordServiceTest {
     when(userRepository.findById(USER_ID)).thenReturn(Optional.of(appUser));
     when(passwordEncoder.matches(USER_PASSWORD, USER_ENCODED_PASSWORD)).thenReturn(true);
     when(passwordEncoder.encode(newPassword)).thenReturn(newEncodedPassword);
-    passwordService.updateUserPassword(USER_ID, USER_PASSWORD, newPassword);
+    userPasswordService.updateUserPassword(USER_ID, USER_PASSWORD, newPassword);
     verify(userRepository).save(any(AppUser.class));
   }
 
@@ -70,14 +70,14 @@ class PasswordServiceTest {
   void updateUserPassword_shouldThrowPasswordMismatchException_whenOldPasswordDoesNotMatch() {
     when(userRepository.findById(USER_ID)).thenReturn(Optional.of(appUser));
     when(passwordEncoder.matches(USER_PASSWORD, USER_ENCODED_PASSWORD)).thenReturn(false);
-    assertThatThrownBy(() -> passwordService.updateUserPassword(USER_ID, USER_PASSWORD, "_")).isInstanceOf(PasswordMismatchException.class);
+    assertThatThrownBy(() -> userPasswordService.updateUserPassword(USER_ID, USER_PASSWORD, "_")).isInstanceOf(PasswordMismatchException.class);
     verify(userRepository, never()).save(any(AppUser.class));
   }
 
   @Test
   void updateUserPassword_shouldThrowUserNotFoundException_whenUserDoesNotExist() {
     when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
-    assertThatThrownBy(() -> passwordService.updateUserPassword(USER_ID, USER_PASSWORD, "new_password")).isInstanceOf(UserNotFoundException.class);
+    assertThatThrownBy(() -> userPasswordService.updateUserPassword(USER_ID, USER_PASSWORD, "new_password")).isInstanceOf(UserNotFoundException.class);
     verify(userRepository, never()).save(any(AppUser.class));
   }
 }

@@ -28,11 +28,12 @@ public class PasswordResetJwtService {
   @Value("${app.jwt.reset-password.expiration}")
   private long expirationInSeconds;
 
-  private final PasswordEncoder passwordEncoder;
 
   private SecretKey key;
 
   public static final String PASSWORD_HASH_CLAIM = "pwh";
+
+  private final PasswordEncoder passwordEncoder;
 
   @PostConstruct
   public void postConstruct() {
