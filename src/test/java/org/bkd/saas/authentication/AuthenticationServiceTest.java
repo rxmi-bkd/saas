@@ -4,7 +4,7 @@ import org.bkd.saas.authentication.services.AccessJwtService;
 import org.bkd.saas.authentication.services.AuthenticationService;
 import org.bkd.saas.user.Role;
 import org.bkd.saas.user.responses.UserResponse;
-import org.bkd.saas.user.services.UserCredentialsService;
+import org.bkd.saas.user.services.CredentialsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,7 +29,7 @@ class AuthenticationServiceTest {
   private AccessJwtService accessJwtService;
 
   @Mock
-  private UserCredentialsService userCredentialsService;
+  private CredentialsService credentialsService;
 
   @InjectMocks
   private AuthenticationService authenticationService;
@@ -44,19 +44,19 @@ class AuthenticationServiceTest {
 
   @Test
   void login_shouldReturnAccessToken_whenCredentialsAreValid() {
-    when(userCredentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD)).thenReturn(Optional.of(USER));
+    when(credentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD)).thenReturn(Optional.of(USER));
     when(accessJwtService.createJwt(USER_ID, Role.ROLE_USER)).thenReturn(ACCESS_TOKEN);
     LoginResponse response = authenticationService.login(USER_EMAIL, USER_PASSWORD);
     assertThat(response.accessToken()).isEqualTo(ACCESS_TOKEN);
-    verify(userCredentialsService).verifyCredentials(USER_EMAIL, USER_PASSWORD);
+    verify(credentialsService).verifyCredentials(USER_EMAIL, USER_PASSWORD);
     verify(accessJwtService).createJwt(USER_ID, Role.ROLE_USER);
   }
 
   @Test
   void login_shouldThrowInvalidCredentialsException_whenCredentialsAreInvalid() {
-    when(userCredentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD)).thenReturn(Optional.empty());
+    when(credentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD)).thenReturn(Optional.empty());
     assertThatThrownBy(() -> authenticationService.login(USER_EMAIL, USER_PASSWORD)).isInstanceOf(InvalidCredentialsException.class);
-    verify(userCredentialsService).verifyCredentials(USER_EMAIL, USER_PASSWORD);
+    verify(credentialsService).verifyCredentials(USER_EMAIL, USER_PASSWORD);
     verify(accessJwtService, never()).createJwt(any(), any());
   }
 }

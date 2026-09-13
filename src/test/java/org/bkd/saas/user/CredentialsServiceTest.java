@@ -1,7 +1,7 @@
 package org.bkd.saas.user;
 
 import org.bkd.saas.user.responses.UserResponse;
-import org.bkd.saas.user.services.UserCredentialsService;
+import org.bkd.saas.user.services.CredentialsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserCredentialsServiceTest {
+class CredentialsServiceTest {
 
   @Mock
   private UserRepository userRepository;
@@ -29,7 +29,7 @@ class UserCredentialsServiceTest {
   private UserMapper userMapper;
 
   @InjectMocks
-  private UserCredentialsService userCredentialsService;
+  private CredentialsService credentialsService;
 
   private static final UUID USER_ID = UUID.randomUUID();
   private static final String USER_EMAIL = "user@example.com";
@@ -45,14 +45,14 @@ class UserCredentialsServiceTest {
     when(userRepository.findByEmail(USER_EMAIL)).thenReturn(Optional.of(appUser));
     when(passwordEncoder.matches(USER_PASSWORD, USER_ENCODED_PASSWORD)).thenReturn(true);
     when(userMapper.toUserResponse(appUser)).thenReturn(USER_RESPONSE);
-    Optional<UserResponse> response = userCredentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD);
+    Optional<UserResponse> response = credentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD);
     assertThat(response).contains(USER_RESPONSE);
   }
 
   @Test
   void verifyCredentials_shouldReturnEmpty_whenEmailIsNotFound() {
     when(userRepository.findByEmail(USER_EMAIL)).thenReturn(Optional.empty());
-    Optional<UserResponse> response = userCredentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD);
+    Optional<UserResponse> response = credentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD);
     assertThat(response).isEmpty();
   }
 
@@ -61,7 +61,7 @@ class UserCredentialsServiceTest {
     AppUser appUser = new AppUser(USER_EMAIL, USER_ENCODED_PASSWORD, USER_ROLE);
     when(userRepository.findByEmail(USER_EMAIL)).thenReturn(Optional.of(appUser));
     when(passwordEncoder.matches(USER_PASSWORD, USER_ENCODED_PASSWORD)).thenReturn(false);
-    Optional<UserResponse> response = userCredentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD);
+    Optional<UserResponse> response = credentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD);
     assertThat(response).isEmpty();
   }
 
@@ -71,7 +71,7 @@ class UserCredentialsServiceTest {
     appUser.setEnabled(false);
     when(userRepository.findByEmail(USER_EMAIL)).thenReturn(Optional.of(appUser));
     when(passwordEncoder.matches(USER_PASSWORD, USER_ENCODED_PASSWORD)).thenReturn(true);
-    Optional<UserResponse> response = userCredentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD);
+    Optional<UserResponse> response = credentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD);
     assertThat(response).isEmpty();
   }
 }

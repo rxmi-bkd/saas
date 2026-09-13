@@ -6,7 +6,7 @@ import org.bkd.saas.user.requests.RegisterRequest;
 import org.bkd.saas.user.requests.UpdateEmailRequest;
 import org.bkd.saas.user.requests.UpdatePasswordRequest;
 import org.bkd.saas.user.responses.UserResponse;
-import org.bkd.saas.user.services.UserPasswordService;
+import org.bkd.saas.user.services.PasswordService;
 import org.bkd.saas.user.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,7 +24,7 @@ import java.util.UUID;
 public class UserController {
 
   private final UserService userService;
-  private final UserPasswordService userPasswordService;
+  private final PasswordService passwordService;
 
   public static final String PRIVATE_ENDPOINT = "/api/users";
   public static final String PUBLIC_ENDPOINT = "/api/public/users";
@@ -43,7 +43,7 @@ public class UserController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PutMapping(PRIVATE_ENDPOINT + "/password")
   public void updatePassword(@AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdatePasswordRequest request) {
-    userPasswordService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
+    passwordService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)

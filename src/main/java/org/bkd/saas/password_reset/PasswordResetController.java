@@ -3,7 +3,7 @@ package org.bkd.saas.password_reset;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.password_reset.requests.ForgotPasswordRequest;
-import org.bkd.saas.password_reset.requests.ResetPasswordRequest;
+import org.bkd.saas.password_reset.requests.PasswordResetRequest;
 import org.bkd.saas.password_reset.services.PasswordResetService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +26,7 @@ public class PasswordResetController {
 
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PostMapping(PUBLIC_ENDPOINT + "/reset")
-  public void resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+  public void resetPassword(@Valid @RequestBody PasswordResetRequest request) {
     passwordResetService.resetPassword(request.jwt(), request.newPassword());
   }
 }
