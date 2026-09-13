@@ -3,10 +3,10 @@ package org.bkd.saas.password_reset.services;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bkd.saas.user.exceptions.UserNotFoundException;
 import org.bkd.saas.user.responses.UserWithPasswordResponse;
 import org.bkd.saas.user.services.PasswordService;
 import org.bkd.saas.user.services.UserService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +27,7 @@ public class PasswordResetService {
       UserWithPasswordResponse user = userService.readUserWithPassword(email);
       String jwt = passwordResetJwtService.createJwt(user.id(), user.password());
       log.info("Password reset requested for {} : {}", email, jwt);
-    } catch (UsernameNotFoundException e) {
+    } catch (UserNotFoundException e) {
       log.info("User with email {} not found", email);
     }
   }

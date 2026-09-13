@@ -1,0 +1,477 @@
+CODE REVIEW REPORT — saas (Java Spring Boot Auth/User Service)
+Generated: 2026-09-13
+Reviewer: code-reviewer agent
+
+Scope reviewed: all files under src/main/java (25 files), src/main/resources
+(application.properties + 3 Liquibase changelogs), src/test/java (6 test
+classes), and pom.xml. 36 files total.
+
+================================================================================
+SCORECARD
+================================================================================
+Files reviewed:      36
+Critical issues:     5
+High issues:         6
+Medium issues:        7
+Low issues/suggestions: 5
+Total actionable findings: 23, plus a dedicated test-coverage gap analysis
+identifying 6 untested classes (including the two classes containing the most
+severe bugs found).
+
+Bottom line: The architecture (stateless JWT, BCrypt, layered services,
+MapStruct, Liquibase, ArchUnit) is sound and idiomatic, but the password-reset
+flow has two concrete defects that undermine its security guarantees (C1
+token leaked to logs instead of emailed, C2 broken exception handling causing
+user enumeration), the seeded default users (C3) and hardcoded JWT secrets
+(C5) are unsafe to ship as-is, and the missing DB-level unique email
+constraint (C4) is a real concurrency bug, not just a hardening suggestion.
+Addressing C1-C5 and H1-H2 should be treated as blockers before any
+production use of this starter; the remaining items are solid
+hardening/code-quality improvements for a project at this early, boilerplate
+stage.
+
+================================================================================
+CRITICAL
+================================================================================
+
+C1. Password-reset token logged in plaintext instead of emailed
+----------------------------------------------------------------
+File: src/main/java/org/bkd/saas/password_reset/services/PasswordResetService.java:29
+
+    log.info("Password reset requested for {} : {}", email, jwt);
+
+The reset JWT - which is a self-contained bearer credential capable of
+setting any user's password - is written to the application log instead of
+being delivered via email (there is no email-sending integration anywhere in
+the codebase). Anyone with log access (log aggregators, ops staff, a
+misconfigured log shipper, a compromised sidecar) can take over any account.
+This is functionally also an incomplete feature: password reset can never
+reach the actual user today.
+
+Fix: Never log secrets/tokens. Integrate a real mail sender
+(JavaMailSender/SES/etc.), send the reset link/token to the user's email, and
+log only a non-sensitive correlation id (or nothing) at INFO. If you need
+audit logging, log a hash of the token, not the token itself.
+
+C2. User enumeration bug caused by catching the wrong exception type
+----------------------------------------------------------------------
+File: src/main/java/org/bkd/saas/password_reset/services/PasswordResetService.java:26-32
+
+    try {
+      UserWithPasswordResponse user = userService.readUserWithPassword(email);
+      ...
+    } catch (UsernameNotFoundException e) {   // org.springframework.security.core.userdetails.UsernameNotFoundException
+      log.info("User with email {} not found", email);
+    }
+
+UserService.readUserWithPassword(String) (user/services/UserService.java:47-49)
+throws org.bkd.saas.user.exceptions.UserNotFoundException, which does NOT
+extend UsernameNotFoundException. The catch clause can therefore never
+trigger, and an unknown email causes UserNotFoundException (annotated
+@ResponseStatus(NOT_FOUND)) to propagate to the client as HTTP 404, while a
+known email returns HTTP 204. This is a textbook account/email-enumeration
+oracle on /api/public/password/forgot, defeating the entire purpose of the
+try/catch that was clearly written to prevent it. No test exists that would
+have caught this (see Test Coverage section).
+
+Fix: Catch org.bkd.saas.user.exceptions.UserNotFoundException instead (or
+better, have PasswordResetService call a repository method returning
+Optional directly), and ensure both branches return the exact same response
+(204, same timing) regardless of whether the email exists.
+
+C3. Seeded default admin/user accounts with a shared, hardcoded bcrypt
+password ship to every environment
+------------------------------------------------------------------------
+File: src/main/resources/db/changelog/v1/002-insert-default-users.yaml:1-55
+
+Both admin@example.com (ROLE_ADMIN) and user@example.com (ROLE_USER) are
+inserted with the IDENTICAL bcrypt hash
+$2a$10$59Kagq5XXy9F82JAz3UMhemYnsxQntC63WWjSVDHRtI/BdqDGPVYK. This changelog
+is included unconditionally from db.changelog-master.yaml (no Liquibase
+context/Spring contexts guard, no profile check), so it runs against EVERY
+environment including production. Since this is a public boilerplate, the
+plaintext password behind this hash is almost certainly guessable/crackable
+(bcrypt cost 10 is offline-crackable for common passwords in seconds to
+minutes), giving anyone who deploys this template a default admin account
+with a known password unless they remember to delete it manually.
+
+Fix: Restrict this changeSet to a Liquibase context (e.g. context="dev") and
+only activate that context in non-prod Spring profiles
+(spring.liquibase.contexts). Never seed a default admin in a changelog that
+runs in production; if one is required, generate a random password at first
+boot and force a reset, or document/enforce that this changelog must be
+removed before prod deploy (fail-fast check is safer).
+
+C4. Missing unique constraint on email - race condition allows duplicate
+accounts
+----------------------------------------------------------------------------
+Files: src/main/resources/db/changelog/v1/001-add-user-table.yaml:16-20,
+       src/main/java/org/bkd/saas/user/services/UserService.java:28-33
+
+The email column has nullable: false but no unique index/constraint at the
+database level. Uniqueness is enforced only in application code via a
+check-then-insert pattern (findByEmail(...).isPresent() then save(...)). Two
+concurrent registration requests with the same email can both pass the check
+and both insert, producing two rows with the same email.
+UserRepository.findByEmail and CredentialsService.verifyCredentials then
+behave non-deterministically (whichever row Postgres returns first), which
+can let one user authenticate into another's "duplicate" account context or
+make password reset target the wrong row.
+
+Fix: Add a Liquibase addUniqueConstraint (or unique index) on
+app_user.email in a new changeSet, and let the DataIntegrityViolationException
+surface as a proper EmailAlreadyUsedException (catch it in
+UserService.createUser/updateUserEmail) as a defense-in-depth alongside (not
+instead of) the existing check.
+
+C5. JWT secrets are weak, hardcoded, generic-boilerplate defaults committed
+to source control
+------------------------------------------------------------------------------
+File: src/main/resources/application.properties:18,22
+
+    app.jwt.secret=your-secret-key-change-in-production
+    app.jwt.reset-password.secret=change-this-reset-secret-in-production
+
+These are obvious placeholder strings shipped in a version-controlled
+properties file. If a team deploys this starter without overriding them (a
+common real-world failure mode for boilerplates), anyone who has ever seen
+this public repo can forge both access tokens and password-reset tokens for
+any user/role (AccessJwtService.createJwt lets the attacker embed
+ROLE_ADMIN directly). There is also no startup-time guard rejecting these
+known defaults.
+
+Fix: Remove secrets from application.properties entirely; require them via
+environment variables/secret manager with no default value (fail fast on
+missing config, e.g. @Value("${app.jwt.secret}") with no default and a
+@PostConstruct check rejecting known placeholder values or too-short keys,
+e.g. < 32 bytes). Add a startup assertion that throws if the secret equals
+the placeholder string.
+
+================================================================================
+HIGH
+================================================================================
+
+H1. resetPassword silently no-ops on an invalid/expired/already-used token
+------------------------------------------------------------------------------
+File: src/main/java/org/bkd/saas/password_reset/services/PasswordResetService.java:35-42
+
+    public void resetPassword(String jwt, String newPassword) {
+      Claims claims = passwordResetJwtService.readJwt(jwt);
+      UUID userId = UUID.fromString(claims.getSubject());
+      UserWithPasswordResponse user = userService.readUserWithPassword(userId);
+      if (passwordResetJwtService.isValidJwt(jwt, user.password())) {
+        passwordService.updateUserPassword(userId, newPassword);
+      }
+    }
+
+If isValidJwt returns false (e.g., the token was already used once and the
+password hash has since changed, or it's a valid-signature/valid-expiry
+token whose pwh claim just doesn't match), the method does nothing but the
+controller (PasswordResetController.java:27-31) still returns 204 No
+Content. The end user believes their password was changed when it was not -
+a correctness/UX bug, and it also hides genuine tampering attempts from any
+monitoring.
+
+Fix: Throw a dedicated exception (e.g. InvalidOrExpiredResetTokenException
+mapped to 400) when isValidJwt returns false, so the controller returns a
+non-2xx status and the caller can react.
+
+H2. No rate limiting / brute-force protection on public endpoints
+------------------------------------------------------------------------------
+Files: authentication/AuthenticationController.java:15-18,
+       password_reset/PasswordResetController.java:22-31,
+       user/UserController.java:37-41,
+       security/SecurityConfiguration.java
+
+/api/public/authentication/login, /api/public/password/forgot,
+/api/public/password/reset, and /api/public/users (registration) are all
+permitAll() with no throttling, no account lockout, no CAPTCHA. This allows
+unlimited credential-stuffing/brute-force login attempts, and unlimited spam
+of the forgot endpoint (each call performs a bcrypt encode - cost factor 10
+- making it a cheap CPU-exhaustion/DoS vector against unauthenticated
+traffic, see H3).
+
+Fix: Add rate limiting (e.g. Bucket4j, Spring Cloud Gateway limiter, or a
+reverse-proxy/WAF rule) keyed by IP and/or email on these three endpoints,
+plus login failure counting/lockout.
+
+H3. No password strength/length validation on any credential input
+------------------------------------------------------------------------------
+Files: authentication/LoginRequest.java:6,
+       user/requests/RegisterRequest.java:6,
+       user/requests/UpdatePasswordRequest.java:5,
+       password_reset/requests/PasswordResetRequest.java:5
+
+All password fields use only @NotBlank. A user can register/reset to a
+1-character password. Combined with H2 (no rate limiting), accounts are
+trivially brute-forceable.
+
+Fix: Add @Size(min = 8, max = 128) (or a proper password-policy validator)
+to every password-bearing DTO.
+
+H4. Timing-based user enumeration in login
+------------------------------------------------------------------------------
+File: src/main/java/org/bkd/saas/user/services/CredentialsService.java:21-26
+
+    return userRepository.findByEmail(email)
+        .filter(user -> passwordEncoder.matches(password, user.getPassword()) && user.isEnabled())
+        .map(userMapper::toUserResponse);
+
+When the email does not exist, Optional.filter short-circuits and
+passwordEncoder.matches (a deliberately slow BCrypt operation) is never
+invoked; when the email exists, it always is. The measurable response-time
+difference lets an attacker enumerate valid emails via timing analysis.
+
+Fix: Always perform a BCrypt comparison against a constant dummy hash when
+the user is not found, so response time is uniform regardless of whether the
+email exists.
+
+H5. Emails are not normalized (case-sensitivity bug in uniqueness & login)
+------------------------------------------------------------------------------
+Files: user/services/UserService.java:28-33,51-61,
+       user/services/CredentialsService.java:21-26,
+       all request DTOs with @Email
+
+No code ever lowercases/trims email addresses before storing or querying.
+Because Postgres VARCHAR comparisons are case-sensitive by default,
+Foo@Example.com and foo@example.com are treated as different accounts,
+which both defeats the (already racy - see C4) duplicate-email check and can
+strand users who register with mixed case and later log in/reset with
+different casing.
+
+Fix: Normalize (.trim().toLowerCase()) email in one place - ideally a
+mapper/service layer entry point used by register, login, update-email, and
+forgot-password - before any lookup or persistence.
+
+H6. AccessJwtService.readRole can throw an unhandled IllegalArgumentException
+------------------------------------------------------------------------------
+File: src/main/java/org/bkd/saas/authentication/services/AccessJwtService.java:70-74
+
+    public Role readRole(String jwt) {
+      Claims claims = readJwt(jwt);
+      String role = claims.get(ROLE_CLAIM, String.class);
+      return Role.valueOf(role);
+    }
+
+If the role claim is missing or its value doesn't match a current Role enum
+constant (e.g., an old token issued before a role was renamed/removed, or a
+null claim), Role.valueOf(null/garbage) throws
+IllegalArgumentException/NullPointerException, which is not caught
+anywhere. Because JwtAuthenticationFilter.doFilterInternal calls this after
+already validating the token (isValidJwt succeeded), this exception
+propagates out of the filter chain as an uncaught 500 error for what should
+be treated as an authentication failure, potentially breaking the request
+pipeline for otherwise legitimately-signed but stale tokens.
+
+Fix: Wrap the enum lookup and rethrow org.bkd.saas.shared.exception.JwtException,
+and have JwtAuthenticationFilter catch JwtException around the whole
+validate/extract block, treating any failure as "no authentication" rather
+than letting an exception escape the filter.
+
+================================================================================
+MEDIUM
+================================================================================
+
+M1. JWT parsed/verified up to three times per authenticated request
+------------------------------------------------------------------------------
+File: src/main/java/org/bkd/saas/security/JwtAuthenticationFilter.java:36-38
+
+    if (hasText(jwt) && accessJwtService.isValidJwt(jwt)) {
+      UUID subject = accessJwtService.readSubject(jwt);
+      Role role = accessJwtService.readRole(jwt);
+
+isValidJwt, readSubject, and readRole each independently call readJwt, so
+the same token is cryptographically verified and parsed three separate
+times per request - a needless, measurable CPU cost on every authenticated
+call under load.
+
+Fix: Parse once (Claims claims = accessJwtService.readJwt(jwt) inside a
+try/catch) and derive subject/role from the same Claims object.
+
+M2. Significant duplication between AccessJwtService and PasswordResetJwtService
+------------------------------------------------------------------------------
+Files: authentication/services/AccessJwtService.java,
+       password_reset/services/PasswordResetJwtService.java
+
+Both classes duplicate: @Value secret/expiration wiring, postConstruct() key
+derivation, the now/now_plus_expiration/Date computation, and an identical
+readJwt try/catch that rewraps io.jsonwebtoken.JwtException into the app's
+own JwtException. This violates DRY and means every future fix (e.g., H6,
+M1) has to be applied twice.
+
+Fix: Extract a shared abstract AbstractJwtService/JwtService component
+handling key setup, issuing, and parsing, parameterized by secret/expiration
+and an extension point for extra claims, with the two current classes
+reduced to thin subclasses.
+
+M3. Update password/email request bodies aren't size-bounded and error
+handling is inconsistent with password-reset flow
+------------------------------------------------------------------------------
+Files: user/UserController.java, user/requests/UpdatePasswordRequest.java,
+       password_reset/requests/PasswordResetRequest.java
+
+No @Size upper bound anywhere on email/password/jwt fields; combined with
+H3, this is defense-in-depth debt rather than an exploitable bug given
+typical Tomcat request-size limits, but should be tightened (e.g.
+@Size(max=254) on emails per RFC 5321, @Size(max=128) on passwords).
+
+M4. No centralized exception handling (@ControllerAdvice)
+------------------------------------------------------------------------------
+Files: whole shared/exception package plus per-package exceptions packages
+
+Every exception hand-rolls its own @ResponseStatus, and there is no
+@RestControllerAdvice/ProblemDetail layer. This scatters HTTP concerns into
+domain exception classes (violates separation of concerns / SRP), makes the
+response body shape inconsistent across error types, and means every new
+failure mode requires a brand-new exception class rather than reuse. It also
+makes it easy to accidentally leak exception messages (e.g.
+JwtException(e.getMessage()) at shared/exception/JwtException.java:8-10
+forwards raw io.jsonwebtoken library messages toward the client) since
+there's no single place enforcing a sanitized error contract.
+
+Fix: Introduce a @RestControllerAdvice mapping domain exceptions to
+ProblemDetail with curated, non-leaking messages; keep exception classes as
+plain RuntimeExceptions without @ResponseStatus.
+
+M5. PasswordResetJwtService's "double bcrypt" design is functional but
+unexplained/fragile
+------------------------------------------------------------------------------
+File: src/main/java/org/bkd/saas/password_reset/services/PasswordResetJwtService.java:43-57,67-75
+
+The token embeds passwordEncoder.encode(currentPasswordHash) (bcrypt-hashing
+an already-bcrypt-hashed value) as a way to auto-invalidate the token once
+the password changes. This works, but it's a non-obvious, undocumented trick
+relying on BCryptPasswordEncoder.matches reusing the salt embedded in pwh;
+there is no comment explaining the intent, and it also means every
+forgotPassword call does an extra bcrypt round (cost 10) on top of the read,
+worsening the DoS surface noted in H2/H3. A simpler, more standard approach
+(store a random reset-token identifier + short expiry + one-time-use flag,
+or just include the password hash's own value un-rehashed since it never
+leaves the server-signed JWT) would be clearer and cheaper.
+
+Fix: At minimum add a code comment explaining the invalidation mechanism;
+consider a lighter-weight scheme (HMAC of the existing password hash
+instead of a fresh bcrypt round) to avoid the extra CPU cost per request.
+
+M6. Dead code: unused UserService.readUser(String email)
+------------------------------------------------------------------------------
+File: src/main/java/org/bkd/saas/user/services/UserService.java:39-41
+
+Confirmed via repo-wide search - no caller exists. Adds unused surface area
+and confusion with the used readUser(UUID) overload.
+
+Fix: Remove it, or wire it into an actual endpoint if intended for future
+admin lookup functionality (in which case it needs authorization to a
+specific role - currently there is no admin-only route anywhere).
+
+M7. Role.ROLE_ADMIN exists but is never authorized against anything
+------------------------------------------------------------------------------
+Files: user/Role.java, security/SecurityConfiguration.java:29-32
+
+The authorization rule is a blanket anyRequest().authenticated() - there is
+no hasRole("ADMIN") anywhere, so ROLE_ADMIN is currently meaningless from an
+access-control standpoint (any authenticated user, admin or not, can hit
+every non-public endpoint). This isn't wrong per se for the current feature
+set (there are no admin-only endpoints yet), but it's worth flagging before
+more endpoints are added under the assumption that "ROLE_ADMIN" already
+gates something.
+
+Fix: When admin-only endpoints are introduced, explicitly add
+.requestMatchers(...).hasAuthority("ROLE_ADMIN") rules and cover them with
+tests (see test-coverage gaps below).
+
+================================================================================
+LOW
+================================================================================
+
+L1. No CORS configuration
+------------------------------------------------------------------------------
+File: src/main/java/org/bkd/saas/security/SecurityConfiguration.java
+
+No CorsConfigurationSource/.cors(...) is configured. If a browser-based
+frontend on a different origin is intended (typical for a JWT SaaS API),
+requests will fail until CORS is explicitly configured. Not a security hole
+today (default is effectively "no cross-origin allowed"), but worth calling
+out as a functional gap before frontend integration.
+
+L2. spring.jpa.hibernate.ddl-auto=validate with application.properties DB
+credentials committed in plaintext
+------------------------------------------------------------------------------
+File: src/main/resources/application.properties:4-5
+
+spring.datasource.username=postgres / password=postgres are checked into
+source control. Likely fine for local dev-only defaults, but if this file is
+reused as-is for any shared/staging environment (a common mistake), it's a
+plaintext credential leak. Recommend externalizing via env vars/.env
+(git-ignored) with no real credentials ever committed, even for "obviously
+local" defaults, to build the right habit.
+
+L3. Unusual/unverified Maven artifact ids
+------------------------------------------------------------------------------
+File: pom.xml:37-53,95-117
+
+Artifacts such as spring-boot-starter-webmvc, spring-boot-starter-data-jpa-test,
+spring-boot-starter-liquibase-test, spring-boot-starter-security-test,
+spring-boot-starter-validation-test, and spring-boot-starter-webmvc-test
+differ from the conventional Spring Boot starter names
+(spring-boot-starter-web, single spring-boot-starter-test). Given the very
+new parent version (4.1.1), this may reflect a genuinely restructured Spring
+Boot 4 BOM, but it's worth explicitly confirming these resolve against the
+intended Spring Boot release and aren't typos, since a build-time failure
+here would block everything.
+
+L4. ArchitectureTests coverage is thin
+------------------------------------------------------------------------------
+File: src/test/java/org/bkd/saas/ArchitectureTests.java
+
+Only two structural rules are enforced (exceptions have @ResponseStatus,
+services have @Transactional). Given this codebase's actual risk areas (JWT
+secret handling, controller authorization), ArchUnit rules such as "no class
+outside security/authentication package reads app.jwt.* properties
+directly" or "controllers must not directly access repositories" would add
+more value.
+
+L5. Minor naming/style
+------------------------------------------------------------------------------
+- AccessJwtService.java:44,46 / PasswordResetJwtService.java:46,48: local
+  variables now_plus_expiration use snake_case, inconsistent with the rest
+  of the (camelCase) Java codebase style.
+- UserService.java:27: stray trailing whitespace before
+  "public UserResponse createUser".
+
+================================================================================
+TEST COVERAGE GAPS
+================================================================================
+
+Tested today: AuthenticationService, AccessJwtService, CredentialsService,
+PasswordService, UserService, plus generic ArchitectureTests.
+
+Not tested at all:
+- AuthenticationController, UserController, PasswordResetController - no
+  @WebMvcTest/MockMvc tests exist for any HTTP layer, so request validation
+  (@Valid), status codes, and routing are unverified.
+- JwtAuthenticationFilter - the component that actually populates
+  SecurityContextHolder from a bearer token has zero tests; a regression
+  here (e.g., wrong header parsing, wrong authorities mapping) would
+  silently break authorization for the whole app.
+- SecurityConfiguration - no integration test verifies that /api/public/**
+  is actually reachable unauthenticated and that everything else is
+  actually rejected without a token (an easy rule to accidentally invert).
+- PasswordResetJwtService and PasswordResetService - THE TWO CLASSES
+  CONTAINING THIS REVIEW'S MOST SERIOUS BUGS (C1, C2, H1) - have no tests
+  whatsoever. A single test asserting "forgotPassword with unknown email
+  returns normally / doesn't throw" would have caught C2 immediately.
+- UserMapper (MapStruct) - no test verifying field mapping correctness (e.g.,
+  that password is excluded from UserResponse but included in
+  UserWithPasswordResponse).
+- No test exercises password-reset end-to-end (issue token -> reset ->
+  verify old token now invalid), which is exactly the flow with the
+  silent-failure bug (H1).
+
+Recommendation: Prioritize @WebMvcTest for all three controllers (with
+@MockBean services) to lock in status codes and validation, a
+@SpringBootTest (or filter unit test with a mock AccessJwtService) for
+JwtAuthenticationFilter, and full unit coverage for
+PasswordResetService/PasswordResetJwtService given they're the least tested
+and most defect-prone classes found in this review.
+</content>
