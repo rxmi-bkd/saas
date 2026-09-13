@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-insert-default-users
+      author: rxmi-bkd
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - insert:
+            tableName: app_user
+            columns:
+              - column:
+                  name: id
+                  value: '550e8400-e29b-41d4-a716-446655440001'
+              - column:
+                  name: email
+                  value: 'admin@example.com'
+              - column:
+                  name: password
+                  value: '$2a$10$59Kagq5XXy9F82JAz3UMhemYnsxQntC63WWjSVDHRtI/BdqDGPVYK'
+              - column:
+                  name: role
+                  value: 'ROLE_ADMIN'
+              - column:
+                  name: enabled
+                  value: true
+              - column:
+                  name: created_at
+                  value: now()
+              - column:
+                  name: updated_at
+                  value: now()
+        - insert:
+            tableName: app_user
+            columns:
+              - column:
+                  name: id
+                  value: '550e8400-e29b-41d4-a716-446655440002'
+              - column:
+                  name: email
+                  value: 'user@example.com'
+              - column:
+                  name: password
+                  value: '$2a$10$59Kagq5XXy9F82JAz3UMhemYnsxQntC63WWjSVDHRtI/BdqDGPVYK'
+              - column:
+                  name: role
+                  value: 'ROLE_USER'
+              - column:
+                  name: enabled
+                  value: true
+              - column:
+                  name: created_at
+                  value: now()
+              - column:
+                  name: updated_at
+                  value: now()
