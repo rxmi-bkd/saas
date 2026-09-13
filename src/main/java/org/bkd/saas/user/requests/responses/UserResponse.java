@@ -1,4 +1,6 @@
-package org.bkd.saas.user;
+package org.bkd.saas.user.requests.responses;
+
+import org.bkd.saas.user.Role;
 
 import java.time.Instant;
 import java.util.UUID;

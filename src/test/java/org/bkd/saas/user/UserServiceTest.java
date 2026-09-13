@@ -1,5 +1,10 @@
 package org.bkd.saas.user;
 
+import org.bkd.saas.user.exceptions.EmailAlreadyUsedException;
+import org.bkd.saas.user.exceptions.PasswordMismatchException;
+import org.bkd.saas.user.exceptions.UserNotFoundException;
+import org.bkd.saas.user.requests.responses.UserResponse;
+import org.bkd.saas.user.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -47,7 +52,7 @@ class UserServiceTest {
     when(userRepository.findByEmail(USER_EMAIL)).thenReturn(Optional.empty());
     when(passwordEncoder.encode(USER_PASSWORD)).thenReturn(USER_ENCODED_PASSWORD);
     when(userRepository.save(any(AppUser.class))).thenReturn(APP_USER);
-    when(userMapper.toResponse(any(AppUser.class))).thenReturn(USER_RESPONSE);
+    when(userMapper.toUserResponse(any(AppUser.class))).thenReturn(USER_RESPONSE);
     userService.createUser(USER_EMAIL, USER_PASSWORD);
     verify(userRepository).save(any(AppUser.class));
   }
@@ -74,14 +79,16 @@ class UserServiceTest {
   void updateUserPassword_shouldThrowPasswordMismatchException_whenOldPasswordDoesNotMatch() {
     when(userRepository.findById(USER_ID)).thenReturn(Optional.of(APP_USER));
     when(passwordEncoder.matches(USER_PASSWORD, USER_ENCODED_PASSWORD)).thenReturn(false);
-    assertThatThrownBy(() -> userService.updateUserPassword(USER_ID, USER_PASSWORD, "_")).isInstanceOf(PasswordMismatchException.class);
+    assertThatThrownBy(() -> userService.updateUserPassword(USER_ID, USER_PASSWORD, "_")).isInstanceOf(
+        PasswordMismatchException.class);
     verify(userRepository, never()).save(any(AppUser.class));
   }
 
   @Test
   void updateUserPassword_shouldThrowUserNotFoundException_whenUserDoesNotExist() {
     when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
-    assertThatThrownBy(() -> userService.updateUserPassword(USER_ID, USER_PASSWORD, "new_password")).isInstanceOf(UserNotFoundException.class);
+    assertThatThrownBy(() -> userService.updateUserPassword(USER_ID, USER_PASSWORD, "new_password")).isInstanceOf(
+        UserNotFoundException.class);
     verify(userRepository, never()).save(any(AppUser.class));
   }
 

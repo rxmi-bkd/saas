@@ -2,6 +2,11 @@ package org.bkd.saas.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.bkd.saas.user.requests.RegisterRequest;
+import org.bkd.saas.user.requests.UpdateEmailRequest;
+import org.bkd.saas.user.requests.UpdatePasswordRequest;
+import org.bkd.saas.user.requests.responses.UserResponse;
+import org.bkd.saas.user.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;

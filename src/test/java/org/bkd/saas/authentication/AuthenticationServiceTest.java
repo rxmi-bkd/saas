@@ -1,9 +1,10 @@
 package org.bkd.saas.authentication;
 
-import org.bkd.saas.jwt.JwtService;
-import org.bkd.saas.user.CredentialsService;
+import org.bkd.saas.authentication.services.AccessJwtService;
+import org.bkd.saas.authentication.services.AuthenticationService;
+import org.bkd.saas.user.services.CredentialsService;
 import org.bkd.saas.user.Role;
-import org.bkd.saas.user.UserResponse;
+import org.bkd.saas.user.requests.responses.UserResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.when;
 class AuthenticationServiceTest {
 
   @Mock
-  private JwtService jwtService;
+  private AccessJwtService accessJwtService;
 
   @Mock
   private CredentialsService credentialsService;
@@ -44,11 +45,11 @@ class AuthenticationServiceTest {
   @Test
   void login_shouldReturnAccessToken_whenCredentialsAreValid() {
     when(credentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD)).thenReturn(Optional.of(USER));
-    when(jwtService.createJwt(USER_ID, Role.ROLE_USER)).thenReturn(ACCESS_TOKEN);
+    when(accessJwtService.createJwt(USER_ID, Role.ROLE_USER)).thenReturn(ACCESS_TOKEN);
     LoginResponse response = authenticationService.login(USER_EMAIL, USER_PASSWORD);
     assertThat(response.accessToken()).isEqualTo(ACCESS_TOKEN);
     verify(credentialsService).verifyCredentials(USER_EMAIL, USER_PASSWORD);
-    verify(jwtService).createJwt(USER_ID, Role.ROLE_USER);
+    verify(accessJwtService).createJwt(USER_ID, Role.ROLE_USER);
   }
 
   @Test
@@ -56,6 +57,6 @@ class AuthenticationServiceTest {
     when(credentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD)).thenReturn(Optional.empty());
     assertThatThrownBy(() -> authenticationService.login(USER_EMAIL, USER_PASSWORD)).isInstanceOf(InvalidCredentialsException.class);
     verify(credentialsService).verifyCredentials(USER_EMAIL, USER_PASSWORD);
-    verify(jwtService, never()).createJwt(any(), any());
+    verify(accessJwtService, never()).createJwt(any(), any());
   }
 }

@@ -1,11 +1,11 @@
-package org.bkd.saas.jwt;
+package org.bkd.saas.user.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class JwtException extends RuntimeException {
-  public JwtException(String message) {
+public class PasswordMismatchException extends RuntimeException {
+  public PasswordMismatchException(String message) {
     super(message);
   }
 }

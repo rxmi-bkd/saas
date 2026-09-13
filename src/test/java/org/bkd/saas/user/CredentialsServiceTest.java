@@ -1,5 +1,7 @@
 package org.bkd.saas.user;
 
+import org.bkd.saas.user.requests.responses.UserResponse;
+import org.bkd.saas.user.services.CredentialsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,7 +44,7 @@ class CredentialsServiceTest {
     AppUser appUser = new AppUser(USER_EMAIL, USER_ENCODED_PASSWORD, USER_ROLE);
     when(userRepository.findByEmail(USER_EMAIL)).thenReturn(Optional.of(appUser));
     when(passwordEncoder.matches(USER_PASSWORD, USER_ENCODED_PASSWORD)).thenReturn(true);
-    when(userMapper.toResponse(appUser)).thenReturn(USER_RESPONSE);
+    when(userMapper.toUserResponse(appUser)).thenReturn(USER_RESPONSE);
     Optional<UserResponse> response = credentialsService.verifyCredentials(USER_EMAIL, USER_PASSWORD);
     assertThat(response).contains(USER_RESPONSE);
   }

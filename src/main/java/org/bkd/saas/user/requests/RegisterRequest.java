@@ -1,4 +1,4 @@
-package org.bkd.saas.user;
+package org.bkd.saas.user.requests;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
