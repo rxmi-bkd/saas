@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.authentication.services.AccessJwtService;
+import org.bkd.saas.authentication.services.AuthenticationTokenService;
 import org.bkd.saas.user.Role;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,7 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private static final String AUTHORIZATION_HEADER = "Authorization";
   private static final String BEARER_PREFIX = "Bearer ";
 
-  private final AccessJwtService accessJwtService;
+  private final AuthenticationTokenService authenticationTokenService;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request,
@@ -33,9 +33,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                   FilterChain filterChain) throws ServletException, IOException {
 
     String jwt = extractJwt(request);
-    if (hasText(jwt) && accessJwtService.isValidJwt(jwt)) {
-      UUID subject = accessJwtService.readSubject(jwt);
-      Role role = accessJwtService.readRole(jwt);
+    if (hasText(jwt) && authenticationTokenService.isValidJwt(jwt)) {
+      UUID subject = authenticationTokenService.readSubject(jwt);
+      Role role = authenticationTokenService.readRole(jwt);
       UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(subject, null, role.getAuthorities());
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }

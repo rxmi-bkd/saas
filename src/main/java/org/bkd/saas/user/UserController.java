@@ -2,11 +2,11 @@ package org.bkd.saas.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.user.requests.RegisterRequest;
-import org.bkd.saas.user.requests.UpdateEmailRequest;
-import org.bkd.saas.user.requests.UpdatePasswordRequest;
+import org.bkd.saas.user.requests.CreateUserRequest;
+import org.bkd.saas.user.requests.UpdateUserEmailRequest;
+import org.bkd.saas.user.requests.UpdateUserPasswordRequest;
 import org.bkd.saas.user.responses.UserResponse;
-import org.bkd.saas.user.services.PasswordService;
+import org.bkd.saas.user.services.UserPasswordService;
 import org.bkd.saas.user.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,7 +24,7 @@ import java.util.UUID;
 public class UserController {
 
   private final UserService userService;
-  private final PasswordService passwordService;
+  private final UserPasswordService userPasswordService;
 
   public static final String PRIVATE_ENDPOINT = "/api/users";
   public static final String PUBLIC_ENDPOINT = "/api/public/users";
@@ -36,19 +36,19 @@ public class UserController {
 
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(PUBLIC_ENDPOINT)
-  public UserResponse register(@Valid @RequestBody RegisterRequest request) {
+  public UserResponse register(@Valid @RequestBody CreateUserRequest request) {
     return userService.createUser(request.email(), request.password());
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PutMapping(PRIVATE_ENDPOINT + "/password")
-  public void updatePassword(@AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdatePasswordRequest request) {
-    passwordService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
+  public void updatePassword(@AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateUserPasswordRequest request) {
+    userPasswordService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PutMapping(PRIVATE_ENDPOINT + "/email")
-  public void updateEmail(@AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateEmailRequest request) {
+  public void updateEmail(@AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateUserEmailRequest request) {
     userService.updateUserEmail(userId, request.email());
   }
 }

@@ -1,12 +1,12 @@
-package org.bkd.saas.authentication.services;
+package org.bkd.saas.password_reset.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.user.Role;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,28 +17,30 @@ import java.util.UUID;
 
 import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
 
-
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AccessJwtService {
+public class PasswordResetTokenService {
 
-  @Value("${app.jwt.secret}")
+  @Value("${app.jwt.reset-password.secret}")
   private String secret;
 
-  @Value("${app.jwt.expiration}")
+  @Value("${app.jwt.reset-password.expiration}")
   private long expirationInSeconds;
+
 
   private SecretKey key;
 
-  public static final String ROLE_CLAIM = "role";
+  public static final String PASSWORD_HASH_CLAIM = "pwh";
+
+  private final PasswordEncoder passwordEncoder;
 
   @PostConstruct
   public void postConstruct() {
     key = hmacShaKeyFor(secret.getBytes());
   }
 
-  public String createJwt(UUID subject, Role role) {
+  public String createJwt(UUID subject, String currentPasswordHash) {
     String subjectString = subject.toString();
     Instant now = Instant.now();
     Instant now_plus_expiration = now.plusSeconds(expirationInSeconds);
@@ -49,7 +51,7 @@ public class AccessJwtService {
                .subject(subjectString)
                .issuedAt(issuedAt)
                .expiration(expireAt)
-               .claim(ROLE_CLAIM, role)
+               .claim(PASSWORD_HASH_CLAIM, passwordEncoder.encode(currentPasswordHash))
                .signWith(key)
                .compact();
   }
@@ -62,21 +64,11 @@ public class AccessJwtService {
     }
   }
 
-  public UUID readSubject(String jwt) {
-    Claims claims = readJwt(jwt);
-    return UUID.fromString(claims.getSubject());
-  }
-
-  public Role readRole(String jwt) {
-    Claims claims = readJwt(jwt);
-    String role = claims.get(ROLE_CLAIM, String.class);
-    return Role.valueOf(role);
-  }
-
-  public boolean isValidJwt(String jwt) {
+  public boolean isValidJwt(String jwt, String currentPasswordHash) {
     try {
-      readJwt(jwt);
-      return true;
+      Claims claims = readJwt(jwt);
+      String pwh = claims.get(PASSWORD_HASH_CLAIM, String.class);
+      return pwh != null && passwordEncoder.matches(currentPasswordHash, pwh);
     } catch (org.bkd.saas.shared.exception.JwtException e) {
       return false;
     }

@@ -16,13 +16,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-  private final AccessJwtService accessJwtService;
+  private final AuthenticationTokenService authenticationTokenService;
   private final CredentialsService credentialsService;
 
   public LoginResponse login(String email, String password) {
     Optional<UserResponse> user = credentialsService.verifyCredentials(email, password);
     if (user.isEmpty()) throw new InvalidCredentialsException();
-    String accessToken = accessJwtService.createJwt(user.get().id(), user.get().role());
+    String accessToken = authenticationTokenService.createJwt(user.get().id(), user.get().role());
     return new LoginResponse(accessToken);
   }
 }
