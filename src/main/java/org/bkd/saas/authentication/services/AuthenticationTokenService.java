@@ -1,22 +1,20 @@
 package org.bkd.saas.authentication.services;
 
+import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
+import java.time.Instant;
+import java.util.Date;
+import java.util.UUID;
+import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.user.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.crypto.SecretKey;
-import java.time.Instant;
-import java.util.Date;
-import java.util.UUID;
-
-import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
-
 
 @Service
 @Transactional
@@ -46,12 +44,12 @@ public class AuthenticationTokenService {
     Date expireAt = Date.from(now_plus_expiration);
 
     return Jwts.builder()
-               .subject(subjectString)
-               .issuedAt(issuedAt)
-               .expiration(expireAt)
-               .claim(ROLE_CLAIM, role)
-               .signWith(key)
-               .compact();
+        .subject(subjectString)
+        .issuedAt(issuedAt)
+        .expiration(expireAt)
+        .claim(ROLE_CLAIM, role)
+        .signWith(key)
+        .compact();
   }
 
   public Claims readJwt(String jwt) {

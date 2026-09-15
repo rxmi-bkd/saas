@@ -1,5 +1,7 @@
 package org.bkd.saas.security;
 
+import static org.bkd.saas.shared.Constants.PUBLIC_BASE_PATH;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,15 +23,15 @@ public class SecurityConfiguration {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    return http
-        .csrf(AbstractHttpConfigurer::disable)
-        .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        )
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/public/**", "/error").permitAll()
-            .anyRequest().authenticated()
-        )
+    return http.csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(PUBLIC_BASE_PATH + "/**", "/error")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
   }
