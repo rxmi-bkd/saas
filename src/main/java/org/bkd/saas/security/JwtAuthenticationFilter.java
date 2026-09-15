@@ -29,28 +29,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-
+      
     String jwt = extractJwt(request);
 
-    if (hasText(jwt) && authenticationTokenService.isValidJwt(jwt)) {
-      UUID subject = authenticationTokenService.readSubject(jwt);
-      Role role = authenticationTokenService.readRole(jwt);
+    boolean hasValidJwt = hasText(jwt) && authenticationTokenService.isValidJwt(jwt);
 
-      UsernamePasswordAuthenticationToken authentication =
-          new UsernamePasswordAuthenticationToken(subject, null, role.getAuthorities());
-
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+    if (hasValidJwt) {
+      UsernamePasswordAuthenticationToken auth = buildAuthenticationToken(jwt);
+      SecurityContextHolder.getContext().setAuthentication(auth);
     }
+
     filterChain.doFilter(request, response);
   }
 
   private String extractJwt(HttpServletRequest request) {
     String authorization = request.getHeader(AUTHORIZATION_HEADER);
+    boolean hasValidHeader = hasText(authorization) && authorization.startsWith(BEARER_PREFIX);
+    if (hasValidHeader) return authorization.substring(BEARER_PREFIX.length());
+    else return null;
+  }
 
-    if (hasText(authorization) && authorization.startsWith(BEARER_PREFIX)) {
-      return authorization.substring(BEARER_PREFIX.length());
-    }
-
-    return null;
+  private UsernamePasswordAuthenticationToken buildAuthenticationToken(String jwt) {
+    UUID subject = authenticationTokenService.readSubject(jwt);
+    Role role = authenticationTokenService.readRole(jwt);
+    return new UsernamePasswordAuthenticationToken(subject, null, role.getAuthorities());
   }
 }
