@@ -31,11 +31,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
 
     String jwt = extractJwt(request);
+
     if (hasText(jwt) && authenticationTokenService.isValidJwt(jwt)) {
       UUID subject = authenticationTokenService.readSubject(jwt);
       Role role = authenticationTokenService.readRole(jwt);
+
       UsernamePasswordAuthenticationToken authentication =
           new UsernamePasswordAuthenticationToken(subject, null, role.getAuthorities());
+
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
     filterChain.doFilter(request, response);
@@ -43,9 +46,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private String extractJwt(HttpServletRequest request) {
     String authorization = request.getHeader(AUTHORIZATION_HEADER);
+
     if (hasText(authorization) && authorization.startsWith(BEARER_PREFIX)) {
       return authorization.substring(BEARER_PREFIX.length());
     }
+
     return null;
   }
 }
