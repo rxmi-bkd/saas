@@ -1,22 +1,24 @@
 package org.bkd.saas.password_reset.services;
 
-import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
-import java.time.Instant;
-import java.util.Date;
-import java.util.UUID;
-import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.user.UserService;
+import org.bkd.saas.user.exceptions.UserNotFoundException;
 import org.bkd.saas.user.responses.UserWithPasswordResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.crypto.SecretKey;
+import java.time.Instant;
+import java.util.Date;
+import java.util.UUID;
+
+import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
 
 @Service
 @Transactional
@@ -82,7 +84,7 @@ public class PasswordResetTokenService {
       UserWithPasswordResponse user = userService.readUserWithPassword(userId);
       String pwh = claims.get(PASSWORD_HASH_CLAIM, String.class);
       return pwh != null && passwordEncoder.matches(user.password(), pwh);
-    } catch (org.bkd.saas.shared.exception.JwtException e) {
+    } catch (org.bkd.saas.shared.exception.JwtException | UserNotFoundException e) {
       return false;
     }
   }

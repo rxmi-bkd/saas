@@ -1,13 +1,9 @@
 package org.bkd.saas.security;
 
-import static org.springframework.util.StringUtils.hasText;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.authentication.services.AuthenticationTokenService;
 import org.bkd.saas.user.Role;
@@ -15,6 +11,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.UUID;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Component
 @RequiredArgsConstructor
@@ -26,15 +27,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final AuthenticationTokenService authenticationTokenService;
 
   @Override
-  protected void doFilterInternal(
-      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-      throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain filterChain) throws ServletException, IOException {
       
     String jwt = extractJwt(request);
 
-    boolean hasValidJwt = hasText(jwt) && authenticationTokenService.isValidJwt(jwt);
+    boolean isValidJwt = hasText(jwt) && authenticationTokenService.isValidJwt(jwt);
 
-    if (hasValidJwt) {
+    if (isValidJwt) {
       UsernamePasswordAuthenticationToken auth = buildAuthenticationToken(jwt);
       SecurityContextHolder.getContext().setAuthentication(auth);
     }

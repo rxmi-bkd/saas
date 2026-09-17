@@ -1,7 +1,5 @@
 package org.bkd.saas.security;
 
-import static org.bkd.saas.shared.Constants.PUBLIC_BASE_PATH;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.bkd.saas.shared.Constants.PUBLIC_BASE_PATH;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -26,7 +26,8 @@ public class SecurityConfiguration {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) {
-    return http.csrf(AbstractHttpConfigurer::disable)
+    return http
+        .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(sessionConfigurer())
         .authorizeHttpRequests(httpConfigurer())
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -37,14 +38,12 @@ public class SecurityConfiguration {
     return session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
   }
 
-  private Customizer<
-          AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry>
-      httpConfigurer() {
-    return auth ->
-        auth.requestMatchers(PUBLIC_BASE_PATH + "/**", "/error")
-            .permitAll()
-            .anyRequest()
-            .authenticated();
+  private Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> httpConfigurer() {
+    return auth -> auth
+        .requestMatchers(PUBLIC_BASE_PATH + "/**", "/error")
+        .permitAll()
+        .anyRequest()
+        .authenticated();
   }
 
   @Bean
