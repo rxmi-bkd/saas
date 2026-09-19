@@ -3,6 +3,7 @@ databaseChangeLog:
       id: 002-insert-default-users
       author: rxmi-bkd
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      context: local
       changes:
         - insert:
             tableName: app_user

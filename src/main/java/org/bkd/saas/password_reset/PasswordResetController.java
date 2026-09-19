@@ -1,6 +1,7 @@
 package org.bkd.saas.password_reset;
 
-import static org.bkd.saas.shared.Constants.PUBLIC_BASE_PATH;
+import static org.bkd.saas.shared.Routes.PasswordReset.FORGOT_PASSWORD;
+import static org.bkd.saas.shared.Routes.PasswordReset.RESET_PASSWORD;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class PasswordResetController {
-  private final PasswordResetService passwordResetService;
+    private final PasswordResetService passwordResetService;
 
-  public static final String PUBLIC_ENDPOINT = PUBLIC_BASE_PATH + "/password";
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping(FORGOT_PASSWORD)
+    public void forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        passwordResetService.forgotPassword(request.email());
+    }
 
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PostMapping(PUBLIC_ENDPOINT + "/forgot")
-  public void forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-    passwordResetService.forgotPassword(request.email());
-  }
-
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PostMapping(PUBLIC_ENDPOINT + "/reset")
-  public void resetPassword(@Valid @RequestBody PasswordResetRequest request) {
-    passwordResetService.resetPassword(request.jwt(), request.newPassword());
-  }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping(RESET_PASSWORD)
+    public void resetPassword(@Valid @RequestBody PasswordResetRequest request) {
+        passwordResetService.resetPassword(request.jwt(), request.newPassword());
+    }
 }

@@ -14,18 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class AuthenticationService {
-  private final UserService userService;
-  private final PasswordEncoder passwordEncoder;
-  private final AuthenticationTokenService authenticationTokenService;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationTokenService authenticationTokenService;
 
-  public LoginResponse login(String email, String password) {
-    Optional<UserWithPasswordResponse> user = userService.readOptionalUserWithPassword(email);
-
-    boolean hasValidCredentials =
-        user.isPresent() && passwordEncoder.matches(password, user.get().password());
-
-    if (!hasValidCredentials) throw new InvalidCredentialsException();
-    String accessToken = authenticationTokenService.createJwt(user.get().id(), user.get().role());
-    return new LoginResponse(accessToken);
-  }
+    public LoginResponse login(String email, String password) {
+        Optional<UserWithPasswordResponse> user = userService.readOptionalUserWithPassword(email);
+        if(user.isEmpty()) throw new InvalidCredentialsException();
+        boolean isPasswordCorrect = passwordEncoder.matches(password, user.get().password());
+        if (!isPasswordCorrect) throw new InvalidCredentialsException();
+        String accessToken = authenticationTokenService.createJwt(user.get().id(), user.get().role());
+        return new LoginResponse(accessToken);
+    }
 }

@@ -21,45 +21,45 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AppUser {
 
-  @Id
-  @Column(nullable = false, updatable = false)
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID id;
+    @Id
+    @Column(nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-  @Column(nullable = false)
-  private String email;
+    @Column(nullable = false)
+    private String email;
 
-  @Column(nullable = false)
-  private String password;
+    @Column(nullable = false)
+    private String password;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
-  @Column(nullable = false)
-  private boolean enabled = true;
+    @Column(nullable = false)
+    private boolean enabled = true;
 
-  @Column(nullable = false, updatable = false)
-  private Instant createdAt;
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
 
-  @Column(nullable = false)
-  private Instant updatedAt;
+    @Column(nullable = false)
+    private Instant updatedAt;
 
-  public AppUser(String email, String password, Role role) {
-    this.email = email;
-    this.password = password;
-    this.role = role;
-  }
+    public AppUser(String email, String password, Role role) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
 
-  @PrePersist
-  public void onCreate() {
-    Instant now = Instant.now();
-    if (createdAt == null) createdAt = now;
-    updatedAt = now;
-  }
+    @PrePersist
+    public void onCreate() {
+        Instant now = Instant.now();
+        if (createdAt == null) createdAt = now;
+        updatedAt = now;
+    }
 
-  @PreUpdate
-  public void onUpdate() {
-    updatedAt = Instant.now();
-  }
+    @PreUpdate
+    public void onUpdate() {
+        updatedAt = Instant.now();
+    }
 }

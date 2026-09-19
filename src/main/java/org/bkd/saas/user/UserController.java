@@ -1,7 +1,9 @@
 package org.bkd.saas.user;
 
-import static org.bkd.saas.shared.Constants.BASE_PATH;
-import static org.bkd.saas.shared.Constants.PUBLIC_BASE_PATH;
+import static org.bkd.saas.shared.Routes.User.ME;
+import static org.bkd.saas.shared.Routes.User.CREATE_USER;
+import static org.bkd.saas.shared.Routes.User.UPDATE_USER_EMAIL;
+import static org.bkd.saas.shared.Routes.User.UPDATE_USER_PASSWORD;
 
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -23,33 +25,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
-  private final UserService userService;
+    private final UserService userService;
 
-  public static final String PRIVATE_ENDPOINT = BASE_PATH + "/users";
-  public static final String PUBLIC_ENDPOINT = PUBLIC_BASE_PATH + "/users";
+    @GetMapping(ME)
+    public UserResponse me(@AuthenticationPrincipal UUID userId) {
+        return userService.readUser(userId);
+    }
 
-  @GetMapping(PRIVATE_ENDPOINT + "/me")
-  public UserResponse me(@AuthenticationPrincipal UUID userId) {
-    return userService.readUser(userId);
-  }
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(CREATE_USER)
+    public UserResponse createUser(@Valid @RequestBody CreateUserRequest request) {
+        return userService.createUser(request.email(), request.password());
+    }
 
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping(PUBLIC_ENDPOINT)
-  public UserResponse register(@Valid @RequestBody CreateUserRequest request) {
-    return userService.createUser(request.email(), request.password());
-  }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping(UPDATE_USER_PASSWORD)
+    public void updateUserPassword(@AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateUserPasswordRequest request) {
+        userService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
+    }
 
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PutMapping(PRIVATE_ENDPOINT + "/password")
-  public void updatePassword(
-      @AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateUserPasswordRequest request) {
-    userService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
-  }
-
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PutMapping(PRIVATE_ENDPOINT + "/email")
-  public void updateEmail(
-      @AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateUserEmailRequest request) {
-    userService.updateUserEmail(userId, request.email());
-  }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping(UPDATE_USER_EMAIL)
+    public void updateUserEmail(@AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateUserEmailRequest request) {
+        userService.updateUserEmail(userId, request.email());
+    }
 }

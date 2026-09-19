@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.UNAUTHORIZED)
 public class InvalidCredentialsException extends RuntimeException {
-  public InvalidCredentialsException() {
-    super("Invalid email or password");
-  }
+    public InvalidCredentialsException() {
+        super("Invalid email or password");
+    }
 }

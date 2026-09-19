@@ -11,11 +11,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @Getter
 @RequiredArgsConstructor
 public enum Role {
-  ROLE_USER,
-  ROLE_ADMIN;
+    ROLE_USER,
+    ROLE_ADMIN;
 
-  public List<GrantedAuthority> getAuthorities() {
-    GrantedAuthority authority = new SimpleGrantedAuthority(this.name());
-    return singletonList(authority);
-  }
+    public List<GrantedAuthority> getAuthorities() {
+        GrantedAuthority authority = new SimpleGrantedAuthority(this.name());
+        return singletonList(authority);
+    }
 }

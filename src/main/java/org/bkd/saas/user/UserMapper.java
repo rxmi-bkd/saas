@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-  UserResponse toUserResponse(AppUser appUser);
+    UserResponse toUserResponse(AppUser appUser);
 
-  UserWithPasswordResponse toUserWithPasswordResponse(AppUser appUser);
+    UserWithPasswordResponse toUserWithPasswordResponse(AppUser appUser);
 }
