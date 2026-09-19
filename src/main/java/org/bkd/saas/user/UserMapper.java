@@ -1,13 +1,14 @@
 package org.bkd.saas.user;
 
-import org.bkd.saas.user.responses.UserResponse;
-import org.bkd.saas.user.responses.UserWithPasswordResponse;
+import org.bkd.saas.user.db.AppUserEntity;
+import org.bkd.saas.user.dto.UserDto;
+import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    UserResponse toUserResponse(AppUser appUser);
+    UserDto toUserDto(AppUserEntity appUserEntity);
 
-    UserWithPasswordResponse toUserWithPasswordResponse(AppUser appUser);
+    UserWithPasswordDto toUserWithPasswordDto(AppUserEntity appUserEntity);
 }

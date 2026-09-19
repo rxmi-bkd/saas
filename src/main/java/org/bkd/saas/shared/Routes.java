@@ -17,6 +17,14 @@ public class Routes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class SocialAuthentication {
+
+        public static final String PUBLIC_ENDPOINT = PUBLIC_BASE_PATH + "/social-authentication";
+        public static final String AUTHORIZE = PUBLIC_ENDPOINT + "/authorize/{platform}";
+        public static final String HANDLE_CALLBACK = PUBLIC_ENDPOINT + "/callback/{platform}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class PasswordReset {
 
         public static final String PUBLIC_ENDPOINT = PUBLIC_BASE_PATH + "/password";

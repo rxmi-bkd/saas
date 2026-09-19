@@ -3,6 +3,7 @@ package org.bkd.saas.security;
 import static org.bkd.saas.shared.Routes.PUBLIC_BASE_PATH;
 
 import lombok.RequiredArgsConstructor;
+import org.bkd.saas.security.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -35,7 +36,8 @@ public class SecurityConfiguration {
     }
 
     private Customizer<SessionManagementConfigurer<HttpSecurity>> sessionConfigurer() {
-        return session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        return session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     private Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> httpConfigurer() {
