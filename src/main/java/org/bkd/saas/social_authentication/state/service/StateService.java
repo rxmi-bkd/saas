@@ -1,11 +1,11 @@
-package org.bkd.saas.state.service;
+package org.bkd.saas.social_authentication.state.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.state.StateMapper;
-import org.bkd.saas.state.db.StateEntity;
-import org.bkd.saas.state.db.StateRepository;
-import org.bkd.saas.state.dto.StateDto;
-import org.bkd.saas.state.exception.StateNotFoundException;
+import org.bkd.saas.social_authentication.state.StateMapper;
+import org.bkd.saas.social_authentication.state.db.StateEntity;
+import org.bkd.saas.social_authentication.state.db.StateRepository;
+import org.bkd.saas.social_authentication.state.dto.StateDto;
+import org.bkd.saas.social_authentication.state.exception.StateNotFoundException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

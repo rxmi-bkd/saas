@@ -1,10 +1,10 @@
 package org.bkd.saas.social_authentication;
 
-import org.bkd.saas.platform.Platform;
+import org.bkd.saas.social_authentication.platform.Platform;
 
 public interface SocialAuthenticationUrlBuilder {
 
-  boolean supports(Platform platform);
+    boolean supports(Platform platform);
 
-  String buildUrl();
+    String buildUrl();
 }
