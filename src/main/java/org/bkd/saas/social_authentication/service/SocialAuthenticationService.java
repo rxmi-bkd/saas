@@ -1,27 +1,22 @@
 package org.bkd.saas.social_authentication.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.social_authentication.SocialAuthenticationUrlBuilder;
 import org.bkd.saas.social_authentication.platform.Platform;
 import org.bkd.saas.social_authentication.platform.exception.UnsupportedPlatformException;
-import org.bkd.saas.social_authentication.state.dto.StateDto;
-import org.bkd.saas.social_authentication.state.service.StateService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class SocialAuthenticationService {
-
-    private final StateService stateService;
     private final List<SocialAuthenticationUrlBuilder> socialAuthenticationUrlBuilders;
 
     public String authorize(Platform platform) {
         SocialAuthenticationUrlBuilder urlBuilder = resolveUrlBuilder(platform);
-        String url = urlBuilder.buildUrl();
-        StateDto state = stateService.createState();
-        return url + "&state=" + state.value();
+        return urlBuilder.buildUrl();
     }
 
     private SocialAuthenticationUrlBuilder resolveUrlBuilder(Platform platform) {

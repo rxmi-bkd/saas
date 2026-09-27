@@ -1,20 +1,8 @@
 package org.bkd.saas.social_authentication;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.fostup.account.AccountService;
-import org.bkd.fostup.platform.Platform;
-import org.bkd.fostup.platform.UnsupportedPlatformException;
-import org.bkd.fostup.profile.Profile;
-import org.bkd.fostup.profile.ProfileService;
-import org.bkd.fostup.state.State;
-import org.bkd.fostup.state.StateExpiredException;
-import org.bkd.fostup.state.StateService;
-import org.bkd.fostup.tokens.TokenManager;
-import org.bkd.fostup.tokens.Tokens;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 
 @Service
@@ -22,6 +10,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OAuth2CallbackHandler {
 
+    /*
     private final StateService stateService;
     private final List<TokenManager> tokenManagers;
     private final List<ProfileService> profileServices;
@@ -81,4 +70,5 @@ public class OAuth2CallbackHandler {
 
         return state_;
     }
+     */
 }
