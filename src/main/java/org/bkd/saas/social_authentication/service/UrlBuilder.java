@@ -1,6 +1,6 @@
 package org.bkd.saas.social_authentication.service;
 
-public interface SocialAuthenticationUrlBuilder extends PlatformScoped {
+public interface UrlBuilder extends PlatformScoped {
 
     String buildUrl();
 }

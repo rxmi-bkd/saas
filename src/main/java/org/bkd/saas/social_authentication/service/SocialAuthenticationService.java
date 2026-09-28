@@ -20,19 +20,19 @@ import java.util.List;
 public class SocialAuthenticationService {
     private final UserService userService;
     private final StateService stateService;
-    private final List<SocialAuthenticationUrlBuilder> socialAuthenticationUrlBuilders;
-    private final List<SocialAuthenticationTokenExchanger> socialAuthenticationTokenExchangers;
-    private final List<SocialAuthenticationProfileFetcher> socialAuthenticationProfileFetchers;
+    private final List<UrlBuilder> urlBuilders;
+    private final List<TokenExchanger> tokenExchangers;
+    private final List<ProfileFetcher> profileFetchers;
 
     public String authorize(PlatformEnum platform) {
-        SocialAuthenticationUrlBuilder urlBuilder = resolve(socialAuthenticationUrlBuilders, platform, "url builder");
+        UrlBuilder urlBuilder = resolve(urlBuilders, platform, "url builder");
         return urlBuilder.buildUrl();
     }
 
     public void handleCallback(String code, String state, PlatformEnum platform) {
         StateDto state_ = validateState(state);
-        SocialAuthenticationTokenExchanger tokenExchanger = resolve(socialAuthenticationTokenExchangers, platform, "token exchanger");
-        SocialAuthenticationProfileFetcher profileFetcher = resolve(socialAuthenticationProfileFetchers, platform, "profile fetcher");
+        TokenExchanger tokenExchanger = resolve(tokenExchangers, platform, "token exchanger");
+        ProfileFetcher profileFetcher = resolve(profileFetchers, platform, "profile fetcher");
         TokenDto tokens = tokenExchanger.exchangeCodeForTokens(code);
         ProfileDto profile = profileFetcher.fetchProfile(tokens);
         userService.readOrCreateUser(profile.email());

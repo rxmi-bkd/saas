@@ -17,7 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class GoogleService implements SocialAuthenticationUrlBuilder, SocialAuthenticationTokenExchanger, SocialAuthenticationProfileFetcher {
+public class GoogleService implements UrlBuilder, TokenExchanger, ProfileFetcher {
     private final RestClient restClient;
     private final StateService stateService;
     private final SocialAuthenticationConfigurations configurations;
