@@ -1,4 +1,4 @@
-package org.bkd.saas.social_authentication.state.db;
+package org.bkd.saas.state.db;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

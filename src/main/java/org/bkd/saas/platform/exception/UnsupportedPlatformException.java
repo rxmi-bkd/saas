@@ -1,7 +1,7 @@
-package org.bkd.saas.social_authentication.platform.exception;
+package org.bkd.saas.platform.exception;
 
 
-import org.bkd.saas.social_authentication.platform.Platform;
+import org.bkd.saas.platform.Platform;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

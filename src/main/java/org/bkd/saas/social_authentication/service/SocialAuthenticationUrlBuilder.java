@@ -1,6 +1,6 @@
 package org.bkd.saas.social_authentication.service;
 
-import org.bkd.saas.social_authentication.platform.Platform;
+import org.bkd.saas.platform.Platform;
 
 public interface SocialAuthenticationUrlBuilder {
 

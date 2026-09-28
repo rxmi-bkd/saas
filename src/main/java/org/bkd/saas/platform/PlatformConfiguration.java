@@ -1,4 +1,4 @@
-package org.bkd.saas.social_authentication.platform.configuration;
+package org.bkd.saas.platform;
 
 import lombok.Getter;
 import lombok.Setter;

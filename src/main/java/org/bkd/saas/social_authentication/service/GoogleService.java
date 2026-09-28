@@ -1,11 +1,11 @@
 package org.bkd.saas.social_authentication.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.social_authentication.platform.Platform;
-import org.bkd.saas.social_authentication.platform.configuration.PlatformConfiguration;
-import org.bkd.saas.social_authentication.platform.configuration.PlatformConfigurations;
-import org.bkd.saas.social_authentication.state.dto.StateDto;
-import org.bkd.saas.social_authentication.state.service.StateService;
+import org.bkd.saas.platform.Platform;
+import org.bkd.saas.platform.PlatformConfiguration;
+import org.bkd.saas.platform.PlatformConfigurations;
+import org.bkd.saas.state.dto.StateDto;
+import org.bkd.saas.state.service.StateService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;

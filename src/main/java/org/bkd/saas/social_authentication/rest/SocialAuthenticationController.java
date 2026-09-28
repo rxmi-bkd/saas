@@ -1,7 +1,7 @@
 package org.bkd.saas.social_authentication.rest;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.social_authentication.platform.Platform;
+import org.bkd.saas.platform.Platform;
 import org.bkd.saas.social_authentication.service.SocialAuthenticationService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

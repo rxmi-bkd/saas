@@ -1,8 +1,8 @@
 package org.bkd.saas.social_authentication.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.social_authentication.platform.Platform;
-import org.bkd.saas.social_authentication.platform.exception.UnsupportedPlatformException;
+import org.bkd.saas.platform.Platform;
+import org.bkd.saas.platform.exception.UnsupportedPlatformException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

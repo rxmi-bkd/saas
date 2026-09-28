@@ -1,4 +1,4 @@
-package org.bkd.saas.social_authentication.state.dto;
+package org.bkd.saas.state.dto;
 
 import java.time.Instant;
 import java.util.UUID;

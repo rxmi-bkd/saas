@@ -22,10 +22,10 @@ import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
 @RequiredArgsConstructor
 public class AuthenticationTokenService {
 
-    @Value("${app.jwt.access-token.secret}")
+    @Value("${app.jwt.authentication-token.secret}")
     private String secret;
 
-    @Value("${app.jwt.access-token.expiration}")
+    @Value("${app.jwt.authentication-token.expiration}")
     private long expirationInSeconds;
 
     private SecretKey key;
