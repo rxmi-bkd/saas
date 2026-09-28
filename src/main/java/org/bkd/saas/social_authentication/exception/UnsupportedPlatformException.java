@@ -1,14 +1,14 @@
-package org.bkd.saas.platform.exception;
+package org.bkd.saas.social_authentication.exception;
 
 
-import org.bkd.saas.platform.Platform;
+import org.bkd.saas.social_authentication.dto.PlatformEnum;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class UnsupportedPlatformException extends RuntimeException {
 
-    public UnsupportedPlatformException(Platform platform) {
+    public UnsupportedPlatformException(PlatformEnum platform) {
         super("Unsupported platform: " + platform);
     }
 }

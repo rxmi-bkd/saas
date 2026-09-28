@@ -1,26 +1,30 @@
 package org.bkd.saas.social_authentication.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.platform.Platform;
-import org.bkd.saas.platform.PlatformConfiguration;
-import org.bkd.saas.platform.PlatformConfigurations;
-import org.bkd.saas.state.dto.StateDto;
-import org.bkd.saas.state.service.StateService;
+import org.bkd.saas.social_authentication.configuration.SocialAuthenticationConfiguration;
+import org.bkd.saas.social_authentication.configuration.SocialAuthenticationConfigurations;
+import org.bkd.saas.social_authentication.dto.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class GoogleService implements SocialAuthenticationUrlBuilder {
+public class GoogleService implements SocialAuthenticationUrlBuilder, SocialAuthenticationTokenExchanger, SocialAuthenticationProfileFetcher {
+    private final RestClient restClient;
     private final StateService stateService;
-    private final PlatformConfigurations configurations;
+    private final SocialAuthenticationConfigurations configurations;
 
     @Override
-    public boolean supports(Platform platform) {
-        return platform == Platform.google;
+    public boolean supports(PlatformEnum platform) {
+        return platform == PlatformEnum.google;
     }
 
     @Override
@@ -37,7 +41,35 @@ public class GoogleService implements SocialAuthenticationUrlBuilder {
                 .toUriString();
     }
 
-    private PlatformConfiguration getConfiguration() {
+    @Override
+    public GoogleTokenDto exchangeCodeForTokens(String code) {
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("client_id", getConfiguration().getClientId());
+        form.add("client_secret", getConfiguration().getClientSecret());
+        form.add("redirect_uri", getConfiguration().getRedirectUri());
+        form.add("grant_type", getConfiguration().getGrantType());
+        form.add("code", code);
+
+        return restClient
+                .post()
+                .uri(getConfiguration().getTokenUri())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(form)
+                .retrieve()
+                .body(GoogleTokenDto.class);
+    }
+
+    @Override
+    public ProfileDto fetchProfile(TokenDto tokenDto) {
+        return restClient
+                .get()
+                .uri(getConfiguration().getUserInfoUri())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.accessToken())
+                .retrieve()
+                .body(ProfileDto.class);
+    }
+
+    private SocialAuthenticationConfiguration getConfiguration() {
         return configurations.getGoogle();
     }
 }

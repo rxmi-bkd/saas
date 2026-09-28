@@ -22,12 +22,12 @@ public class AppUserEntity {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.ROLE_USER;
+    private RoleEnum role = RoleEnum.ROLE_USER;
 
     @Column(nullable = false)
     private boolean enabled = true;

@@ -29,7 +29,7 @@ databaseChangeLog:
                   type: VARCHAR(255)
               - column:
                   constraints:
-                    nullable: false
+                    nullable: true
                   name: password
                   type: VARCHAR(255)
               - column:

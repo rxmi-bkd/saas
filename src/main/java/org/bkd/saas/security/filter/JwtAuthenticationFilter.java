@@ -1,20 +1,21 @@
 package org.bkd.saas.security.filter;
 
-import static org.springframework.util.StringUtils.hasText;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.authentication.service.AuthenticationTokenService;
-import org.bkd.saas.user.db.Role;
+import org.bkd.saas.user.db.RoleEnum;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.UUID;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Component
 @RequiredArgsConstructor
@@ -47,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private UsernamePasswordAuthenticationToken buildAuthenticationToken(String jwt) {
         UUID subject = authenticationTokenService.readSubject(jwt);
-        Role role = authenticationTokenService.readRole(jwt);
+        RoleEnum role = authenticationTokenService.readRole(jwt);
         return new UsernamePasswordAuthenticationToken(subject, null, role.getAuthorities());
     }
 }

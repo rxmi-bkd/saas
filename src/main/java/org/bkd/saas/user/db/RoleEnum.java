@@ -1,16 +1,17 @@
 package org.bkd.saas.user.db;
 
-import static java.util.Collections.singletonList;
-
-import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.List;
+
+import static java.util.Collections.singletonList;
+
 @Getter
 @RequiredArgsConstructor
-public enum Role {
+public enum RoleEnum {
     ROLE_USER,
     ROLE_ADMIN;
 

@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1790650000000-1
+      author: bouka
+      context: local
+      changes:
+        - insert:
+            tableName: app_user
+            columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
+                  name: email
+                  value: admin@admin.com
+              - column:
+                  name: password
+                  value: $2y$10$ad/HPy3QlulIu/cjJL8MbOwOrZhD9mvnODtGkZvrvrlQ1QyoFg5d2
+              - column:
+                  name: role
+                  value: ROLE_ADMIN
+              - column:
+                  name: enabled
+                  valueBoolean: true
+              - column:
+                  name: created_at
+                  valueComputed: now()
+              - column:
+                  name: updated_at
+                  valueComputed: now()

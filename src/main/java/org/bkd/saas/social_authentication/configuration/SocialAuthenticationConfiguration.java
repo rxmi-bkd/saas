@@ -1,4 +1,4 @@
-package org.bkd.saas.platform;
+package org.bkd.saas.social_authentication.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-public class PlatformConfiguration {
+public class SocialAuthenticationConfiguration {
     private String clientId;
     private String clientSecret;
     private String scope;

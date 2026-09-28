@@ -1,19 +1,20 @@
 package org.bkd.saas.user.service;
 
-import java.util.Optional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.user.UserMapper;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
+import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.EmailAlreadyUsedException;
 import org.bkd.saas.user.exception.PasswordMismatchException;
 import org.bkd.saas.user.exception.UserNotFoundException;
-import org.bkd.saas.user.dto.UserDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -45,6 +46,13 @@ public class UserService {
                 .findByEmail(email)
                 .map(userMapper::toUserDto)
                 .orElseThrow(UserNotFoundException::new);
+    }
+
+    public UserDto readOrCreateUser(String email) {
+        return userRepository
+                .findByEmail(email)
+                .map(userMapper::toUserDto)
+                .orElseGet(() -> createUser(email, null));
     }
 
     public UserWithPasswordDto readUserWithPassword(UUID userId) {

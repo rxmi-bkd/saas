@@ -5,7 +5,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.user.db.Role;
+import org.bkd.saas.user.db.RoleEnum;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +37,7 @@ public class AuthenticationTokenService {
         key = hmacShaKeyFor(secret.getBytes());
     }
 
-    public String createJwt(UUID subject, Role role) {
+    public String createJwt(UUID subject, RoleEnum role) {
         String subjectString = subject.toString();
         Instant now = Instant.now();
         Instant now_plus_expiration = now.plusSeconds(expirationInSeconds);
@@ -66,10 +66,10 @@ public class AuthenticationTokenService {
         return UUID.fromString(claims.getSubject());
     }
 
-    public Role readRole(String jwt) {
+    public RoleEnum readRole(String jwt) {
         Claims claims = readJwt(jwt);
         String role = claims.get(ROLE_CLAIM, String.class);
-        return Role.valueOf(role);
+        return RoleEnum.valueOf(role);
     }
 
     public boolean isValidJwt(String jwt) {

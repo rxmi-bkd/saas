@@ -1,4 +1,4 @@
-package org.bkd.saas.platform;
+package org.bkd.saas.social_authentication.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 @Configuration
 @ConfigurationProperties(prefix = "app.social-authentication")
-public class PlatformConfigurations {
-    private PlatformConfiguration google;
+public class SocialAuthenticationConfigurations {
+    private SocialAuthenticationConfiguration google;
 }

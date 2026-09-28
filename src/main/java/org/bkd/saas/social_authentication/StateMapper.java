@@ -1,7 +1,7 @@
-package org.bkd.saas.state;
+package org.bkd.saas.social_authentication;
 
-import org.bkd.saas.state.db.StateEntity;
-import org.bkd.saas.state.dto.StateDto;
+import org.bkd.saas.social_authentication.db.StateEntity;
+import org.bkd.saas.social_authentication.dto.StateDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
