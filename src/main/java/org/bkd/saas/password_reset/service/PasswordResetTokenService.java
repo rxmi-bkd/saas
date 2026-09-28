@@ -1,33 +1,34 @@
 package org.bkd.saas.password_reset.service;
 
-import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
-import java.time.Instant;
-import java.util.Date;
-import java.util.UUID;
-import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.user.service.UserService;
-import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
+import org.bkd.saas.user.exception.UserNotFoundException;
+import org.bkd.saas.user.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.crypto.SecretKey;
+import java.time.Instant;
+import java.util.Date;
+import java.util.UUID;
+
+import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class PasswordResetTokenService {
 
-    @Value("${app.jwt.reset-password.secret}")
+    @Value("${app.jwt.reset-password-token.secret}")
     private String secret;
 
-    @Value("${app.jwt.reset-password.expiration}")
+    @Value("${app.jwt.reset-password-token.expiration}")
     private long expirationInSeconds;
 
     private SecretKey key;
