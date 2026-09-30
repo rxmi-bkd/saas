@@ -24,6 +24,35 @@ class ArchitectureTests {
   private static final String BASE_PACKAGE = "org.bkd.saas";
 
   @Test
+  void all_controller_methods_should_return_response_entity() {
+    JavaClasses classes = mainClasses();
+
+    ArchRule rule =
+      methods()
+        .that()
+        .areDeclaredInClassesThat()
+        .areAnnotatedWith(RestController.class)
+        .should()
+        .haveRawReturnType(ResponseEntity.class);
+
+    rule.check(classes);
+  }
+
+  @Test
+  void all_services_should_have_transactional_annotation() {
+    JavaClasses classes = mainClasses();
+
+    ArchRule rule =
+      classes()
+        .that()
+        .areAnnotatedWith(Service.class)
+        .should()
+        .beAnnotatedWith(Transactional.class);
+
+    rule.check(classes);
+  }
+
+  @Test
   void all_exceptions_should_have_response_status_annotation() {
     JavaClasses classes = mainClasses();
 
@@ -38,31 +67,9 @@ class ArchitectureTests {
   }
 
   @Test
-  void all_services_should_have_transactional_annotation() {
+  void all_classes_should_be_public() {
     JavaClasses classes = mainClasses();
-
-    ArchRule rule =
-        classes()
-            .that()
-            .areAnnotatedWith(Service.class)
-            .should()
-            .beAnnotatedWith(Transactional.class);
-
-    rule.check(classes);
-  }
-
-  @Test
-  void all_controller_methods_should_return_response_entity() {
-    JavaClasses classes = mainClasses();
-
-    ArchRule rule =
-        methods()
-            .that()
-            .areDeclaredInClassesThat()
-            .areAnnotatedWith(RestController.class)
-            .should()
-            .haveRawReturnType(ResponseEntity.class);
-
+    ArchRule rule = classes().should().bePublic();
     rule.check(classes);
   }
 
@@ -98,13 +105,6 @@ class ArchitectureTests {
     checkPackageHasSuffix(classes, "..dto", "Dto", "Enum");
     checkPackageHasSuffix(classes, "..mapper", "Mapper", "MapperImpl");
     checkPackageHasSuffix(classes, "..exception", "Exception");
-  }
-
-  @Test
-  void all_classes_should_be_public() {
-    JavaClasses classes = mainClasses();
-    ArchRule rule = classes().should().bePublic();
-    rule.check(classes);
   }
 
   private static JavaClasses mainClasses() {
