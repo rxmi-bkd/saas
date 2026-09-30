@@ -1,7 +1,6 @@
 package org.bkd.saas.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.user.UserMapper;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;
@@ -9,6 +8,7 @@ import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.EmailAlreadyUsedException;
 import org.bkd.saas.user.exception.PasswordMismatchException;
 import org.bkd.saas.user.exception.UserNotFoundException;
+import org.bkd.saas.user.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

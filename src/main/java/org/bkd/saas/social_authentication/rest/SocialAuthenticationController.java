@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.bkd.saas.shared.Routes.SocialAuthentication.AUTHORIZE;
-import static org.bkd.saas.shared.Routes.SocialAuthentication.HANDLE_CALLBACK;
+import static org.bkd.saas.social_authentication.rest.Routes.AUTHORIZE;
+import static org.bkd.saas.social_authentication.rest.Routes.HANDLE_CALLBACK;
 
 @RestController
 @RequiredArgsConstructor

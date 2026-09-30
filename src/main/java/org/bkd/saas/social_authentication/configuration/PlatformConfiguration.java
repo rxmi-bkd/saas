@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-public class SocialAuthenticationConfiguration {
+public class PlatformConfiguration {
     private String clientId;
     private String clientSecret;
     private String scope;

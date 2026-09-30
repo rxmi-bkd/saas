@@ -1,7 +1,5 @@
 package org.bkd.saas.authentication.rest;
 
-import static org.bkd.saas.shared.Routes.Authentication.LOGIN;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.authentication.dto.AuthenticationTokenDto;
@@ -10,6 +8,8 @@ import org.bkd.saas.authentication.service.AuthenticationService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import static org.bkd.saas.authentication.rest.Routes.LOGIN;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,5 +1,5 @@
 package org.bkd.saas.social_authentication.dto;
 
-public interface TokenDto {
+public interface AccessTokenDto {
     String accessToken();
 }

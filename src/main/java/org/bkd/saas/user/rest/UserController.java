@@ -1,26 +1,19 @@
 package org.bkd.saas.user.rest;
 
-import static org.bkd.saas.shared.Routes.User.ME;
-import static org.bkd.saas.shared.Routes.User.CREATE_USER;
-import static org.bkd.saas.shared.Routes.User.UPDATE_USER_EMAIL;
-import static org.bkd.saas.shared.Routes.User.UPDATE_USER_PASSWORD;
-
 import jakarta.validation.Valid;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.user.service.UserService;
+import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.bkd.saas.user.rest.request.UpdateUserEmailRequest;
 import org.bkd.saas.user.rest.request.UpdateUserPasswordRequest;
-import org.bkd.saas.user.dto.UserDto;
+import org.bkd.saas.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+import static org.bkd.saas.user.rest.Routes.*;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package org.bkd.saas.user;
+package org.bkd.saas.user.mapper;
 
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.dto.UserDto;

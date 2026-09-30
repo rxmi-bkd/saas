@@ -1,10 +1,10 @@
 package org.bkd.saas.social_authentication.service;
 
 import lombok.RequiredArgsConstructor;
+import org.bkd.saas.social_authentication.dto.AccessTokenDto;
 import org.bkd.saas.social_authentication.dto.PlatformEnum;
 import org.bkd.saas.social_authentication.dto.ProfileDto;
 import org.bkd.saas.social_authentication.dto.StateDto;
-import org.bkd.saas.social_authentication.dto.TokenDto;
 import org.bkd.saas.social_authentication.exception.StateExpiredException;
 import org.bkd.saas.social_authentication.exception.UnsupportedPlatformException;
 import org.bkd.saas.user.service.UserService;
@@ -33,7 +33,7 @@ public class SocialAuthenticationService {
         StateDto state_ = validateState(state);
         TokenExchanger tokenExchanger = resolve(tokenExchangers, platform, "token exchanger");
         ProfileFetcher profileFetcher = resolve(profileFetchers, platform, "profile fetcher");
-        TokenDto tokens = tokenExchanger.exchangeCodeForTokens(code);
+        AccessTokenDto tokens = tokenExchanger.exchangeCodeForTokens(code);
         ProfileDto profile = profileFetcher.fetchProfile(tokens);
         userService.readOrCreateUser(profile.email());
         stateService.deleteState(state_.id());

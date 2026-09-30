@@ -1,4 +1,4 @@
-package org.bkd.saas.social_authentication;
+package org.bkd.saas.social_authentication.mapper;
 
 import org.bkd.saas.social_authentication.db.StateEntity;
 import org.bkd.saas.social_authentication.dto.StateDto;

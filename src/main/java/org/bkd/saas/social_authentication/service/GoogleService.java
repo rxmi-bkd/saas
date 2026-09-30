@@ -1,8 +1,8 @@
 package org.bkd.saas.social_authentication.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.social_authentication.configuration.SocialAuthenticationConfiguration;
-import org.bkd.saas.social_authentication.configuration.SocialAuthenticationConfigurations;
+import org.bkd.saas.social_authentication.configuration.PlatformConfiguration;
+import org.bkd.saas.social_authentication.configuration.PlatformConfigurations;
 import org.bkd.saas.social_authentication.dto.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,7 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class GoogleService implements UrlBuilder, TokenExchanger, ProfileFetcher {
     private final RestClient restClient;
     private final StateService stateService;
-    private final SocialAuthenticationConfigurations configurations;
+    private final PlatformConfigurations configurations;
 
     @Override
     public boolean supports(PlatformEnum platform) {
@@ -60,16 +60,16 @@ public class GoogleService implements UrlBuilder, TokenExchanger, ProfileFetcher
     }
 
     @Override
-    public ProfileDto fetchProfile(TokenDto tokenDto) {
+    public ProfileDto fetchProfile(AccessTokenDto accessTokenDto) {
         return restClient
                 .get()
                 .uri(getConfiguration().getUserInfoUri())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.accessToken())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.accessToken())
                 .retrieve()
                 .body(ProfileDto.class);
     }
 
-    private SocialAuthenticationConfiguration getConfiguration() {
+    private PlatformConfiguration getConfiguration() {
         return configurations.getGoogle();
     }
 }
