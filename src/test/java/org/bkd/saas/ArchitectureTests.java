@@ -28,12 +28,12 @@ class ArchitectureTests {
     JavaClasses classes = mainClasses();
 
     ArchRule rule =
-      methods()
-        .that()
-        .areDeclaredInClassesThat()
-        .areAnnotatedWith(RestController.class)
-        .should()
-        .haveRawReturnType(ResponseEntity.class);
+        methods()
+            .that()
+            .areDeclaredInClassesThat()
+            .areAnnotatedWith(RestController.class)
+            .should()
+            .haveRawReturnType(ResponseEntity.class);
 
     rule.check(classes);
   }
@@ -43,11 +43,11 @@ class ArchitectureTests {
     JavaClasses classes = mainClasses();
 
     ArchRule rule =
-      classes()
-        .that()
-        .areAnnotatedWith(Service.class)
-        .should()
-        .beAnnotatedWith(Transactional.class);
+        classes()
+            .that()
+            .areAnnotatedWith(Service.class)
+            .should()
+            .beAnnotatedWith(Transactional.class);
 
     rule.check(classes);
   }
