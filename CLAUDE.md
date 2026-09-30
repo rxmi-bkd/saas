@@ -1,40 +1,80 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This `CLAUDE.md` file provides guidelines for Claude Code (claude.ai/code) when interacting with the code in this repository.
 
 ## Stack
 
-Spring Boot 4.1 (webmvc), Java 21, Maven wrapper, PostgreSQL 17, Liquibase, Spring Security with JWT (jjwt), MapStruct + Lombok, ArchUnit. Spotless version is declared in `pom.xml` properties.
+The project utilizes Spring Boot 4.1, Java 21, Maven Wrapper, PostgreSQL 17, Liquibase, Spring Security with JWT (jjwt), MapStruct, Lombok, ArchUnit, and Spotless.
 
 ## Commands
 
+The following commands are standard for this project:
+
 ```
-docker compose up -d              # Postgres (compose.yml); also auto-started via spring.docker.compose.file
-./mvnw spring-boot:run            # run the app (needs env vars, see below)
-./mvnw test                       # all tests
-./mvnw test -Dtest=ArchitectureTests#all_services_should_have_transactional_annotation   # single test
+docker compose up -d                                                                   # Starts PostgreSQL (via compose.yml); also auto-starts via spring.docker.compose.file
+./mvnw spring-boot:run                                                                 # Runs the application (requires environment variables)
+./mvnw test                                                                            # Runs all tests
+./mvnw test -Dtest=ArchitectureTests#all_services_should_have_transactional_annotation # Runs a single designated test
+./mvnw spotless:apply                                                                  # Formats code using google-java-format (use spotless:check to verify)
 ```
 
-Configuration comes from environment variables (`.env.example` lists them): `DB_*`, `JWT_AUTHENTICATION_TOKEN_*`, `JWT_RESET_PASSWORD_TOKEN_*`, `GOOGLE_CLIENT_ID`, `GOOGLE_SECRET`. `application-local.properties` sets the Liquibase context `local`. The Google redirect URI is hardcoded to `localhost:8080` in `application.properties`. `spring.jpa.hibernate.ddl-auto=validate`, so schema changes must go through a Liquibase changelog in `src/main/resources/db/changelog/v1/` (registered in `db.changelog-master.yaml`).
+## Project Structure
 
-## Architecture
+Code is organized by feature (package-by-feature) under `src/main/java/org/bkd/saas/`. Do not group code by technical layer at the top level.
 
-Package-by-feature under `org.bkd.saas`: `authentication`, `password_reset`, `social_authentication`, `user`, plus `security` (filter chain and `JwtAuthenticationFilter`) and `shared`. Within a feature, the layout is `rest` (controllers, `request/`, `Routes`), `service`, `db` (entities, repositories), `dto`, `mapper` (MapStruct), `exception`.
+* Each feature is one top-level package named in snake_case and must follow this layout, creating only the sub-packages it needs:
 
-Conventions visible across the code:
-- **Routes**: each feature has a `rest/Routes` constants class (private constructor) built on `shared/Routes` (`/api/v1`, `/api/v1/public`). Put new endpoint paths there, not inline in controllers.
-- **Exceptions**: every exception class must carry `@ResponseStatus`. The HTTP mapping lives on the exception, not in a controller advice.
-- **Services**: every `@Service` must be `@Transactional`.
-- Both rules are enforced by `src/test/java/org/bkd/saas/ArchitectureTests.java`, so run it after adding services or exceptions.
-- Entities are not exposed directly. Controllers and services use DTOs converted by MapStruct mappers.
+```
+src/main/java/org/bkd/saas/<feature>/
+├── rest/             # Controller, Routes
+│   └── request/      # Request records
+├── service/          # Services
+├── db/               # Entities, Repositories
+├── dto/              # Dtos, Enums
+├── mapper/           # MapStruct Mappers
+└── exception/        # Exceptions
+```
 
-### Two separate JWT token types
-`AuthenticationTokenService` (login/session) and `PasswordResetTokenService` use different secrets and expirations (`app.jwt.authentication-token.*` vs `app.jwt.reset-password-token.*`).
+* Sub-packages must match the Naming table under Conventions; never put a class in a package that does not match its suffix.
+* Features must not reach into another feature's `db` package: use that feature's service and DTOs instead.
+* Cross-cutting code shared by several features goes in `shared/`.
+* Feature-specific configuration classes go in a `configuration/` sub-package of the feature.
+* Database schema changes go in Liquibase changelogs under `src/main/resources/db/changelog/`. Never edit an already-applied changeset.
+* Tests mirror the main package structure under `src/test/java/org/bkd/saas/`.
 
-### Social authentication (OAuth2 code flow)
-`SocialAuthenticationService` orchestrates: `authorize(platform)` builds the provider URL and persists a `State` (`StateService`/`StateEntity`) for CSRF protection. `handleCallback` validates the state and its expiry, exchanges the code for tokens, fetches the profile, reads or creates the user by email, then deletes the state.
+## Conventions
 
-Platform support is a strategy pattern. `UrlBuilder`, `TokenExchanger` and `ProfileFetcher` all extend `PlatformScoped` (`supports(PlatformEnum)`). `SocialAuthenticationService.resolve` picks the single matching bean and throws `UnsupportedPlatformException` if none match, or `IllegalStateException` if more than one does. To add a provider:
-- Add a `PlatformEnum` value.
-- Add a properties block under `app.social-authentication.<platform>.*`, bound through `PlatformConfiguration(s)`.
-- Implement the three interfaces, as `GoogleService` does for Google.
+* **Dependency injection**: Use `@RequiredArgsConstructor` with `private final` fields, and strictly avoid using `@Autowired`.
+
+
+* **Routes**: Each feature must include a `rest/Routes` constants class (with a private constructor) built upon `shared/Routes` (e.g., `/api/v1`, `/api/v1/public`). Define new endpoint paths within these constant classes rather than inline within the controllers.
+
+
+* **Exceptions**: Every exception class must be annotated with `@ResponseStatus`. The HTTP status mapping must be defined directly on the exception class itself, rather than handled in a global controller advice.
+
+
+* **Services**: Every class annotated with `@Service` must also be annotated with `@Transactional`.
+
+
+* **Naming**: A class's suffix must indicate its architectural layer, and its package must match this structure accordingly:
+
+
+
+| Package | Suffix |
+| --- | --- |
+| `rest` | `Controller` (along with the `Routes` constants class)
+| `rest/request` | `Request`<br> |
+| `service` | `Service`<br> |
+| `db` | `Entity`, `Repository`<br> |
+| `dto` | `Dto`, `Enum`<br> |
+| `mapper` | `Mapper`<br> |
+| `exception` | `Exception`<br> |
+
+* **Interfaces**: Interfaces should be named based on their specific roles without appending a general suffix. The only exceptions are `Mapper` and `Repository` interfaces, which must retain their respective package suffixes.
+
+
+* **Requests**: Request bodies must reside in the `rest/request` package of their respective features. They should be implemented as Java records and utilize Jakarta validation annotations (such as `@NotBlank` or `@Email`). They must be bound in controllers using `@Valid @RequestBody`. These records serve strictly as input for the REST layer; they should never be passed down to services or persisted in the database.
+
+
+* **Entities**: Entities must never be exposed directly to the REST layer. Only services are permitted to manipulate entities, and services must always return DTOs that have been mapped using MapStruct.
+
+
+* **Controllers**: Every method within a controller must return a `ResponseEntity`.

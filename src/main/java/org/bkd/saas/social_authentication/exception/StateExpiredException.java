@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class StateExpiredException extends RuntimeException {
 
-    public StateExpiredException() {
-        super("State expired");
-    }
+  public StateExpiredException() {
+    super("State expired");
+  }
 }

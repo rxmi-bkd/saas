@@ -23,33 +23,33 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(sessionConfigurer())
-                .authorizeHttpRequests(httpConfigurer())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) {
+    return http.csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(sessionConfigurer())
+        .authorizeHttpRequests(httpConfigurer())
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
+  }
 
-    private Customizer<SessionManagementConfigurer<HttpSecurity>> sessionConfigurer() {
-        return session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    }
+  private Customizer<SessionManagementConfigurer<HttpSecurity>> sessionConfigurer() {
+    return session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+  }
 
-    private Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> httpConfigurer() {
-        return auth -> auth
-                .requestMatchers(PUBLIC_BASE_PATH + "/**", "/error")
-                .permitAll()
-                .anyRequest()
-                .authenticated();
-    }
+  private Customizer<
+          AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry>
+      httpConfigurer() {
+    return auth ->
+        auth.requestMatchers(PUBLIC_BASE_PATH + "/**", "/error")
+            .permitAll()
+            .anyRequest()
+            .authenticated();
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 }

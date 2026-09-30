@@ -10,5 +10,5 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "app.social-authentication")
 public class PlatformConfigurations {
-    private PlatformConfiguration google;
+  private PlatformConfiguration google;
 }

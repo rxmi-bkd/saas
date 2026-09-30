@@ -1,5 +1,7 @@
 package org.bkd.saas.authentication.rest;
 
+import static org.bkd.saas.authentication.rest.Routes.LOGIN;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.authentication.dto.AuthenticationTokenDto;
@@ -9,16 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.bkd.saas.authentication.rest.Routes.LOGIN;
-
 @RestController
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-    private final AuthenticationService authenticationService;
+  private final AuthenticationService authenticationService;
 
-    @PostMapping(LOGIN)
-    public AuthenticationTokenDto login(@Valid @RequestBody LoginRequest request) {
-        return authenticationService.login(request.email(), request.password());
-    }
+  @PostMapping(LOGIN)
+  public AuthenticationTokenDto login(@Valid @RequestBody LoginRequest request) {
+    return authenticationService.login(request.email(), request.password());
+  }
 }

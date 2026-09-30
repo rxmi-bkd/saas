@@ -13,63 +13,61 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class GoogleService implements UrlBuilder, TokenExchanger, ProfileFetcher {
-    private final RestClient restClient;
-    private final StateService stateService;
-    private final PlatformConfigurations configurations;
+  private final RestClient restClient;
+  private final StateService stateService;
+  private final PlatformConfigurations configurations;
 
-    @Override
-    public boolean supports(PlatformEnum platform) {
-        return platform == PlatformEnum.google;
-    }
+  @Override
+  public boolean supports(PlatformEnum platform) {
+    return platform == PlatformEnum.google;
+  }
 
-    @Override
-    public String buildUrl() {
-        StateDto state = stateService.createState();
+  @Override
+  public String buildUrl() {
+    StateDto state = stateService.createState();
 
-        return UriComponentsBuilder
-                .fromUriString(getConfiguration().getAuthorizationUri())
-                .queryParam("client_id", getConfiguration().getClientId())
-                .queryParam("redirect_uri", getConfiguration().getRedirectUri())
-                .queryParam("response_type", getConfiguration().getResponseType())
-                .queryParam("scope", getConfiguration().getScope())
-                .queryParam("state", state.value())
-                .toUriString();
-    }
+    return UriComponentsBuilder.fromUriString(getConfiguration().getAuthorizationUri())
+        .queryParam("client_id", getConfiguration().getClientId())
+        .queryParam("redirect_uri", getConfiguration().getRedirectUri())
+        .queryParam("response_type", getConfiguration().getResponseType())
+        .queryParam("scope", getConfiguration().getScope())
+        .queryParam("state", state.value())
+        .toUriString();
+  }
 
-    @Override
-    public GoogleTokenDto exchangeCodeForTokens(String code) {
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("client_id", getConfiguration().getClientId());
-        form.add("client_secret", getConfiguration().getClientSecret());
-        form.add("redirect_uri", getConfiguration().getRedirectUri());
-        form.add("grant_type", getConfiguration().getGrantType());
-        form.add("code", code);
+  @Override
+  public GoogleTokenDto exchangeCodeForTokens(String code) {
+    MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+    form.add("client_id", getConfiguration().getClientId());
+    form.add("client_secret", getConfiguration().getClientSecret());
+    form.add("redirect_uri", getConfiguration().getRedirectUri());
+    form.add("grant_type", getConfiguration().getGrantType());
+    form.add("code", code);
 
-        return restClient
-                .post()
-                .uri(getConfiguration().getTokenUri())
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(form)
-                .retrieve()
-                .body(GoogleTokenDto.class);
-    }
+    return restClient
+        .post()
+        .uri(getConfiguration().getTokenUri())
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .body(form)
+        .retrieve()
+        .body(GoogleTokenDto.class);
+  }
 
-    @Override
-    public ProfileDto fetchProfile(AccessTokenDto accessTokenDto) {
-        return restClient
-                .get()
-                .uri(getConfiguration().getUserInfoUri())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.accessToken())
-                .retrieve()
-                .body(ProfileDto.class);
-    }
+  @Override
+  public ProfileDto fetchProfile(AccessToken accessToken) {
+    return restClient
+        .get()
+        .uri(getConfiguration().getUserInfoUri())
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken.accessToken())
+        .retrieve()
+        .body(ProfileDto.class);
+  }
 
-    private PlatformConfiguration getConfiguration() {
-        return configurations.getGoogle();
-    }
+  private PlatformConfiguration getConfiguration() {
+    return configurations.getGoogle();
+  }
 }

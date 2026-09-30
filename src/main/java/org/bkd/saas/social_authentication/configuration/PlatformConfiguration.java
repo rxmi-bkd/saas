@@ -8,13 +8,13 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 @Configuration
 public class PlatformConfiguration {
-    private String clientId;
-    private String clientSecret;
-    private String scope;
-    private String redirectUri;
-    private String responseType;
-    private String grantType;
-    private String authorizationUri;
-    private String tokenUri;
-    private String userInfoUri;
+  private String clientId;
+  private String clientSecret;
+  private String scope;
+  private String redirectUri;
+  private String responseType;
+  private String grantType;
+  private String authorizationUri;
+  private String tokenUri;
+  private String userInfoUri;
 }

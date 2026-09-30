@@ -1,12 +1,12 @@
 package org.bkd.saas.user.db;
 
 import jakarta.persistence.*;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.Instant;
-import java.util.UUID;
+import org.bkd.saas.user.dto.RoleEnum;
 
 @Entity(name = "app_user")
 @Getter
@@ -14,44 +14,44 @@ import java.util.UUID;
 @NoArgsConstructor
 public class AppUserEntity {
 
-    @Id
-    @Column(nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+  @Id
+  @Column(nullable = false, updatable = false)
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
-    @Column(nullable = false)
-    private String email;
+  @Column(nullable = false)
+  private String email;
 
-    @Column(nullable = true)
-    private String password;
+  @Column(nullable = true)
+  private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RoleEnum role = RoleEnum.ROLE_USER;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private RoleEnum role = RoleEnum.ROLE_USER;
 
-    @Column(nullable = false)
-    private boolean enabled = true;
+  @Column(nullable = false)
+  private boolean enabled = true;
 
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
+  @Column(nullable = false, updatable = false)
+  private Instant createdAt = Instant.now();
 
-    @Column(nullable = false)
-    private Instant updatedAt = Instant.now();
+  @Column(nullable = false)
+  private Instant updatedAt = Instant.now();
 
-    public AppUserEntity(String email, String password) {
-        this.email = email;
-        this.password = password;
-    }
+  public AppUserEntity(String email, String password) {
+    this.email = email;
+    this.password = password;
+  }
 
-    @PrePersist
-    public void onCreate() {
-        Instant now = Instant.now();
-        if (createdAt == null) createdAt = now;
-        updatedAt = now;
-    }
+  @PrePersist
+  public void onCreate() {
+    Instant now = Instant.now();
+    if (createdAt == null) createdAt = now;
+    updatedAt = now;
+  }
 
-    @PreUpdate
-    public void onUpdate() {
-        updatedAt = Instant.now();
-    }
+  @PreUpdate
+  public void onUpdate() {
+    updatedAt = Instant.now();
+  }
 }
