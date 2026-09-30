@@ -1,7 +1,7 @@
 package org.bkd.saas.user.rest;
 
-import static org.bkd.saas.shared.Routes.BASE_PATH;
-import static org.bkd.saas.shared.Routes.PUBLIC_BASE_PATH;
+import static org.bkd.saas.shared.rest.Routes.BASE_PATH;
+import static org.bkd.saas.shared.rest.Routes.PUBLIC_BASE_PATH;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package org.bkd.saas.password_reset.rest;
 
-import static org.bkd.saas.shared.Routes.PUBLIC_BASE_PATH;
+import static org.bkd.saas.shared.rest.Routes.PUBLIC_BASE_PATH;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

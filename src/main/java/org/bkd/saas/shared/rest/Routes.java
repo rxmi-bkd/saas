@@ -1,4 +1,4 @@
-package org.bkd.saas.shared;
+package org.bkd.saas.shared.rest;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

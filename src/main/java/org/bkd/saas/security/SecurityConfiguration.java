@@ -1,6 +1,6 @@
 package org.bkd.saas.security;
 
-import static org.bkd.saas.shared.Routes.PUBLIC_BASE_PATH;
+import static org.bkd.saas.shared.rest.Routes.PUBLIC_BASE_PATH;
 
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.security.filter.JwtAuthenticationFilter;
