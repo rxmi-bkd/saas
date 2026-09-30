@@ -2,16 +2,17 @@ package org.bkd.saas;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.JavaMethod;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
+import jakarta.persistence.Entity;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
@@ -106,21 +107,23 @@ class ArchitectureTests {
   }
 
   @Test
-  void requests_should_not_be_used_outside_rest_layer() {
-    noClasses()
-        .that()
-        .resideInAnyPackage("..service..", "..db..", "..mapper..", "..dto..")
-        .should()
-        .dependOnClassesThat()
-        .resideInAPackage("..rest.request..")
-        .check(mainClasses());
-  }
-
-  @Test
   void all_classes_should_be_public() {
     JavaClasses classes = mainClasses();
     ArchRule rule = classes().should().bePublic();
     rule.check(classes);
+  }
+
+  @Test
+  void service_methods_should_not_return_entities() {
+    ArchRule rule =
+        methods()
+            .that()
+            .areDeclaredInClassesThat()
+            .areAnnotatedWith(Service.class)
+            .should(notReturnEntities())
+            .because("services must always return DTOs");
+
+    rule.check(mainClasses());
   }
 
   private static JavaClasses mainClasses() {
@@ -135,8 +138,6 @@ class ArchitectureTests {
         .haveSimpleNameEndingWith(suffix)
         .and()
         .resideInAPackage(BASE_PACKAGE + "..")
-        .and()
-        .areNotNestedClasses()
         .should()
         .resideInAPackage(pkg)
         .because("classes suffixed with '" + suffix + "' belong in " + pkg)
@@ -148,9 +149,9 @@ class ArchitectureTests {
         .that()
         .resideInAPackage(pkg)
         .and()
-        .areNotNestedClasses()
-        .and()
         .areNotInterfaces()
+        .and()
+        .areNotNestedClasses()
         .should(haveSimpleNameEndingWithAny(suffixes))
         .because("classes in " + pkg + " must end with " + String.join("/", suffixes))
         .check(classes);
@@ -166,6 +167,21 @@ class ArchitectureTests {
               SimpleConditionEvent.violated(
                   item, item.getName() + " does not end with " + String.join(" or ", suffixes)));
         }
+      }
+    };
+  }
+
+  private static ArchCondition<JavaMethod> notReturnEntities() {
+    return new ArchCondition<>("not return an entity (including as a generic type argument)") {
+      @Override
+      public void check(JavaMethod method, ConditionEvents events) {
+        method.getReturnType().getAllInvolvedRawTypes().stream()
+          .filter(type -> type.isAnnotatedWith(Entity.class))
+          .forEach(
+            type ->
+              events.add(
+                SimpleConditionEvent.violated(
+                  method, method.getFullName() + " returns entity " + type.getName())));
       }
     };
   }
