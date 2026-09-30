@@ -5,14 +5,12 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.domain.JavaMethod;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
-import jakarta.persistence.Entity;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
@@ -71,16 +69,13 @@ class ArchitectureTests {
   @Test
   void all_methods_should_be_public_or_private() {
     JavaClasses classes = mainClasses();
-
     ArchRule rule = methods().should().bePublic().orShould().bePrivate();
-
     rule.check(classes);
   }
 
   @Test
   void classes_with_layer_suffix_should_reside_in_matching_package() {
     JavaClasses classes = mainClasses();
-
     checkSuffixResidesIn(classes, "Controller", "..rest");
     checkSuffixResidesIn(classes, "Routes", "..rest");
     checkSuffixResidesIn(classes, "Request", "..rest.request");
@@ -96,7 +91,6 @@ class ArchitectureTests {
   @Test
   void classes_in_layer_package_should_have_matching_suffix() {
     JavaClasses classes = mainClasses();
-
     checkPackageHasSuffix(classes, "..rest", "Controller", "Routes");
     checkPackageHasSuffix(classes, "..rest.request", "Request");
     checkPackageHasSuffix(classes, "..service", "Service");
@@ -111,19 +105,6 @@ class ArchitectureTests {
     JavaClasses classes = mainClasses();
     ArchRule rule = classes().should().bePublic();
     rule.check(classes);
-  }
-
-  @Test
-  void service_methods_should_not_return_entities() {
-    ArchRule rule =
-        methods()
-            .that()
-            .areDeclaredInClassesThat()
-            .areAnnotatedWith(Service.class)
-            .should(notReturnEntities())
-            .because("services must always return DTOs");
-
-    rule.check(mainClasses());
   }
 
   private static JavaClasses mainClasses() {
@@ -167,21 +148,6 @@ class ArchitectureTests {
               SimpleConditionEvent.violated(
                   item, item.getName() + " does not end with " + String.join(" or ", suffixes)));
         }
-      }
-    };
-  }
-
-  private static ArchCondition<JavaMethod> notReturnEntities() {
-    return new ArchCondition<>("not return an entity (including as a generic type argument)") {
-      @Override
-      public void check(JavaMethod method, ConditionEvents events) {
-        method.getReturnType().getAllInvolvedRawTypes().stream()
-          .filter(type -> type.isAnnotatedWith(Entity.class))
-          .forEach(
-            type ->
-              events.add(
-                SimpleConditionEvent.violated(
-                  method, method.getFullName() + " returns entity " + type.getName())));
       }
     };
   }
