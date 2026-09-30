@@ -11,6 +11,7 @@ import org.bkd.saas.user.rest.request.UpdateUserEmailRequest;
 import org.bkd.saas.user.rest.request.UpdateUserPasswordRequest;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,27 +22,27 @@ public class UserController {
   private final UserService userService;
 
   @GetMapping(ME)
-  public UserDto me(@AuthenticationPrincipal UUID userId) {
-    return userService.readUser(userId);
+  public ResponseEntity<UserDto> me(@AuthenticationPrincipal UUID userId) {
+    return ResponseEntity.ok(userService.readUser(userId));
   }
 
-  @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(CREATE_USER)
-  public UserDto createUser(@Valid @RequestBody CreateUserRequest request) {
-    return userService.createUser(request.email(), request.password());
+  public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(userService.createUser(request.email(), request.password()));
   }
 
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   @PutMapping(UPDATE_USER_PASSWORD)
-  public void updateUserPassword(
+  public ResponseEntity<Void> updateUserPassword(
       @AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateUserPasswordRequest request) {
     userService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
+    return ResponseEntity.noContent().build();
   }
 
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   @PutMapping(UPDATE_USER_EMAIL)
-  public void updateUserEmail(
+  public ResponseEntity<Void> updateUserEmail(
       @AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateUserEmailRequest request) {
     userService.updateUserEmail(userId, request.email());
+    return ResponseEntity.noContent().build();
   }
 }
