@@ -69,10 +69,6 @@ public class RefreshTokenService {
       throw new InvalidRefreshTokenException();
     }
 
-    Instant now = Instant.now();
-    current.setRevokedAt(now);
-    refreshTokenRepository.save(current);
-
     Optional<UserDto> user = userService.readOptionalUser(current.getUserId());
 
     if (user.isEmpty()) {
@@ -84,6 +80,9 @@ public class RefreshTokenService {
       revokeToken(token);
       throw new InvalidRefreshTokenException();
     }
+
+    current.setRevokedAt(now());
+    refreshTokenRepository.save(current);
 
     String access = accessTokenService.createJwt(user.get().id(), user.get().role());
     String refresh = createToken(current.getUserId(), current.getFamilyId());
