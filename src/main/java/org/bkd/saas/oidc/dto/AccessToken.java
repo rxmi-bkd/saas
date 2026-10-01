@@ -1,4 +1,4 @@
-package org.bkd.saas.social_authentication.dto;
+package org.bkd.saas.oidc.dto;
 
 public interface AccessToken {
   String accessToken();

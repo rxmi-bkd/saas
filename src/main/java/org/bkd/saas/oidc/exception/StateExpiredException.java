@@ -1,4 +1,4 @@
-package org.bkd.saas.social_authentication.exception;
+package org.bkd.saas.oidc.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

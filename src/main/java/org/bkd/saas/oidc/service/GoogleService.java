@@ -1,9 +1,14 @@
-package org.bkd.saas.social_authentication.service;
+package org.bkd.saas.oidc.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.social_authentication.configuration.PlatformConfiguration;
-import org.bkd.saas.social_authentication.configuration.PlatformConfigurations;
-import org.bkd.saas.social_authentication.dto.*;
+import org.bkd.saas.oidc.configuration.PlatformConfiguration;
+import org.bkd.saas.oidc.configuration.PlatformConfigurations;
+import org.bkd.saas.oidc.dto.*;
+import org.bkd.saas.oidc.dto.AccessToken;
+import org.bkd.saas.oidc.dto.GoogleTokenDto;
+import org.bkd.saas.oidc.dto.PlatformEnum;
+import org.bkd.saas.oidc.dto.ProfileDto;
+import org.bkd.saas.oidc.dto.StateDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;

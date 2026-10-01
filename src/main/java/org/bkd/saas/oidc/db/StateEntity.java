@@ -1,4 +1,4 @@
-package org.bkd.saas.social_authentication.db;
+package org.bkd.saas.oidc.db;
 
 import jakarta.persistence.*;
 import java.time.Instant;

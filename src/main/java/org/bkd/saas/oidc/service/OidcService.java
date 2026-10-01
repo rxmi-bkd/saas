@@ -1,14 +1,14 @@
-package org.bkd.saas.social_authentication.service;
+package org.bkd.saas.oidc.service;
 
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.social_authentication.dto.AccessToken;
-import org.bkd.saas.social_authentication.dto.PlatformEnum;
-import org.bkd.saas.social_authentication.dto.ProfileDto;
-import org.bkd.saas.social_authentication.dto.StateDto;
-import org.bkd.saas.social_authentication.exception.StateExpiredException;
-import org.bkd.saas.social_authentication.exception.UnsupportedPlatformException;
+import org.bkd.saas.oidc.dto.AccessToken;
+import org.bkd.saas.oidc.dto.PlatformEnum;
+import org.bkd.saas.oidc.dto.ProfileDto;
+import org.bkd.saas.oidc.dto.StateDto;
+import org.bkd.saas.oidc.exception.StateExpiredException;
+import org.bkd.saas.oidc.exception.UnsupportedPlatformException;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class SocialAuthenticationService {
+public class OidcService {
   private final UserService userService;
   private final StateService stateService;
   private final List<UrlBuilder> urlBuilders;

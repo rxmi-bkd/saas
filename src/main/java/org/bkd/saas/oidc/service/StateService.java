@@ -1,4 +1,4 @@
-package org.bkd.saas.social_authentication.service;
+package org.bkd.saas.oidc.service;
 
 import static java.time.Instant.now;
 
@@ -7,11 +7,11 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.social_authentication.db.StateEntity;
-import org.bkd.saas.social_authentication.db.StateRepository;
-import org.bkd.saas.social_authentication.dto.StateDto;
-import org.bkd.saas.social_authentication.exception.StateNotFoundException;
-import org.bkd.saas.social_authentication.mapper.StateMapper;
+import org.bkd.saas.oidc.db.StateEntity;
+import org.bkd.saas.oidc.db.StateRepository;
+import org.bkd.saas.oidc.dto.StateDto;
+import org.bkd.saas.oidc.exception.StateNotFoundException;
+import org.bkd.saas.oidc.mapper.StateMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

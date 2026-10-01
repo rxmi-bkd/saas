@@ -1,4 +1,4 @@
-package org.bkd.saas.social_authentication.rest;
+package org.bkd.saas.oidc.rest;
 
 import static org.bkd.saas.shared.rest.Routes.PUBLIC_BASE_PATH;
 

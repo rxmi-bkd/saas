@@ -1,6 +1,6 @@
-package org.bkd.saas.social_authentication.service;
+package org.bkd.saas.oidc.service;
 
-import org.bkd.saas.social_authentication.dto.AccessToken;
+import org.bkd.saas.oidc.dto.AccessToken;
 
 public interface TokenExchanger extends PlatformScoped {
 

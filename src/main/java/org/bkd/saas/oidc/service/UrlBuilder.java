@@ -1,4 +1,4 @@
-package org.bkd.saas.social_authentication.service;
+package org.bkd.saas.oidc.service;
 
 public interface UrlBuilder extends PlatformScoped {
 

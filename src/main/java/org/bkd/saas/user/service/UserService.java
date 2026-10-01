@@ -61,13 +61,6 @@ public class UserService {
         .orElseThrow(UserNotFoundException::new);
   }
 
-  public UserWithPasswordDto readUserWithPassword(String email) {
-    return userRepository
-        .findByEmail(email)
-        .map(userMapper::toUserWithPasswordDto)
-        .orElseThrow(UserNotFoundException::new);
-  }
-
   public Optional<UserWithPasswordDto> readOptionalUserWithPassword(String email) {
     return userRepository.findByEmail(email).map(userMapper::toUserWithPasswordDto);
   }
