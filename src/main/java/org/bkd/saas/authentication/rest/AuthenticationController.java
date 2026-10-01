@@ -11,6 +11,7 @@ import org.bkd.saas.authentication.rest.request.LoginRequest;
 import org.bkd.saas.authentication.rest.request.LogoutRequest;
 import org.bkd.saas.authentication.rest.request.RefreshTokenRequest;
 import org.bkd.saas.authentication.service.AuthenticationService;
+import org.bkd.saas.authentication.service.RefreshTokenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
+  private final RefreshTokenService refreshTokenService;
   private final AuthenticationService authenticationService;
 
   @PostMapping(LOGIN)
@@ -29,12 +31,12 @@ public class AuthenticationController {
 
   @PostMapping(REFRESH)
   public ResponseEntity<TokenPairDto> refresh(@Valid @RequestBody RefreshTokenRequest request) {
-    return ResponseEntity.ok(authenticationService.refresh(request.refresh()));
+    return ResponseEntity.ok(refreshTokenService.refreshToken(request.refresh()));
   }
 
   @PostMapping(LOGOUT)
   public ResponseEntity<Void> logout(@Valid @RequestBody LogoutRequest request) {
-    authenticationService.logout(request.refresh());
+    refreshTokenService.revokeToken(request.refresh());
     return ResponseEntity.noContent().build();
   }
 }

@@ -36,12 +36,4 @@ public class AuthenticationService {
     String refreshToken = refreshTokenService.createToken(user.get().id());
     return new TokenPairDto(accessToken, refreshToken);
   }
-
-  public TokenPairDto refresh(String token) {
-    return refreshTokenService.refreshToken(token);
-  }
-
-  public void logout(String rawRefreshToken) {
-    refreshTokenService.revokeToken(rawRefreshToken);
-  }
 }
