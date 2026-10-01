@@ -26,7 +26,11 @@ public class UserService {
 
   public UserDto createUser(String email, String password) {
     boolean isEmailUsed = userRepository.findByEmail(email).isPresent();
-    if (isEmailUsed) throw new EmailAlreadyUsedException();
+
+    if (isEmailUsed) {
+      throw new EmailAlreadyUsedException();
+    }
+
     AppUserEntity user = new AppUserEntity(email, null);
     setPassword(user, password);
     AppUserEntity saved = userRepository.save(user);
@@ -40,11 +44,8 @@ public class UserService {
         .orElseThrow(UserNotFoundException::new);
   }
 
-  public UserDto readUser(String email) {
-    return userRepository
-        .findByEmail(email)
-        .map(userMapper::toUserDto)
-        .orElseThrow(UserNotFoundException::new);
+  public Optional<UserDto> readOptionalUser(UUID userId) {
+    return userRepository.findById(userId).map(userMapper::toUserDto);
   }
 
   public UserDto readOrCreateUser(String email) {
@@ -74,7 +75,9 @@ public class UserService {
             .filter(appUserEntity -> !appUserEntity.getId().equals(userId))
             .isPresent();
 
-    if (isEmailUsedByAnotherUser) throw new EmailAlreadyUsedException();
+    if (isEmailUsedByAnotherUser) {
+      throw new EmailAlreadyUsedException();
+    }
 
     user.setEmail(email);
     userRepository.save(user);
@@ -89,7 +92,11 @@ public class UserService {
   public void updateUserPassword(UUID userId, String oldPassword, String newPassword) {
     AppUserEntity user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     boolean isOldPasswordCorrect = passwordEncoder.matches(oldPassword, user.getPassword());
-    if (!isOldPasswordCorrect) throw new PasswordMismatchException("Old password is incorrect");
+
+    if (!isOldPasswordCorrect) {
+      throw new PasswordMismatchException("Old password is incorrect");
+    }
+
     setPassword(user, newPassword);
     userRepository.save(user);
   }

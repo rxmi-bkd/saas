@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.authentication.service.AuthenticationTokenService;
+import org.bkd.saas.authentication.service.AccessTokenService;
 import org.bkd.saas.user.dto.RoleEnum;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,14 +23,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private static final String AUTHORIZATION_HEADER = "Authorization";
   private static final String BEARER_PREFIX = "Bearer ";
 
-  private final AuthenticationTokenService authenticationTokenService;
+  private final AccessTokenService accessTokenService;
 
   @Override
   public void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     String jwt = extractJwt(request);
-    boolean isValidJwt = hasText(jwt) && authenticationTokenService.isValidJwt(jwt);
+    boolean isValidJwt = hasText(jwt) && accessTokenService.isValidJwt(jwt);
 
     if (isValidJwt) {
       UsernamePasswordAuthenticationToken auth = buildAuthenticationToken(jwt);
@@ -43,13 +43,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private String extractJwt(HttpServletRequest request) {
     String authorization = request.getHeader(AUTHORIZATION_HEADER);
     boolean hasValidHeader = hasText(authorization) && authorization.startsWith(BEARER_PREFIX);
-    if (hasValidHeader) return authorization.substring(BEARER_PREFIX.length());
-    else return null;
+
+    if (hasValidHeader) {
+      return authorization.substring(BEARER_PREFIX.length());
+    }
+
+    return null;
   }
 
   private UsernamePasswordAuthenticationToken buildAuthenticationToken(String jwt) {
-    UUID subject = authenticationTokenService.readSubject(jwt);
-    RoleEnum role = authenticationTokenService.readRole(jwt);
+    UUID subject = accessTokenService.readSubject(jwt);
+    RoleEnum role = accessTokenService.readRole(jwt);
     return new UsernamePasswordAuthenticationToken(subject, null, role.getAuthorities());
   }
 }

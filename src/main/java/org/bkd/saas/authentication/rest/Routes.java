@@ -10,4 +10,6 @@ public class Routes {
 
   public static final String PUBLIC_ENDPOINT = PUBLIC_BASE_PATH + "/authentication";
   public static final String LOGIN = PUBLIC_ENDPOINT + "/login";
+  public static final String REFRESH = PUBLIC_ENDPOINT + "/refresh";
+  public static final String LOGOUT = PUBLIC_ENDPOINT + "/logout";
 }

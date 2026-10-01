@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/v1/init.yaml
   - include:
       file: db/changelog/v1/seed-admin-user.yaml
+  - include:
+      file: db/changelog/v1/refresh-token.yaml

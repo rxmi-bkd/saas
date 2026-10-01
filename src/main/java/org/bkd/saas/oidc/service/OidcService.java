@@ -41,7 +41,11 @@ public class OidcService {
   private StateDto validateState(String state) {
     StateDto stateDto = stateService.readState(state);
     boolean isExpired = stateDto.expiresAt().isBefore(Instant.now());
-    if (isExpired) throw new StateExpiredException();
+
+    if (isExpired) {
+      throw new StateExpiredException();
+    }
+
     return stateDto;
   }
 

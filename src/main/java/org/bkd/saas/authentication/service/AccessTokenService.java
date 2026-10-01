@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AuthenticationTokenService {
+public class AccessTokenService {
 
   @Value("${app.jwt.authentication-token.secret}")
   private String secret;

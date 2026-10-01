@@ -46,7 +46,11 @@ public class AppUserEntity {
   @PrePersist
   public void onCreate() {
     Instant now = Instant.now();
-    if (createdAt == null) createdAt = now;
+
+    if (createdAt == null) {
+      createdAt = now;
+    }
+
     updatedAt = now;
   }
 
