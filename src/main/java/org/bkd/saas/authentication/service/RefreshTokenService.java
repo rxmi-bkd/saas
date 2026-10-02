@@ -72,12 +72,12 @@ public class RefreshTokenService {
     Optional<UserDto> user = userService.readOptionalUser(current.getUserId());
 
     if (user.isEmpty()) {
-      revokeToken(token);
+      revokeTokenFamily(current.getFamilyId());
       throw new InvalidRefreshTokenException();
     }
 
     if (!user.get().enabled()) {
-      revokeToken(token);
+      revokeTokenFamily(current.getFamilyId());
       throw new InvalidRefreshTokenException();
     }
 
