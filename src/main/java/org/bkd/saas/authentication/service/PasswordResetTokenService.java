@@ -1,6 +1,7 @@
-package org.bkd.saas.password_reset.service;
+package org.bkd.saas.authentication.service;
 
 import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
+import static org.bkd.saas.authentication.service.Utils.hash;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -8,14 +9,15 @@ import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
+import org.bkd.saas.authentication.exception.TokenException;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,9 +35,7 @@ public class PasswordResetTokenService {
   private SecretKey key;
 
   public static final String PASSWORD_HASH_CLAIM = "pwh";
-
-  private final PasswordEncoder passwordEncoder;
-
+  
   private final UserService userService;
 
   @PostConstruct
@@ -54,7 +54,7 @@ public class PasswordResetTokenService {
         .subject(subjectString)
         .issuedAt(issuedAt)
         .expiration(expireAt)
-        .claim(PASSWORD_HASH_CLAIM, passwordEncoder.encode(passwordHash))
+        .claim(PASSWORD_HASH_CLAIM, hash(passwordHash))
         .signWith(key)
         .compact();
   }
@@ -63,7 +63,7 @@ public class PasswordResetTokenService {
     try {
       return Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt).getPayload();
     } catch (JwtException e) {
-      throw new org.bkd.saas.shared.exception.JwtException(e.getMessage());
+      throw new TokenException();
     }
   }
 
@@ -82,8 +82,8 @@ public class PasswordResetTokenService {
       UUID userId = readSubject(claims);
       UserWithPasswordDto user = userService.readUserWithPassword(userId);
       String pwh = claims.get(PASSWORD_HASH_CLAIM, String.class);
-      return pwh != null && passwordEncoder.matches(user.password(), pwh);
-    } catch (org.bkd.saas.shared.exception.JwtException | UserNotFoundException e) {
+      return pwh != null && Objects.equals(hash(user.password()), pwh);
+    } catch (TokenException | UserNotFoundException e) {
       return false;
     }
   }

@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
+import org.bkd.saas.authentication.exception.TokenException;
 import org.bkd.saas.user.dto.RoleEnum;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,7 @@ public class AccessTokenService {
     try {
       return Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt).getPayload();
     } catch (JwtException e) {
-      throw new org.bkd.saas.shared.exception.JwtException(e.getMessage());
+      throw new TokenException();
     }
   }
 
@@ -75,7 +76,7 @@ public class AccessTokenService {
     try {
       readJwt(jwt);
       return true;
-    } catch (org.bkd.saas.shared.exception.JwtException e) {
+    } catch (TokenException e) {
       return false;
     }
   }
