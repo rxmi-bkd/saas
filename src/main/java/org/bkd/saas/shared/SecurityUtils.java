@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 public class SecurityUtils {
   public static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-  public static String hash(String token) {
+  public static String hash(String string) {
     try {
       byte[] digest =
-          MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.UTF_8));
+          MessageDigest.getInstance("SHA-256").digest(string.getBytes(StandardCharsets.UTF_8));
       return HexFormat.of().formatHex(digest);
     } catch (NoSuchAlgorithmException e) {
       throw new IllegalStateException(e);

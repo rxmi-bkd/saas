@@ -68,15 +68,11 @@ public class RefreshTokenService {
   public void revokeToken(UUID tokenId) {
     RefreshTokenEntity refreshToken =
         refreshTokenRepository.findById(tokenId).orElseThrow(TokenException::new);
-    revokeToken(refreshToken);
-  }
 
-  private void revokeToken(RefreshTokenEntity refreshToken) {
     if (refreshToken.getRevokedAt() == null) {
       refreshToken.setRevokedAt(now());
+      refreshTokenRepository.save(refreshToken);
     }
-
-    refreshTokenRepository.save(refreshToken);
   }
 
   @Scheduled(cron = "0 0 * * * *")

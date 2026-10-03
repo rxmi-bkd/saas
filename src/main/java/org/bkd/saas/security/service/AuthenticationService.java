@@ -69,13 +69,12 @@ public class AuthenticationService {
   public TokenPairDto refresh(String token) {
     RefreshTokenDto tokenDto = refreshTokenService.readToken(token);
 
-    if (refreshTokenService.isRevoked(tokenDto)) {
-      // A revoked token is being replayed: assume theft and kill the whole family.
-      refreshTokenService.revokeTokenFamily(tokenDto.familyId());
+    if (refreshTokenService.isExpired(tokenDto)) {
       throw new TokenException();
     }
 
-    if (refreshTokenService.isExpired(tokenDto)) {
+    if (refreshTokenService.isRevoked(tokenDto)) {
+      refreshTokenService.revokeTokenFamily(tokenDto.familyId());
       throw new TokenException();
     }
 
