@@ -1,7 +1,7 @@
 package org.bkd.saas.authentication.service;
 
 import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
-import static org.bkd.saas.authentication.service.Utils.hash;
+import static org.bkd.saas.shared.SecurityUtils.hash;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -36,7 +36,7 @@ public class PasswordResetTokenService {
   private SecretKey key;
 
   public static final String PASSWORD_HASH_CLAIM = "pwh";
-  
+
   private final UserService userService;
 
   @PostConstruct

@@ -1,8 +1,8 @@
 package org.bkd.saas.authentication.service;
 
 import static java.time.Instant.now;
-import static org.bkd.saas.authentication.service.Utils.SECURE_RANDOM;
-import static org.bkd.saas.authentication.service.Utils.hash;
+import static org.bkd.saas.shared.SecurityUtils.SECURE_RANDOM;
+import static org.bkd.saas.shared.SecurityUtils.hash;
 
 import java.time.Instant;
 import java.util.Base64;
@@ -66,7 +66,8 @@ public class RefreshTokenService {
   }
 
   public void revokeToken(UUID tokenId) {
-    RefreshTokenEntity refreshToken = refreshTokenRepository.findById(tokenId).orElseThrow(TokenException::new);
+    RefreshTokenEntity refreshToken =
+        refreshTokenRepository.findById(tokenId).orElseThrow(TokenException::new);
     revokeToken(refreshToken);
   }
 

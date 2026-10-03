@@ -1,6 +1,5 @@
 package org.bkd.saas.authentication.service;
 
-
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
