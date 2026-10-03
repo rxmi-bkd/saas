@@ -1,7 +1,7 @@
-package org.bkd.saas.authentication.mapper;
+package org.bkd.saas.security.mapper;
 
-import org.bkd.saas.authentication.db.RefreshTokenEntity;
-import org.bkd.saas.authentication.dto.RefreshTokenDto;
+import org.bkd.saas.security.db.RefreshTokenEntity;
+import org.bkd.saas.security.dto.RefreshTokenDto;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

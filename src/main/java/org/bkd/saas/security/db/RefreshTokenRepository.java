@@ -1,4 +1,4 @@
-package org.bkd.saas.authentication.db;
+package org.bkd.saas.security.db;
 
 import jakarta.persistence.LockModeType;
 import java.time.Instant;

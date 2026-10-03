@@ -1,13 +1,13 @@
-package org.bkd.saas.authentication.service;
+package org.bkd.saas.security.service;
 
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bkd.saas.authentication.dto.RefreshTokenDto;
-import org.bkd.saas.authentication.dto.TokenPairDto;
-import org.bkd.saas.authentication.exception.InvalidCredentialsException;
-import org.bkd.saas.authentication.exception.TokenException;
+import org.bkd.saas.security.dto.RefreshTokenDto;
+import org.bkd.saas.security.dto.TokenPairDto;
+import org.bkd.saas.security.exception.InvalidCredentialsException;
+import org.bkd.saas.security.exception.TokenException;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.service.UserService;

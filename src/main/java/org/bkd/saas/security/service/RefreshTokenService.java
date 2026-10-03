@@ -1,4 +1,4 @@
-package org.bkd.saas.authentication.service;
+package org.bkd.saas.security.service;
 
 import static java.time.Instant.now;
 import static org.bkd.saas.shared.SecurityUtils.SECURE_RANDOM;
@@ -8,11 +8,11 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.authentication.db.RefreshTokenEntity;
-import org.bkd.saas.authentication.db.RefreshTokenRepository;
-import org.bkd.saas.authentication.dto.RefreshTokenDto;
-import org.bkd.saas.authentication.exception.TokenException;
-import org.bkd.saas.authentication.mapper.RefreshTokenMapper;
+import org.bkd.saas.security.db.RefreshTokenEntity;
+import org.bkd.saas.security.db.RefreshTokenRepository;
+import org.bkd.saas.security.dto.RefreshTokenDto;
+import org.bkd.saas.security.exception.TokenException;
+import org.bkd.saas.security.mapper.RefreshTokenMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

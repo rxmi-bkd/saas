@@ -1,20 +1,20 @@
-package org.bkd.saas.authentication.rest;
+package org.bkd.saas.security.rest;
 
-import static org.bkd.saas.authentication.rest.Routes.FORGOT_PASSWORD;
-import static org.bkd.saas.authentication.rest.Routes.LOGIN;
-import static org.bkd.saas.authentication.rest.Routes.LOGOUT;
-import static org.bkd.saas.authentication.rest.Routes.REFRESH;
-import static org.bkd.saas.authentication.rest.Routes.RESET_PASSWORD;
+import static org.bkd.saas.security.rest.Routes.FORGOT_PASSWORD;
+import static org.bkd.saas.security.rest.Routes.LOGIN;
+import static org.bkd.saas.security.rest.Routes.LOGOUT;
+import static org.bkd.saas.security.rest.Routes.REFRESH;
+import static org.bkd.saas.security.rest.Routes.RESET_PASSWORD;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.authentication.dto.TokenPairDto;
-import org.bkd.saas.authentication.rest.request.ForgotPasswordRequest;
-import org.bkd.saas.authentication.rest.request.LoginRequest;
-import org.bkd.saas.authentication.rest.request.LogoutRequest;
-import org.bkd.saas.authentication.rest.request.PasswordResetRequest;
-import org.bkd.saas.authentication.rest.request.RefreshTokenRequest;
-import org.bkd.saas.authentication.service.AuthenticationService;
+import org.bkd.saas.security.dto.TokenPairDto;
+import org.bkd.saas.security.rest.request.ForgotPasswordRequest;
+import org.bkd.saas.security.rest.request.LoginRequest;
+import org.bkd.saas.security.rest.request.LogoutRequest;
+import org.bkd.saas.security.rest.request.PasswordResetRequest;
+import org.bkd.saas.security.rest.request.RefreshTokenRequest;
+import org.bkd.saas.security.service.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

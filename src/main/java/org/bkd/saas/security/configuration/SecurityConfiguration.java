@@ -1,4 +1,4 @@
-package org.bkd.saas.security;
+package org.bkd.saas.security.configuration;
 
 import static org.bkd.saas.shared.rest.Routes.PUBLIC_BASE_PATH;
 

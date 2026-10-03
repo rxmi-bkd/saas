@@ -1,4 +1,4 @@
-package org.bkd.saas.authentication.dto;
+package org.bkd.saas.security.dto;
 
 import java.time.Instant;
 import java.util.UUID;

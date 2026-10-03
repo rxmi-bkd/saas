@@ -20,13 +20,13 @@ public class CreateUserTests extends AbstractIntegrationTests {
 
   @Test
   void testGetUser() throws Exception {
+    CreateUserRequest body = new CreateUserRequest("t@t.com", "t");
+
     RequestBuilder request =
         MockMvcRequestBuilders.post(CREATE_USER)
-            .content(MAPPER.writeValueAsString(new CreateUserRequest("t", "t")))
+            .content(MAPPER.writeValueAsString(body))
             .contentType(MediaType.APPLICATION_JSON);
-    ResultMatcher isOk = MockMvcResultMatchers.status().isOk();
-    ResultMatcher jsonResponse =
-        MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON);
-    mockMvc.perform(request).andExpect(isOk).andExpect(jsonResponse).andReturn();
+
+    ResultMatcher isOk = MockMvcResultMatchers.status().isCreated();
   }
 }

@@ -4,7 +4,7 @@ import static org.bkd.saas.oidc.rest.Routes.AUTHORIZE;
 import static org.bkd.saas.oidc.rest.Routes.HANDLE_CALLBACK;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.authentication.dto.TokenPairDto;
+import org.bkd.saas.security.dto.TokenPairDto;
 import org.bkd.saas.oidc.dto.PlatformEnum;
 import org.bkd.saas.oidc.service.OidcService;
 import org.springframework.http.ResponseEntity;
