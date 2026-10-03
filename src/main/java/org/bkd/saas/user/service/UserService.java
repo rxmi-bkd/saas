@@ -25,6 +25,7 @@ public class UserService {
   private final UserMapper userMapper;
 
   public UserDto createUser(String email, String password) {
+    email = email.trim().toLowerCase();
     boolean isEmailUsed = userRepository.findByEmail(email).isPresent();
 
     if (isEmailUsed) {
