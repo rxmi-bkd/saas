@@ -1,4 +1,4 @@
 package org.bkd.saas;
 
-public record DefaultErrorResponse(
+public record ErrorDto(
     String timestamp, int status, String error, String message, String path) {}

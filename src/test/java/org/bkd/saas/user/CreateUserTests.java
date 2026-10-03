@@ -1,32 +1,29 @@
 package org.bkd.saas.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bkd.saas.user.rest.Routes.CREATE_USER;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import lombok.RequiredArgsConstructor;
 import org.bkd.saas.AbstractIntegrationTests;
-import org.bkd.saas.DefaultErrorResponse;
+import org.bkd.saas.ErrorDto;
+import org.bkd.saas.UserTestUtils;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.RoleEnum;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClient;
 
+@RequiredArgsConstructor
 public class CreateUserTests extends AbstractIntegrationTests {
   private static final String EMAIL = "test@test.com";
   private static final String PASSWORD = "test";
 
-  @Autowired private RestClient restClient;
-  @Autowired private UserRepository userRepository;
+  private final UserRepository userRepository;
 
   @BeforeEach
-  void setUp() {
+  void beforeEach() {
     userRepository.deleteAll();
   }
 
@@ -36,7 +33,7 @@ public class CreateUserTests extends AbstractIntegrationTests {
     CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
 
     // act
-    ResponseEntity<UserDto> response = createUser(createUserRequest, UserDto.class);
+    ResponseEntity<UserDto> response = UserTestUtils.createUser(createUserRequest, UserDto.class);
 
     // assert
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -55,22 +52,11 @@ public class CreateUserTests extends AbstractIntegrationTests {
     CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
 
     // act
-    createUser(createUserRequest, UserDto.class);
-    ResponseEntity<DefaultErrorResponse> response =
-        createUser(createUserRequest, DefaultErrorResponse.class);
+    UserTestUtils.createUser(createUserRequest, UserDto.class);
+    ResponseEntity<ErrorDto> response =
+      UserTestUtils.createUser(createUserRequest, ErrorDto.class);
 
     // assert
     assertThat(response.getBody().status()).isEqualTo(HttpStatus.CONFLICT.value());
-  }
-
-  private <T> ResponseEntity<T> createUser(CreateUserRequest body, Class<T> responseType) {
-    return restClient
-        .post()
-        .uri(localServerUrl() + CREATE_USER)
-        .contentType(APPLICATION_JSON)
-        .body(body)
-        .retrieve()
-        .onStatus(HttpStatusCode::isError, (request, response) -> {})
-        .toEntity(responseType);
   }
 }
