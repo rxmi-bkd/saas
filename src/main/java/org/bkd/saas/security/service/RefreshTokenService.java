@@ -29,6 +29,9 @@ public class RefreshTokenService {
   @Value("${app.jwt.refresh-token.expiration}")
   private long expirationInSeconds;
 
+  @Value("${app.jwt.refresh-token.reuse-grace-period}")
+  private long reuseGracePeriodInSeconds;
+
   public String createToken(UUID userId) {
     return createToken(userId, UUID.randomUUID());
   }
@@ -87,6 +90,11 @@ public class RefreshTokenService {
 
   public boolean isRevokedToken(RefreshTokenDto token) {
     return token.revokedAt() != null;
+  }
+
+  public boolean isWithinReuseGracePeriod(RefreshTokenDto token) {
+    Instant graceEnd = token.revokedAt().plusSeconds(reuseGracePeriodInSeconds);
+    return now().isBefore(graceEnd);
   }
 
   public boolean isExpiredToken(RefreshTokenDto token) {

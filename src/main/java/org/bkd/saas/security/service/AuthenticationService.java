@@ -42,7 +42,7 @@ public class AuthenticationService {
   public TokenPairDto login(String email, String password) {
     Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(email);
 
-    // Always run BCrypt, even for unknown emails,
+    // Always run "passwordEncoder.matches", even for unknown emails,
     // so response time does not reveal whether an account exists.
     String hashToCheck = user.map(UserWithPasswordDto::password).orElse(dummyPasswordHash);
     boolean isPasswordCorrect = passwordEncoder.matches(password, hashToCheck);
@@ -90,7 +90,11 @@ public class AuthenticationService {
     }
 
     if (refreshTokenService.isRevokedToken(tokenDto)) {
-      refreshTokenService.revokeTokenFamily(tokenDto.familyId());
+
+      if (!refreshTokenService.isWithinReuseGracePeriod(tokenDto)) {
+        refreshTokenService.revokeTokenFamily(tokenDto.familyId());
+      }
+
       throw new InvalidTokenException();
     }
 
