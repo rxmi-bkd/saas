@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.security.exception.TokenException;
+import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.user.dto.RoleEnum;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -58,7 +58,7 @@ public class AccessTokenService {
     try {
       return Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt).getPayload();
     } catch (JwtException e) {
-      throw new TokenException();
+      throw new InvalidTokenException();
     }
   }
 
@@ -77,7 +77,7 @@ public class AccessTokenService {
     try {
       readJwt(jwt);
       return true;
-    } catch (TokenException e) {
+    } catch (InvalidTokenException e) {
       return false;
     }
   }

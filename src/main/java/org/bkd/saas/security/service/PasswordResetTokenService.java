@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.security.exception.TokenException;
+import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.service.UserService;
@@ -64,7 +64,7 @@ public class PasswordResetTokenService {
     try {
       return Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt).getPayload();
     } catch (JwtException e) {
-      throw new TokenException();
+      throw new InvalidTokenException();
     }
   }
 
@@ -84,7 +84,7 @@ public class PasswordResetTokenService {
       UserWithPasswordDto user = userService.readUserWithPassword(userId);
       String pwh = claims.get(PASSWORD_HASH_CLAIM, String.class);
       return pwh != null && Objects.equals(hash(user.password()), pwh);
-    } catch (TokenException | UserNotFoundException e) {
+    } catch (InvalidTokenException | UserNotFoundException e) {
       return false;
     }
   }

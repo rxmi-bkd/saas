@@ -1,10 +1,10 @@
 package org.bkd.saas.oidc.service;
 
 import static java.time.Instant.now;
+import static org.bkd.saas.shared.SecurityUtils.encodeToBase64;
 
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.oidc.db.StateEntity;
@@ -56,6 +56,6 @@ public class StateService {
   private String generateRandomString() {
     byte[] randomBytes = new byte[32];
     secureRandom.nextBytes(randomBytes);
-    return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+    return encodeToBase64(randomBytes);
   }
 }

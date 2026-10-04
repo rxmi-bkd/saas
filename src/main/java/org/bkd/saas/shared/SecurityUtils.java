@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.HexFormat;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -20,5 +21,9 @@ public class SecurityUtils {
     } catch (NoSuchAlgorithmException e) {
       throw new IllegalStateException(e);
     }
+  }
+
+  public static String encodeToBase64(byte[] bytes) {
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
   }
 }

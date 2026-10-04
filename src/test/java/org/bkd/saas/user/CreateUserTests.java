@@ -2,25 +2,22 @@ package org.bkd.saas.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lombok.RequiredArgsConstructor;
 import org.bkd.saas.AbstractIntegrationTests;
 import org.bkd.saas.ErrorDto;
-import org.bkd.saas.UserTestUtils;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.RoleEnum;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
-@RequiredArgsConstructor
 public class CreateUserTests extends AbstractIntegrationTests {
   private static final String EMAIL = "test@test.com";
   private static final String PASSWORD = "test";
 
-  private final UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -33,10 +30,10 @@ public class CreateUserTests extends AbstractIntegrationTests {
     CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
 
     // act
-    ResponseEntity<UserDto> response = UserTestUtils.createUser(createUserRequest, UserDto.class);
+    ResponseEntity<UserDto> response = createUserOk(createUserRequest);
 
     // assert
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    assertThat(response.getStatusCode().value()).isEqualTo(201);
     UserDto createdUser = response.getBody();
     assertThat(createdUser.id()).isNotNull();
     assertThat(createdUser.email()).isEqualTo(EMAIL);
@@ -52,11 +49,20 @@ public class CreateUserTests extends AbstractIntegrationTests {
     CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
 
     // act
-    UserTestUtils.createUser(createUserRequest, UserDto.class);
-    ResponseEntity<ErrorDto> response =
-      UserTestUtils.createUser(createUserRequest, ErrorDto.class);
+    createUserOk(createUserRequest);
+    ResponseEntity<ErrorDto> response = createUserKo(createUserRequest);
 
     // assert
-    assertThat(response.getBody().status()).isEqualTo(HttpStatus.CONFLICT.value());
+    assertThat(response.getBody().status()).isEqualTo(409);
+    assertThat(response.getBody().message()).isEqualTo("Email already used");
+    assertThat(response.getBody().error()).isEqualTo("Conflict");
+  }
+
+  private ResponseEntity<UserDto> createUserOk(CreateUserRequest request) {
+    return UserTestUtils.createUserOk(request, server());
+  }
+
+  private ResponseEntity<ErrorDto> createUserKo(CreateUserRequest request) {
+    return UserTestUtils.createUserKo(request, server());
   }
 }

@@ -1,5 +1,9 @@
 package org.bkd.saas.security.service;
 
+import static org.bkd.saas.shared.SecurityUtils.SECURE_RANDOM;
+import static org.bkd.saas.shared.SecurityUtils.encodeToBase64;
+
+import jakarta.annotation.PostConstruct;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bkd.saas.security.dto.RefreshTokenDto;
 import org.bkd.saas.security.dto.TokenPairDto;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
-import org.bkd.saas.security.exception.TokenException;
+import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.service.UserService;
@@ -26,16 +30,24 @@ public class AuthenticationService {
   private final RefreshTokenService refreshTokenService;
   private final PasswordResetTokenService passwordResetTokenService;
 
+  private String dummyPasswordHash;
+
+  @PostConstruct
+  void postConstruct() {
+    byte[] randomBytes = new byte[32];
+    SECURE_RANDOM.nextBytes(randomBytes);
+    dummyPasswordHash = passwordEncoder.encode(encodeToBase64(randomBytes));
+  }
+
   public TokenPairDto login(String email, String password) {
     Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(email);
 
-    if (user.isEmpty()) {
-      throw new InvalidCredentialsException();
-    }
+    // Always run BCrypt, even for unknown emails,
+    // so response time does not reveal whether an account exists.
+    String hashToCheck = user.map(UserWithPasswordDto::password).orElse(dummyPasswordHash);
+    boolean isPasswordCorrect = passwordEncoder.matches(password, hashToCheck);
 
-    boolean isPasswordCorrect = passwordEncoder.matches(password, user.get().password());
-
-    if (!isPasswordCorrect || !user.get().enabled()) {
+    if (user.isEmpty() || !isPasswordCorrect || !user.get().enabled()) {
       throw new InvalidCredentialsException();
     }
 
@@ -62,32 +74,36 @@ public class AuthenticationService {
     if (isValidJwt) {
       userService.updateUserPassword(userId, newPassword);
       refreshTokenService.revokeUserTokens(userId);
+      return;
     }
+
+    throw new InvalidTokenException();
   }
 
-  @Transactional(noRollbackFor = TokenException.class)
+  @Transactional(noRollbackFor = InvalidTokenException.class)
   public TokenPairDto refresh(String token) {
-    RefreshTokenDto tokenDto = refreshTokenService.readToken(token);
+    RefreshTokenDto tokenDto =
+        refreshTokenService.readOptionalToken(token).orElseThrow(InvalidTokenException::new);
 
-    if (refreshTokenService.isExpired(tokenDto)) {
-      throw new TokenException();
+    if (refreshTokenService.isExpiredToken(tokenDto)) {
+      throw new InvalidTokenException();
     }
 
-    if (refreshTokenService.isRevoked(tokenDto)) {
+    if (refreshTokenService.isRevokedToken(tokenDto)) {
       refreshTokenService.revokeTokenFamily(tokenDto.familyId());
-      throw new TokenException();
+      throw new InvalidTokenException();
     }
 
     Optional<UserDto> user = userService.readOptionalUser(tokenDto.userId());
 
     if (user.isEmpty()) {
       refreshTokenService.revokeTokenFamily(tokenDto.familyId());
-      throw new TokenException();
+      throw new InvalidTokenException();
     }
 
     if (!user.get().enabled()) {
       refreshTokenService.revokeTokenFamily(tokenDto.familyId());
-      throw new TokenException();
+      throw new InvalidTokenException();
     }
 
     refreshTokenService.revokeToken(tokenDto.id());

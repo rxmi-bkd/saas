@@ -2,16 +2,17 @@ package org.bkd.saas.security.service;
 
 import static java.time.Instant.now;
 import static org.bkd.saas.shared.SecurityUtils.SECURE_RANDOM;
+import static org.bkd.saas.shared.SecurityUtils.encodeToBase64;
 import static org.bkd.saas.shared.SecurityUtils.hash;
 
 import java.time.Instant;
-import java.util.Base64;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.security.db.RefreshTokenEntity;
 import org.bkd.saas.security.db.RefreshTokenRepository;
 import org.bkd.saas.security.dto.RefreshTokenDto;
-import org.bkd.saas.security.exception.TokenException;
+import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.security.mapper.RefreshTokenMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -35,7 +36,7 @@ public class RefreshTokenService {
   public String createToken(UUID userId, UUID familyId) {
     byte[] randomBytes = new byte[32];
     SECURE_RANDOM.nextBytes(randomBytes);
-    String token = Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+    String token = encodeToBase64(randomBytes);
     String hash = hash(token);
     Instant expiresAt = now().plusSeconds(expirationInSeconds);
     RefreshTokenEntity refresh = new RefreshTokenEntity(userId, hash, familyId, expiresAt);
@@ -44,10 +45,13 @@ public class RefreshTokenService {
   }
 
   public RefreshTokenDto readToken(String token) {
+    return readOptionalToken(token).orElseThrow(InvalidTokenException::new);
+  }
+
+  public Optional<RefreshTokenDto> readOptionalToken(String token) {
     return refreshTokenRepository
         .findByHash(hash(token))
-        .map(refreshTokenMapper::toRefreshTokenDto)
-        .orElseThrow(TokenException::new);
+        .map(refreshTokenMapper::toRefreshTokenDto);
   }
 
   public int revokeTokenFamily(UUID familyId) {
@@ -67,7 +71,7 @@ public class RefreshTokenService {
 
   public void revokeToken(UUID tokenId) {
     RefreshTokenEntity refreshToken =
-        refreshTokenRepository.findById(tokenId).orElseThrow(TokenException::new);
+        refreshTokenRepository.findById(tokenId).orElseThrow(InvalidTokenException::new);
 
     if (refreshToken.getRevokedAt() == null) {
       refreshToken.setRevokedAt(now());
@@ -81,11 +85,11 @@ public class RefreshTokenService {
     return refreshTokenRepository.deleteExpiredTokens(now);
   }
 
-  public boolean isRevoked(RefreshTokenDto token) {
+  public boolean isRevokedToken(RefreshTokenDto token) {
     return token.revokedAt() != null;
   }
 
-  public boolean isExpired(RefreshTokenDto token) {
+  public boolean isExpiredToken(RefreshTokenDto token) {
     Instant now = now();
     return token.expiresAt().isBefore(now);
   }
