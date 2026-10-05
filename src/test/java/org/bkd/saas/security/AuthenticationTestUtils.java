@@ -6,10 +6,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.bkd.saas.ErrorDto;
 import org.bkd.saas.security.dto.TokenPairDto;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.security.rest.request.LogoutRequest;
+import org.bkd.saas.shared.dto.ErrorDto;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;

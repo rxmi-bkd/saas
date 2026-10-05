@@ -5,7 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.bkd.saas.ErrorDto;
+import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.springframework.http.HttpStatusCode;

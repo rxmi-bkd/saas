@@ -93,6 +93,10 @@ public class RefreshTokenService {
   }
 
   public boolean isWithinReuseGracePeriod(RefreshTokenDto token) {
+    if (token.revokedAt() == null) {
+      return false;
+    }
+
     Instant graceEnd = token.revokedAt().plusSeconds(reuseGracePeriodInSeconds);
     return now().isBefore(graceEnd);
   }

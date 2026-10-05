@@ -3,7 +3,7 @@ package org.bkd.saas.user;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bkd.saas.AbstractIntegrationTests;
-import org.bkd.saas.ErrorDto;
+import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.RoleEnum;
 import org.bkd.saas.user.dto.UserDto;

@@ -33,7 +33,7 @@ public class AuthenticationService {
   private String dummyPasswordHash;
 
   @PostConstruct
-  void postConstruct() {
+  public void postConstruct() {
     byte[] randomBytes = new byte[32];
     SECURE_RANDOM.nextBytes(randomBytes);
     dummyPasswordHash = passwordEncoder.encode(encodeToBase64(randomBytes));

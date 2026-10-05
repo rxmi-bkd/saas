@@ -3,9 +3,9 @@ package org.bkd.saas.security;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bkd.saas.AbstractIntegrationTests;
-import org.bkd.saas.ErrorDto;
 import org.bkd.saas.security.dto.TokenPairDto;
 import org.bkd.saas.security.rest.request.LoginRequest;
+import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.UserTestUtils;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
