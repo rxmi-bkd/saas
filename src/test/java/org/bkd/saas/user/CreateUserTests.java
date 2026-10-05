@@ -1,11 +1,11 @@
 package org.bkd.saas.user;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.bkd.saas.TestUtils.assertError;
+import static org.bkd.saas.user.UserTestUtils.assertUserCreated;
 
 import org.bkd.saas.AbstractIntegrationTests;
 import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.db.UserRepository;
-import org.bkd.saas.user.dto.RoleEnum;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,14 +33,7 @@ public class CreateUserTests extends AbstractIntegrationTests {
     ResponseEntity<UserDto> response = createUserOk(createUserRequest);
 
     // assert
-    assertThat(response.getStatusCode().value()).isEqualTo(201);
-    UserDto createdUser = response.getBody();
-    assertThat(createdUser.id()).isNotNull();
-    assertThat(createdUser.email()).isEqualTo(EMAIL);
-    assertThat(createdUser.role()).isEqualTo(RoleEnum.ROLE_USER);
-    assertThat(createdUser.enabled()).isTrue();
-    assertThat(createdUser.createdAt()).isNotNull();
-    assertThat(createdUser.updatedAt()).isNotNull();
+    assertUserCreated(response, EMAIL);
   }
 
   @Test
@@ -53,9 +46,7 @@ public class CreateUserTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = createUserKo(createUserRequest);
 
     // assert
-    assertThat(response.getBody().status()).isEqualTo(409);
-    assertThat(response.getBody().message()).isEqualTo("Email already used");
-    assertThat(response.getBody().error()).isEqualTo("Conflict");
+    assertError(response, 409, "Conflict", "Email already used");
   }
 
   private ResponseEntity<UserDto> createUserOk(CreateUserRequest request) {

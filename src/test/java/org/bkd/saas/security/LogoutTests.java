@@ -1,6 +1,8 @@
 package org.bkd.saas.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bkd.saas.TestUtils.assertError;
+import static org.bkd.saas.TestUtils.assertNoContent;
 
 import java.util.List;
 import org.bkd.saas.AbstractIntegrationTests;
@@ -45,7 +47,7 @@ public class LogoutTests extends AbstractIntegrationTests {
     ResponseEntity<Void> response = logoutOk(logoutRequest);
 
     // assert
-    assertThat(response.getStatusCode().value()).isEqualTo(204);
+    assertNoContent(response);
     List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
     assertThat(tokens).hasSize(1);
     assertThat(tokens.get(0).getRevokedAt()).isNotNull();
@@ -60,9 +62,7 @@ public class LogoutTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = logoutKo(logoutRequest);
 
     // assert
-    assertThat(response.getBody().status()).isEqualTo(401);
-    assertThat(response.getBody().message()).isEqualTo("Invalid token");
-    assertThat(response.getBody().error()).isEqualTo("Unauthorized");
+    assertError(response, 401, "Unauthorized", "Invalid token");
   }
 
   private ResponseEntity<UserDto> createUserOk(CreateUserRequest request) {

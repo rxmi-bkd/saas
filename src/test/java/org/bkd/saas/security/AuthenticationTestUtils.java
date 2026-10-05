@@ -1,5 +1,6 @@
 package org.bkd.saas.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bkd.saas.security.rest.Routes.LOGIN;
 import static org.bkd.saas.security.rest.Routes.LOGOUT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -33,6 +34,14 @@ public class AuthenticationTestUtils {
 
   public static ResponseEntity<ErrorDto> logoutKo(LogoutRequest body, String host) {
     return logout(body, ErrorDto.class, host);
+  }
+
+  public static void assertTokenPair(ResponseEntity<TokenPairDto> response) {
+    assertThat(response.getStatusCode().value()).isEqualTo(200);
+    TokenPairDto tokenPair = response.getBody();
+    assertThat(tokenPair).isNotNull();
+    assertThat(tokenPair.access()).isNotBlank();
+    assertThat(tokenPair.refresh()).isNotBlank();
   }
 
   private static <T> ResponseEntity<T> logout(

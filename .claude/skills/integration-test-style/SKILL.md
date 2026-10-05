@@ -12,7 +12,7 @@ Tests here exercise the real app over HTTP against a Testcontainers PostgreSQL. 
 - One test class per use case/endpoint, named `<Action><Feature>Tests` (e.g. `CreateUserTests`), in `src/test/java/org/bkd/saas/<feature>/`, mirroring the main package.
 - The class is `public`, extends `AbstractIntegrationTests`, and uses JUnit 5 `@Test` (package-private methods).
 - HTTP helpers for a feature live in `src/test/java/org/bkd/saas/<feature>/<Feature>TestUtils.java` (same package as the tests) (e.g. `UserTestUtils`): a private-constructor class (`@NoArgsConstructor(access = AccessLevel.PRIVATE)`) with static methods. Add new calls there rather than inlining RestClient code in tests.
-- Shared test-only types (e.g. `ErrorDto`) live in `src/test/java/org/bkd/saas/shared/dto/`, mirroring the main `shared` package.
+- Shared assertions that are not feature-specific (`assertError`, `assertNoContent`) live in `src/test/java/org/bkd/saas/TestUtils.java`.
 
 ## Helper conventions
 
@@ -31,13 +31,23 @@ private ResponseEntity<UserDto> createUserOk(CreateUserRequest request) {
 }
 ```
 
+## Assertion helpers
+
+Don't inline response assertions in tests. Put them in a static helper and call it from the test:
+
+- Error responses: `TestUtils.assertError(response, status, error, message)` checks the HTTP status, then `status()`, `error()` and `message()` of the `ErrorDto`. Example: `assertError(response, 409, "Conflict", "Email already used")`.
+- Bodyless success (e.g. 204): `TestUtils.assertNoContent(response)`. Add similar generic helpers (not tied to one feature) to `TestUtils`.
+- Success with a body: add a static `assert<Result>(response, ...)` to the feature's `<Feature>TestUtils` (e.g. `UserTestUtils.assertUserCreated(response, email)`, `AuthenticationTestUtils.assertTokenPair(response)`). It checks the status code, that the body is not null, and each meaningful field.
+- Reuse an existing helper when it fits; add a new one when a new endpoint needs it. Extra checks that need a repository (e.g. persisted state) stay in the test after the helper call.
+- Helpers take expected status as `int` and use AssertJ `assertThat`.
+
 ## Test structure
 
 - Reset state in `@BeforeEach` (e.g. `userRepository.deleteAll()`), with the repository `@Autowired` into the test, so tests are independent.
 - Constants for shared inputs at the top (`EMAIL`, `PASSWORD`).
 - Method names: `<action>_<condition>_<expectedResult>`, e.g. `createUser_withAlreadyUsedEmail_returnsConflict`. Drop the condition for the happy path (`createUser_returnsCreatedUser`).
 - Body is split by `// arrange`, `// act`, `// assert` comments, in that order, always all three.
-- Assert with AssertJ (`assertThat`). On success, check the status code and each meaningful field. On failure, check `status()`, `message()` and `error()` of the `ErrorDto`.
+- Assert through the helpers above (see "Assertion helpers"); use AssertJ `assertThat` directly only for checks not covered by a helper, such as persisted state.
 
 ## Rules that matter
 
@@ -60,9 +70,7 @@ void createUser_withDifferentCaseEmail_returnsConflict() {
   ResponseEntity<ErrorDto> response = createUserKo(upperCaseRequest);
 
   // assert
-  assertThat(response.getBody().status()).isEqualTo(409);
-  assertThat(response.getBody().message()).isEqualTo("Email already used");
-  assertThat(response.getBody().error()).isEqualTo("Conflict");
+  assertError(response, 409, "Conflict", "Email already used");
 }
 ```
 

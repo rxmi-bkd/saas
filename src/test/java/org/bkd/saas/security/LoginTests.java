@@ -1,6 +1,7 @@
 package org.bkd.saas.security;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.bkd.saas.TestUtils.assertError;
+import static org.bkd.saas.security.AuthenticationTestUtils.assertTokenPair;
 
 import org.bkd.saas.AbstractIntegrationTests;
 import org.bkd.saas.security.dto.TokenPairDto;
@@ -38,10 +39,7 @@ public class LoginTests extends AbstractIntegrationTests {
     ResponseEntity<TokenPairDto> response = loginOk(loginRequest);
 
     // assert
-    assertThat(response.getStatusCode().value()).isEqualTo(200);
-    TokenPairDto tokenPair = response.getBody();
-    assertThat(tokenPair.access()).isNotBlank();
-    assertThat(tokenPair.refresh()).isNotBlank();
+    assertTokenPair(response);
   }
 
   @Test
@@ -53,9 +51,7 @@ public class LoginTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = loginKo(loginRequest);
 
     // assert
-    assertThat(response.getBody().status()).isEqualTo(401);
-    assertThat(response.getBody().message()).isEqualTo("Invalid email or password");
-    assertThat(response.getBody().error()).isEqualTo("Unauthorized");
+    assertError(response, 401, "Unauthorized", "Invalid email or password");
   }
 
   @Test
@@ -69,9 +65,7 @@ public class LoginTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = loginKo(loginRequest);
 
     // assert
-    assertThat(response.getBody().status()).isEqualTo(401);
-    assertThat(response.getBody().message()).isEqualTo("Invalid email or password");
-    assertThat(response.getBody().error()).isEqualTo("Unauthorized");
+    assertError(response, 401, "Unauthorized", "Invalid email or password");
   }
 
   @Test
@@ -86,9 +80,7 @@ public class LoginTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = loginKo(loginRequest);
 
     // assert
-    assertThat(response.getBody().status()).isEqualTo(401);
-    assertThat(response.getBody().message()).isEqualTo("Invalid email or password");
-    assertThat(response.getBody().error()).isEqualTo("Unauthorized");
+    assertError(response, 401, "Unauthorized", "Invalid email or password");
   }
 
   private void disableUser(String email) {

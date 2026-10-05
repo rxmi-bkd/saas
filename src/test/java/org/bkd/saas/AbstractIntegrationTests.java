@@ -14,7 +14,8 @@ public abstract class AbstractIntegrationTests {
   @LocalServerPort private int port;
 
   @ServiceConnection
-  private final static PostgreSQLContainer postgresql = new PostgreSQLContainer("postgres:17-alpine");
+  private static final PostgreSQLContainer postgresql =
+      new PostgreSQLContainer("postgres:17-alpine");
 
   protected String server() {
     return "http://localhost:" + port;
