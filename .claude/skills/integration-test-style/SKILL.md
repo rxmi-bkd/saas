@@ -1,6 +1,6 @@
 ---
 name: integration-test-style
-description: House style for writing integration tests in this Spring Boot SaaS repo (extends AbstractIntegrationTests, real HTTP through RestClient, Testcontainers Postgres). Use whenever the user asks to add, write, extend or refactor a test under src/test (e.g. CreateUserTests, a new <Feature>Tests class, a new endpoint test, a test for a service method), even if they only say "add a test for X" without mentioning integration tests.
+description: House style for writing integration tests in this Spring Boot SaaS repo (extends AbstractIntegrationTests, real HTTP through RestClient-based test clients, Testcontainers Postgres). Use whenever the user asks to add, write, extend or refactor a test under src/test (e.g. CreateUserTests, a new <Feature>Tests class, a new endpoint test, a test for a service method), even if they only say "add a test for X" without mentioning integration tests.
 ---
 
 # Integration test style
@@ -11,33 +11,33 @@ Tests here exercise the real app over HTTP against a Testcontainers PostgreSQL. 
 
 - One test class per use case/endpoint, named `<Action><Feature>Tests` (e.g. `CreateUserTests`), in `src/test/java/org/bkd/saas/<feature>/`, mirroring the main package.
 - The class is `public`, extends `AbstractIntegrationTests`, and uses JUnit 5 `@Test` (package-private methods).
-- HTTP helpers for a feature live in `src/test/java/org/bkd/saas/<feature>/<Feature>TestUtils.java` (same package as the tests) (e.g. `UserTestUtils`): a private-constructor class (`@NoArgsConstructor(access = AccessLevel.PRIVATE)`) with static methods. Add new calls there rather than inlining RestClient code in tests.
-- Shared assertions that are not feature-specific (`assertError`, `assertNoContent`) live in `src/test/java/org/bkd/saas/TestUtils.java`.
+- HTTP clients for a feature live in `src/test/java/org/bkd/saas/<feature>/<Feature>TestClient.java` (same package as the tests), e.g. `UserTestClient`. A client is an instance class: its constructor takes the server host and builds a `RestClient` with `baseUrl(host)`. It only sends requests; it contains no assertions. Add new calls there rather than inlining RestClient code in tests.
+- Assertions that are specific to a feature live in `<Feature>Assertions.java` in the same package (e.g. `UserAssertions`, `SecurityAssertions`): a private-constructor class (`@NoArgsConstructor(access = AccessLevel.PRIVATE)`) with static methods.
+- Shared assertions that are not feature-specific (`assertError`, `assertNoContent`) live in `src/test/java/org/bkd/saas/SharedAssertions.java`.
+- `AbstractIntegrationTests` exposes the ready-to-use clients as protected fields (`security`, `users`), created in a `@BeforeEach` from `server()`. When adding a client for a new feature, add a field and its initialization there. Tests call `users.createUserOk(request)` directly; never add private wrapper methods that pass `server()`.
 
-## Helper conventions
+## Client conventions
 
-For each endpoint, expose a pair in the TestUtils class that wraps one private generic method:
+For each endpoint, expose a pair in the client class that wraps one private generic method:
 
-- `<action>Ok(request, host)` returns `ResponseEntity<SuccessDto>`
-- `<action>Ko(request, host)` returns `ResponseEntity<ErrorDto>`
+- `<action>Ok(request)` returns `ResponseEntity<SuccessDto>`
+- `<action>Ko(request)` returns `ResponseEntity<ErrorDto>`
 
-The private generic method uses `RestClient` and `.onStatus(HttpStatusCode::isError, (request, response) -> {})` so error statuses don't throw and can be asserted on. Use the route constants from the main code (`org.bkd.saas.<feature>.rest.Routes`), not string literals.
-
-In the test class, add thin private wrappers that pass `server()`:
+The private generic method uses the client's `RestClient` with relative URIs (the route constant only, the base URL is already set) and `.onStatus(HttpStatusCode::isError, (request, response) -> {})` so error statuses don't throw and can be asserted on. Use the route constants from the main code (`org.bkd.saas.<feature>.rest.Routes`), not string literals.
 
 ```java
-private ResponseEntity<UserDto> createUserOk(CreateUserRequest request) {
-  return UserTestUtils.createUserOk(request, server());
+public ResponseEntity<UserDto> createUserOk(CreateUserRequest body) {
+  return createUser(body, UserDto.class);
 }
 ```
 
 ## Assertion helpers
 
-Don't inline response assertions in tests. Put them in a static helper and call it from the test:
+Don't inline response assertions in tests, and don't put them in the clients. Put them in a static helper and call it from the test:
 
-- Error responses: `TestUtils.assertError(response, status, error, message)` checks the HTTP status, then `status()`, `error()` and `message()` of the `ErrorDto`. Example: `assertError(response, 409, "Conflict", "Email already used")`.
-- Bodyless success (e.g. 204): `TestUtils.assertNoContent(response)`. Add similar generic helpers (not tied to one feature) to `TestUtils`.
-- Success with a body: add a static `assert<Result>(response, ...)` to the feature's `<Feature>TestUtils` (e.g. `UserTestUtils.assertUserCreated(response, email)`, `AuthenticationTestUtils.assertTokenPair(response)`). It checks the status code, that the body is not null, and each meaningful field.
+- Error responses: `SharedAssertions.assertError(response, status, error, message)` checks the HTTP status, then `status()`, `error()` and `message()` of the `ErrorDto`. Example: `assertError(response, 409, "Conflict", "Email already used")`.
+- Bodyless success (e.g. 204): `SharedAssertions.assertNoContent(response)`. Add similar generic helpers (not tied to one feature) to `SharedAssertions`.
+- Success with a body: add a static `assert<Result>(response, ...)` to the feature's `<Feature>Assertions` (e.g. `UserAssertions.assertUserCreated(response, email)`, `SecurityAssertions.assertTokenPair(response)`). It checks the status code, that the body is not null, and each meaningful field.
 - Reuse an existing helper when it fits; add a new one when a new endpoint needs it. Extra checks that need a repository (e.g. persisted state) stay in the test after the helper call.
 - Helpers take expected status as `int` and use AssertJ `assertThat`.
 
@@ -51,7 +51,7 @@ Don't inline response assertions in tests. Put them in a static helper and call 
 
 ## Rules that matter
 
-- **Never construct a DTO/request inline as an argument.** Build it into a local variable in `// arrange` first, then pass the variable. `createUserOk(new CreateUserRequest(...))` is wrong; `CreateUserRequest request = new CreateUserRequest(...); createUserOk(request);` is right. This keeps arrange separate from act.
+- **Never construct a DTO/request inline as an argument.** Build it into a local variable in `// arrange` first, then pass the variable. `users.createUserOk(new CreateUserRequest(...))` is wrong; `CreateUserRequest request = new CreateUserRequest(...); users.createUserOk(request);` is right. This keeps arrange separate from act.
 - Setup calls that are really part of the scenario (creating the first user before testing a conflict) go in `// act`, not `// arrange`; arrange only builds data.
 - Don't mock; call the API. Use the repository directly only for cleanup or for checking persisted state.
 - Keep one behavior per test; if two assertions need different arranged data, make two tests.
@@ -66,8 +66,8 @@ void createUser_withDifferentCaseEmail_returnsConflict() {
   CreateUserRequest upperCaseRequest = new CreateUserRequest(EMAIL.toUpperCase(), PASSWORD);
 
   // act
-  createUserOk(createUserRequest);
-  ResponseEntity<ErrorDto> response = createUserKo(upperCaseRequest);
+  users.createUserOk(createUserRequest);
+  ResponseEntity<ErrorDto> response = users.createUserKo(upperCaseRequest);
 
   // assert
   assertError(response, 409, "Conflict", "Email already used");

@@ -1,7 +1,7 @@
 package org.bkd.saas.user;
 
-import static org.bkd.saas.TestUtils.assertError;
-import static org.bkd.saas.user.UserTestUtils.assertUserCreated;
+import static org.bkd.saas.SharedAssertions.assertError;
+import static org.bkd.saas.user.UserAssertions.assertUserCreated;
 
 import org.bkd.saas.AbstractIntegrationTests;
 import org.bkd.saas.shared.dto.ErrorDto;
@@ -30,7 +30,7 @@ public class CreateUserTests extends AbstractIntegrationTests {
     CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
 
     // act
-    ResponseEntity<UserDto> response = createUserOk(createUserRequest);
+    ResponseEntity<UserDto> response = users.createUserOk(createUserRequest);
 
     // assert
     assertUserCreated(response, EMAIL);
@@ -42,18 +42,10 @@ public class CreateUserTests extends AbstractIntegrationTests {
     CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
 
     // act
-    createUserOk(createUserRequest);
-    ResponseEntity<ErrorDto> response = createUserKo(createUserRequest);
+    users.createUserOk(createUserRequest);
+    ResponseEntity<ErrorDto> response = users.createUserKo(createUserRequest);
 
     // assert
     assertError(response, 409, "Conflict", "Email already used");
-  }
-
-  private ResponseEntity<UserDto> createUserOk(CreateUserRequest request) {
-    return UserTestUtils.createUserOk(request, server());
-  }
-
-  private ResponseEntity<ErrorDto> createUserKo(CreateUserRequest request) {
-    return UserTestUtils.createUserKo(request, server());
   }
 }

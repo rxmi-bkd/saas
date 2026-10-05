@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class AuthenticationController {
+public class SecurityController {
   private final AuthenticationService authenticationService;
 
   @PostMapping(LOGIN)

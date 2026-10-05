@@ -8,7 +8,7 @@ import org.bkd.saas.shared.dto.ErrorDto;
 import org.springframework.http.ResponseEntity;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class TestUtils {
+public class SharedAssertions {
 
   public static void assertError(
       ResponseEntity<ErrorDto> response,
