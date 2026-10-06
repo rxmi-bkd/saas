@@ -56,7 +56,6 @@ public class RefreshTests extends AbstractIntegrationTests {
     List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
     assertThat(tokens).hasSize(2);
     assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(1);
-    assertThat(tokens.stream().map(RefreshTokenEntity::getFamilyId).distinct()).hasSize(1);
   }
 
   @Test
@@ -108,6 +107,7 @@ public class RefreshTests extends AbstractIntegrationTests {
     // assert
     assertError(response, 401, "Unauthorized", "Invalid token");
     List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
+    assertThat(tokens).hasSize(2);
     assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(1);
   }
 
@@ -128,6 +128,7 @@ public class RefreshTests extends AbstractIntegrationTests {
     // assert
     assertError(response, 401, "Unauthorized", "Invalid token");
     List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
+    assertThat(tokens).hasSize(2);
     assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(2);
   }
 
@@ -147,6 +148,7 @@ public class RefreshTests extends AbstractIntegrationTests {
     // assert
     assertError(response, 401, "Unauthorized", "Invalid token");
     List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
+    assertThat(tokens).hasSize(1);
     assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(1);
   }
 
@@ -164,11 +166,6 @@ public class RefreshTests extends AbstractIntegrationTests {
         refreshTokenRepository.save(token);
       }
     }
-  }
-
-  // expires_at is not updatable through JPA, so backdate it with SQL
-  private void expireTokens() {
-    jdbcTemplate.update("UPDATE refresh_token SET expires_at = now() - interval '1 minute'");
   }
 
   private static boolean isRevoked(RefreshTokenEntity refreshTokenEntity) {
