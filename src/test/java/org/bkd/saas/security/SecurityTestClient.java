@@ -4,6 +4,7 @@ import static org.bkd.saas.security.rest.Routes.LOGIN;
 import static org.bkd.saas.security.rest.Routes.LOGOUT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import lombok.RequiredArgsConstructor;
 import org.bkd.saas.security.dto.TokenPairDto;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.security.rest.request.LogoutRequest;
@@ -12,13 +13,10 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
+
+@RequiredArgsConstructor
 public class SecurityTestClient {
-
   private final RestClient restClient;
-
-  public SecurityTestClient(String host) {
-    this.restClient = RestClient.builder().baseUrl(host).build();
-  }
 
   public ResponseEntity<TokenPairDto> loginOk(LoginRequest body) {
     return login(body, TokenPairDto.class);

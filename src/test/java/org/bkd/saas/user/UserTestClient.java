@@ -4,6 +4,7 @@ import static org.bkd.saas.user.rest.Routes.CREATE_USER;
 import static org.bkd.saas.user.rest.Routes.UPDATE_USER_EMAIL;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import lombok.RequiredArgsConstructor;
 import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
@@ -13,13 +14,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
+@RequiredArgsConstructor
 public class UserTestClient {
-
   private final RestClient restClient;
-
-  public UserTestClient(String host) {
-    this.restClient = RestClient.builder().baseUrl(host).build();
-  }
 
   public ResponseEntity<UserDto> createUserOk(CreateUserRequest body) {
     return createUser(body, UserDto.class);

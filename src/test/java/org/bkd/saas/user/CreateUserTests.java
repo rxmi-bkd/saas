@@ -30,7 +30,7 @@ public class CreateUserTests extends AbstractIntegrationTests {
     CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
 
     // act
-    ResponseEntity<UserDto> response = users.createUserOk(createUserRequest);
+    ResponseEntity<UserDto> response = userClient.createUserOk(createUserRequest);
 
     // assert
     assertUserCreated(response, EMAIL);
@@ -42,8 +42,8 @@ public class CreateUserTests extends AbstractIntegrationTests {
     CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
 
     // act
-    users.createUserOk(createUserRequest);
-    ResponseEntity<ErrorDto> response = users.createUserKo(createUserRequest);
+    userClient.createUserOk(createUserRequest);
+    ResponseEntity<ErrorDto> response = userClient.createUserKo(createUserRequest);
 
     // assert
     assertError(response, 409, "Conflict", "Email already used");

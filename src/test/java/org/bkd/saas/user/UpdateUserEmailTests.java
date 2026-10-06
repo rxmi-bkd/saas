@@ -37,9 +37,9 @@ public class UpdateUserEmailTests extends AbstractIntegrationTests {
     UpdateUserEmailRequest updateRequest = new UpdateUserEmailRequest(NEW_EMAIL);
 
     // act
-    UserDto user = users.createUserOk(createUserRequest).getBody();
-    String accessToken = security.loginOk(loginRequest).getBody().access();
-    ResponseEntity<Void> response = users.updateUserEmailOk(updateRequest, accessToken);
+    UserDto user = userClient.createUserOk(createUserRequest).getBody();
+    String accessToken = securityClient.loginOk(loginRequest).getBody().access();
+    ResponseEntity<Void> response = userClient.updateUserEmailOk(updateRequest, accessToken);
 
     // assert
     assertNoContent(response);
@@ -55,10 +55,10 @@ public class UpdateUserEmailTests extends AbstractIntegrationTests {
     UpdateUserEmailRequest updateRequest = new UpdateUserEmailRequest(OTHER_EMAIL);
 
     // act
-    UserDto user = users.createUserOk(createUserRequest).getBody();
-    users.createUserOk(otherUserRequest);
-    String accessToken = security.loginOk(loginRequest).getBody().access();
-    ResponseEntity<ErrorDto> response = users.updateUserEmailKo(updateRequest, accessToken);
+    UserDto user = userClient.createUserOk(createUserRequest).getBody();
+    userClient.createUserOk(otherUserRequest);
+    String accessToken = securityClient.loginOk(loginRequest).getBody().access();
+    ResponseEntity<ErrorDto> response = userClient.updateUserEmailKo(updateRequest, accessToken);
 
     // assert
     assertError(response, 409, "Conflict", "Email already used");

@@ -39,10 +39,10 @@ public class LogoutTests extends AbstractIntegrationTests {
     LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
 
     // act
-    users.createUserOk(createUserRequest);
-    TokenPairDto tokenPair = security.loginOk(loginRequest).getBody();
+    userClient.createUserOk(createUserRequest);
+    TokenPairDto tokenPair = securityClient.loginOk(loginRequest).getBody();
     LogoutRequest logoutRequest = new LogoutRequest(tokenPair.refresh());
-    ResponseEntity<Void> response = security.logoutOk(logoutRequest);
+    ResponseEntity<Void> response = securityClient.logoutOk(logoutRequest);
 
     // assert
     assertNoContent(response);
@@ -57,7 +57,7 @@ public class LogoutTests extends AbstractIntegrationTests {
     LogoutRequest logoutRequest = new LogoutRequest("unknown-token");
 
     // act
-    ResponseEntity<ErrorDto> response = security.logoutKo(logoutRequest);
+    ResponseEntity<ErrorDto> response = securityClient.logoutKo(logoutRequest);
 
     // assert
     assertError(response, 401, "Unauthorized", "Invalid token");

@@ -33,8 +33,8 @@ public class LoginTests extends AbstractIntegrationTests {
     LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
 
     // act
-    users.createUserOk(createUserRequest);
-    ResponseEntity<TokenPairDto> response = security.loginOk(loginRequest);
+    userClient.createUserOk(createUserRequest);
+    ResponseEntity<TokenPairDto> response = securityClient.loginOk(loginRequest);
 
     // assert
     assertTokenPair(response);
@@ -46,7 +46,7 @@ public class LoginTests extends AbstractIntegrationTests {
     LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
 
     // act
-    ResponseEntity<ErrorDto> response = security.loginKo(loginRequest);
+    ResponseEntity<ErrorDto> response = securityClient.loginKo(loginRequest);
 
     // assert
     assertError(response, 401, "Unauthorized", "Invalid email or password");
@@ -59,8 +59,8 @@ public class LoginTests extends AbstractIntegrationTests {
     LoginRequest loginRequest = new LoginRequest(EMAIL, "wrong-password");
 
     // act
-    users.createUserOk(createUserRequest);
-    ResponseEntity<ErrorDto> response = security.loginKo(loginRequest);
+    userClient.createUserOk(createUserRequest);
+    ResponseEntity<ErrorDto> response = securityClient.loginKo(loginRequest);
 
     // assert
     assertError(response, 401, "Unauthorized", "Invalid email or password");
@@ -73,9 +73,9 @@ public class LoginTests extends AbstractIntegrationTests {
     LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
 
     // act
-    users.createUserOk(createUserRequest);
+    userClient.createUserOk(createUserRequest);
     disableUser(EMAIL);
-    ResponseEntity<ErrorDto> response = security.loginKo(loginRequest);
+    ResponseEntity<ErrorDto> response = securityClient.loginKo(loginRequest);
 
     // assert
     assertError(response, 401, "Unauthorized", "Invalid email or password");

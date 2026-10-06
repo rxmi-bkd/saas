@@ -1,12 +1,13 @@
 package org.bkd.saas;
 
+import jakarta.annotation.PostConstruct;
 import org.bkd.saas.security.SecurityTestClient;
 import org.bkd.saas.user.UserTestClient;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.RestClient;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @SpringBootTest(
@@ -20,16 +21,18 @@ public abstract class AbstractIntegrationTests {
   private static final PostgreSQLContainer postgresql =
       new PostgreSQLContainer("postgres:17-alpine");
 
-  protected SecurityTestClient security;
-  protected UserTestClient users;
+  protected SecurityTestClient securityClient;
+  protected UserTestClient userClient;
 
-  @BeforeEach
-  void initClients() {
-    security = new SecurityTestClient(server());
-    users = new UserTestClient(server());
+
+  @PostConstruct
+  void postConstruct() {
+    RestClient restClient = RestClient.builder().baseUrl(host()).build();
+    securityClient = new SecurityTestClient(restClient);
+    userClient = new UserTestClient(restClient);
   }
 
-  protected String server() {
+  private String host() {
     return "http://localhost:" + port;
   }
 }
