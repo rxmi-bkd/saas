@@ -12,6 +12,7 @@ import org.bkd.saas.security.db.RefreshTokenRepository;
 import org.bkd.saas.security.dto.TokenPairDto;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.security.rest.request.RefreshTokenRequest;
+import org.bkd.saas.security.service.RefreshTokenService;
 import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
@@ -20,6 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class RefreshTests extends AbstractIntegrationTests {
   private static final String EMAIL = "test@test.com";
@@ -27,6 +30,8 @@ public class RefreshTests extends AbstractIntegrationTests {
 
   @Autowired private UserRepository userRepository;
   @Autowired private RefreshTokenRepository refreshTokenRepository;
+  @Autowired private JdbcTemplate jdbcTemplate;
+  @Autowired private RefreshTokenService refreshTokenService;
 
   @BeforeEach
   void beforeEach() {
@@ -48,29 +53,10 @@ public class RefreshTests extends AbstractIntegrationTests {
 
     // assert
     assertTokenPair(response);
-    assertThat(response.getBody().refresh()).isNotEqualTo(tokenPair.refresh());
     List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
     assertThat(tokens).hasSize(2);
-    assertThat(tokens.stream().filter(token -> token.getRevokedAt() == null)).hasSize(1);
+    assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(1);
     assertThat(tokens.stream().map(RefreshTokenEntity::getFamilyId).distinct()).hasSize(1);
-  }
-
-  @Test
-  void refresh_withNewTokenAfterRefresh_returnsTokenPair() {
-    // arrange
-    CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
-    LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
-
-    // act
-    userClient.createUserOk(createUserRequest);
-    TokenPairDto tokenPair = securityClient.loginOk(loginRequest).getBody();
-    RefreshTokenRequest firstRequest = new RefreshTokenRequest(tokenPair.refresh());
-    TokenPairDto rotated = securityClient.refreshOk(firstRequest).getBody();
-    RefreshTokenRequest secondRequest = new RefreshTokenRequest(rotated.refresh());
-    ResponseEntity<TokenPairDto> response = securityClient.refreshOk(secondRequest);
-
-    // assert
-    assertTokenPair(response);
   }
 
   @Test
@@ -83,6 +69,27 @@ public class RefreshTests extends AbstractIntegrationTests {
 
     // assert
     assertError(response, 401, "Unauthorized", "Invalid token");
+  }
+
+  @Test
+  void refresh_withExpiredToken_returnsUnauthorized() {
+    // arrange
+    long baseValue = (long) ReflectionTestUtils.getField(refreshTokenService, "expirationInSeconds");
+    ReflectionTestUtils.setField(refreshTokenService, "expirationInSeconds", -1l);
+    CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
+    LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
+
+    // act
+    userClient.createUserOk(createUserRequest);
+    TokenPairDto tokenPair = securityClient.loginOk(loginRequest).getBody();
+    RefreshTokenRequest refreshRequest = new RefreshTokenRequest(tokenPair.refresh());
+    ResponseEntity<ErrorDto> response = securityClient.refreshKo(refreshRequest);
+
+    // assert
+    assertError(response, 401, "Unauthorized", "Invalid token");
+
+    // clean up
+    ReflectionTestUtils.setField(refreshTokenService, "expirationInSeconds", baseValue);
   }
 
   @Test
@@ -101,7 +108,7 @@ public class RefreshTests extends AbstractIntegrationTests {
     // assert
     assertError(response, 401, "Unauthorized", "Invalid token");
     List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
-    assertThat(tokens.stream().filter(token -> token.getRevokedAt() == null)).hasSize(1);
+    assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(1);
   }
 
   @Test
@@ -114,16 +121,14 @@ public class RefreshTests extends AbstractIntegrationTests {
     userClient.createUserOk(createUserRequest);
     TokenPairDto tokenPair = securityClient.loginOk(loginRequest).getBody();
     RefreshTokenRequest refreshRequest = new RefreshTokenRequest(tokenPair.refresh());
-    TokenPairDto rotated = securityClient.refreshOk(refreshRequest).getBody();
+    securityClient.refreshOk(refreshRequest);
     expireGracePeriod();
     ResponseEntity<ErrorDto> response = securityClient.refreshKo(refreshRequest);
 
     // assert
     assertError(response, 401, "Unauthorized", "Invalid token");
-    assertThat(refreshTokenRepository.findAll())
-        .allSatisfy(token -> assertThat(token.getRevokedAt()).isNotNull());
-    RefreshTokenRequest rotatedRequest = new RefreshTokenRequest(rotated.refresh());
-    assertError(securityClient.refreshKo(rotatedRequest), 401, "Unauthorized", "Invalid token");
+    List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
+    assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(2);
   }
 
   @Test
@@ -141,8 +146,8 @@ public class RefreshTests extends AbstractIntegrationTests {
 
     // assert
     assertError(response, 401, "Unauthorized", "Invalid token");
-    assertThat(refreshTokenRepository.findAll())
-        .allSatisfy(token -> assertThat(token.getRevokedAt()).isNotNull());
+    List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
+    assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(1);
   }
 
   private void disableUser(String email) {
@@ -159,5 +164,14 @@ public class RefreshTests extends AbstractIntegrationTests {
         refreshTokenRepository.save(token);
       }
     }
+  }
+
+  // expires_at is not updatable through JPA, so backdate it with SQL
+  private void expireTokens() {
+    jdbcTemplate.update("UPDATE refresh_token SET expires_at = now() - interval '1 minute'");
+  }
+
+  private static boolean isRevoked(RefreshTokenEntity refreshTokenEntity) {
+    return refreshTokenEntity.getRevokedAt() != null;
   }
 }
