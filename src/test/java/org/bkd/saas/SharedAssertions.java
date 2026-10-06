@@ -26,4 +26,8 @@ public class SharedAssertions {
   public static void assertNoContent(ResponseEntity<Void> response) {
     assertThat(response.getStatusCode().value()).isEqualTo(204);
   }
+
+  public static void assertStatus(ResponseEntity<?> response, int expectedStatus) {
+    assertThat(response.getStatusCode().value()).isEqualTo(expectedStatus);
+  }
 }

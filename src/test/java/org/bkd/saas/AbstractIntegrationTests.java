@@ -24,7 +24,6 @@ public abstract class AbstractIntegrationTests {
   protected SecurityTestClient securityClient;
   protected UserTestClient userClient;
 
-
   @PostConstruct
   void postConstruct() {
     RestClient restClient = RestClient.builder().baseUrl(host()).build();
