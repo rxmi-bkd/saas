@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class SecurityService {
   private final UserService userService;
   private final PasswordEncoder passwordEncoder;
   private final AccessTokenService accessTokenService;
