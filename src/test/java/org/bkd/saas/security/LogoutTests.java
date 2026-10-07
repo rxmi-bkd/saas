@@ -48,7 +48,7 @@ public class LogoutTests extends AbstractIntegrationTests {
     assertNoContent(response);
     List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
     assertThat(tokens).hasSize(1);
-    assertThat(tokens.get(0).getRevokedAt()).isNotNull();
+    assertThat(tokens.getFirst().getRevokedAt()).isNotNull();
   }
 
   @Test

@@ -9,10 +9,12 @@ import org.bkd.saas.oidc.dto.ProfileDto;
 import org.bkd.saas.oidc.dto.StateDto;
 import org.bkd.saas.oidc.exception.StateExpiredException;
 import org.bkd.saas.oidc.exception.UnsupportedPlatformException;
+import org.bkd.saas.oidc.exception.UnverifiedEmailException;
 import org.bkd.saas.security.dto.TokenPairDto;
 import org.bkd.saas.security.service.AccessTokenService;
 import org.bkd.saas.security.service.RefreshTokenService;
 import org.bkd.saas.user.dto.UserDto;
+import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +43,17 @@ public class OidcService {
     AccessToken tokens = tokenExchanger.exchangeCodeForTokens(code);
     ProfileDto profile = profileFetcher.fetchProfile(tokens);
     stateService.deleteState(state_.id());
+
+    if (!profile.emailVerified()) {
+      throw new UnverifiedEmailException(profile.email());
+    }
+
     UserDto user = userService.readOrCreateUser(profile.email());
+
+    if (!user.enabled()) {
+      throw new DisabledUserException(user.id());
+    }
+
     String access = accessTokenService.createJwt(user.id(), user.role());
     String refresh = refreshTokenService.createToken(user.id());
     return new TokenPairDto(access, refresh);
@@ -52,7 +64,7 @@ public class OidcService {
     boolean isExpired = stateDto.expiresAt().isBefore(Instant.now());
 
     if (isExpired) {
-      throw new StateExpiredException();
+      throw new StateExpiredException(state);
     }
 
     return stateDto;

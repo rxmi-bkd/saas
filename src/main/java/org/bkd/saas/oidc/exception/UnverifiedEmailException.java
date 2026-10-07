@@ -4,9 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class StateExpiredException extends RuntimeException {
-
-    public StateExpiredException(String state) {
-        super("State expired: " + state);
+public class UnverifiedEmailException extends RuntimeException {
+    public UnverifiedEmailException(String email) {
+        super("Email unverified: " + email);
     }
 }

@@ -58,7 +58,7 @@ public class AccessTokenService {
     try {
       return Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt).getPayload();
     } catch (JwtException e) {
-      throw new InvalidTokenException();
+      throw new InvalidTokenException(jwt);
     }
   }
 

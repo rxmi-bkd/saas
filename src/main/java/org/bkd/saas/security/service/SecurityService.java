@@ -14,6 +14,8 @@ import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
+import org.bkd.saas.user.exception.DisabledUserException;
+import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,8 +49,16 @@ public class SecurityService {
     String hashToCheck = user.map(UserWithPasswordDto::password).orElse(dummyPasswordHash);
     boolean isPasswordCorrect = passwordEncoder.matches(password, hashToCheck);
 
-    if (user.isEmpty() || !isPasswordCorrect || !user.get().enabled()) {
+    if (!isPasswordCorrect) {
       throw new InvalidCredentialsException();
+    }
+
+    if (user.isEmpty()) {
+      throw new UserNotFoundException(email);
+    }
+
+    if (!user.get().enabled()) {
+      throw new DisabledUserException(user.get().id());
     }
 
     String accessToken = accessTokenService.createJwt(user.get().id(), user.get().role());
@@ -77,7 +87,7 @@ public class SecurityService {
       return;
     }
 
-    throw new InvalidTokenException();
+    throw new InvalidTokenException(jwt);
   }
 
   @Transactional(noRollbackFor = InvalidTokenException.class)
@@ -86,7 +96,7 @@ public class SecurityService {
         refreshTokenService.readOptionalToken(token).orElseThrow(InvalidTokenException::new);
 
     if (refreshTokenService.isExpiredToken(tokenDto)) {
-      throw new InvalidTokenException();
+      throw new InvalidTokenException(token);
     }
 
     if (refreshTokenService.isRevokedToken(tokenDto)) {
@@ -95,19 +105,19 @@ public class SecurityService {
         refreshTokenService.revokeTokenFamily(tokenDto.familyId());
       }
 
-      throw new InvalidTokenException();
+      throw new InvalidTokenException(token);
     }
 
     Optional<UserDto> user = userService.readOptionalUser(tokenDto.userId());
 
     if (user.isEmpty()) {
       refreshTokenService.revokeTokenFamily(tokenDto.familyId());
-      throw new InvalidTokenException();
+      throw new UserNotFoundException(tokenDto.userId());
     }
 
     if (!user.get().enabled()) {
       refreshTokenService.revokeTokenFamily(tokenDto.familyId());
-      throw new InvalidTokenException();
+      throw new DisabledUserException(user.get().id());
     }
 
     refreshTokenService.revokeToken(tokenDto.id());
