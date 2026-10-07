@@ -27,6 +27,12 @@ public class SecurityUtils {
     }
   }
 
+  public static String randomToken() {
+    byte[] randomBytes = new byte[32];
+    SECURE_RANDOM.nextBytes(randomBytes);
+    return encodeToBase64(randomBytes);
+  }
+
   public static String encodeToBase64(byte[] bytes) {
     return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
   }

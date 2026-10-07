@@ -1,8 +1,9 @@
 package org.bkd.saas.security.service;
 
-import static org.bkd.saas.shared.SecurityUtils.SECURE_RANDOM;
-import static org.bkd.saas.shared.SecurityUtils.encodeToBase64;
+import static io.jsonwebtoken.Claims.SUBJECT;
+import static org.bkd.saas.shared.SecurityUtils.randomToken;
 
+import io.jsonwebtoken.Claims;
 import jakarta.annotation.PostConstruct;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,9 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bkd.saas.security.dto.AccessTokenDto;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
-import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
-import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,14 +32,11 @@ public class SecurityService {
 
   @PostConstruct
   public void postConstruct() {
-    byte[] randomBytes = new byte[32];
-    SECURE_RANDOM.nextBytes(randomBytes);
-    dummyPasswordHash = passwordEncoder.encode(encodeToBase64(randomBytes));
+    dummyPasswordHash = passwordEncoder.encode(randomToken());
   }
 
   public AccessTokenDto login(String email, String password) {
-    String normalized = StringUtils.normalizeEmail(email);
-    Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(normalized);
+    Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(email);
 
     // Always run "passwordEncoder.matches", even for unknown emails,
     // so response time does not reveal whether an account exists.
@@ -51,17 +47,12 @@ public class SecurityService {
       throw new InvalidCredentialsException();
     }
 
-    if (user.isEmpty()) {
-      throw new UserNotFoundException(normalized);
-    }
-
     String accessToken = accessTokenService.createJwt(user.get().id(), user.get().role());
     return new AccessTokenDto(accessToken);
   }
 
   public void forgotPassword(String email) {
-    String normalized = StringUtils.normalizeEmail(email);
-    Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(normalized);
+    Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(email);
 
     if (user.isEmpty()) {
       return;
@@ -72,10 +63,11 @@ public class SecurityService {
   }
 
   public void resetPassword(String jwt, String newPassword) {
-    UUID userId = passwordResetTokenService.readSubject(jwt);
     boolean isValidJwt = passwordResetTokenService.isValidJwt(jwt);
 
     if (isValidJwt) {
+      Claims claims = passwordResetTokenService.readJwt(jwt);
+      UUID userId = claims.get(SUBJECT, UUID.class);
       userService.updateUserPassword(userId, newPassword);
       return;
     }

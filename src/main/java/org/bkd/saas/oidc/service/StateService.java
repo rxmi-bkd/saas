@@ -1,19 +1,16 @@
 package org.bkd.saas.oidc.service;
 
 import static java.time.Instant.now;
-import static org.bkd.saas.shared.SecurityUtils.SECURE_RANDOM;
-import static org.bkd.saas.shared.SecurityUtils.encodeToBase64;
+import static org.bkd.saas.shared.SecurityUtils.randomToken;
 
-import java.time.Instant;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.oidc.db.StateEntity;
 import org.bkd.saas.oidc.db.StateRepository;
-import org.bkd.saas.oidc.dto.StateDto;
+import org.bkd.saas.oidc.exception.StateExpiredException;
 import org.bkd.saas.oidc.exception.StateNotFoundException;
-import org.bkd.saas.oidc.mapper.StateMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -22,39 +19,37 @@ import org.springframework.transaction.annotation.Transactional;
 public class StateService {
   private static final int STATE_EXPIRATION_SECONDS = 5 * 60;
 
-  private final StateMapper stateMapper;
   private final StateRepository stateRepository;
 
-  public StateDto createState() {
-    Instant now = now();
-    Instant expiresAt = now.plusSeconds(STATE_EXPIRATION_SECONDS);
-    String value = generateRandomString();
+  public String createState() {
+    String value = randomToken();
+    StateEntity state =
+        StateEntity.builder()
+            .value(value)
+            .expiresAt(now().plusSeconds(STATE_EXPIRATION_SECONDS))
+            .build();
 
-    StateEntity newStateEntity = StateEntity.builder().value(value).expiresAt(expiresAt).build();
-
-    newStateEntity = stateRepository.save(newStateEntity);
-    return stateMapper.toStateDto(newStateEntity);
+    stateRepository.save(state);
+    return value;
   }
 
-  public StateDto readState(String value) {
-    return stateRepository
-        .findByValue(value)
-        .map(stateMapper::toStateDto)
-        .orElseThrow(() -> new StateNotFoundException(value));
-  }
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void consumeState(String value) {
+    boolean isConsumed = stateRepository.deleteUnexpiredByValue(value, now()) > 0;
 
-  public void deleteState(UUID stateId) {
-    stateRepository.deleteById(stateId);
+    if (isConsumed) {
+      return;
+    }
+
+    if (stateRepository.existsByValue(value)) {
+      throw new StateExpiredException(value);
+    }
+
+    throw new StateNotFoundException(value);
   }
 
   @Scheduled(cron = "0 */5 * * * *")
   public void deleteExpiredStates() {
     stateRepository.deleteAllByExpiresAtBefore(now());
-  }
-
-  private String generateRandomString() {
-    byte[] randomBytes = new byte[32];
-    SECURE_RANDOM.nextBytes(randomBytes);
-    return encodeToBase64(randomBytes);
   }
 }

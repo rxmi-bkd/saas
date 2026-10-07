@@ -1,20 +1,12 @@
 package org.bkd.saas.oidc.configuration;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.context.annotation.Configuration;
-
-@Getter
-@Setter
-@Configuration
-public class PlatformConfiguration {
-  private String clientId;
-  private String clientSecret;
-  private String scope;
-  private String redirectUri;
-  private String responseType;
-  private String grantType;
-  private String authorizationUri;
-  private String tokenUri;
-  private String userInfoUri;
-}
+public record PlatformConfiguration(
+    String clientId,
+    String clientSecret,
+    String scope,
+    String redirectUri,
+    String responseType,
+    String grantType,
+    String authorizationUri,
+    String tokenUri,
+    String userInfoUri) {}

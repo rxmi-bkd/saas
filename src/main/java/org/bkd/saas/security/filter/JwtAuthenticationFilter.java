@@ -1,7 +1,9 @@
 package org.bkd.saas.security.filter;
 
+import static org.bkd.saas.security.service.AccessTokenService.ROLE_CLAIM;
 import static org.springframework.util.StringUtils.hasText;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,8 +54,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   private UsernamePasswordAuthenticationToken buildAuthenticationToken(String jwt) {
-    UUID subject = accessTokenService.readSubject(jwt);
-    RoleEnum role = accessTokenService.readRole(jwt);
+    Claims claims = accessTokenService.readJwt(jwt);
+    UUID subject = UUID.fromString(claims.getSubject());
+    RoleEnum role = claims.get(ROLE_CLAIM, RoleEnum.class);
     return new UsernamePasswordAuthenticationToken(subject, null, role.getAuthorities());
   }
 }

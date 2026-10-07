@@ -66,7 +66,8 @@ public class UserService {
   }
 
   public Optional<UserWithPasswordDto> readOptionalUserWithPassword(String email) {
-    return userRepository.findByEmail(email).map(userMapper::toUserWithPasswordDto);
+    String normalized = StringUtils.normalizeEmail(email);
+    return userRepository.findByEmail(normalized).map(userMapper::toUserWithPasswordDto);
   }
 
   public void updateUserEmail(UUID userId, String email) {

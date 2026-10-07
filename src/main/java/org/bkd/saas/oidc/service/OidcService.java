@@ -1,13 +1,12 @@
 package org.bkd.saas.oidc.service;
 
-import java.time.Instant;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.bkd.saas.oidc.dto.AccessToken;
+import java.util.Map;
 import org.bkd.saas.oidc.dto.PlatformEnum;
 import org.bkd.saas.oidc.dto.ProfileDto;
-import org.bkd.saas.oidc.dto.StateDto;
-import org.bkd.saas.oidc.exception.StateExpiredException;
 import org.bkd.saas.oidc.exception.UnsupportedPlatformException;
 import org.bkd.saas.oidc.exception.UnverifiedEmailException;
 import org.bkd.saas.security.dto.AccessTokenDto;
@@ -19,27 +18,33 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class OidcService {
   private final UserService userService;
   private final StateService stateService;
-  private final List<UrlBuilder> urlBuilders;
-  private final List<TokenExchanger> tokenExchangers;
-  private final List<ProfileFetcher> profileFetchers;
   private final AccessTokenService accessTokenService;
+  private final Map<PlatformEnum, OidcProviderService> providers;
+
+  public OidcService(
+      UserService userService,
+      StateService stateService,
+      AccessTokenService accessTokenService,
+      List<OidcProviderService> providers) {
+    this.userService = userService;
+    this.stateService = stateService;
+    this.accessTokenService = accessTokenService;
+    this.providers =
+        providers.stream().collect(toMap(OidcProviderService::getPlatform, identity()));
+  }
 
   public String authorize(PlatformEnum platform) {
-    UrlBuilder urlBuilder = resolve(urlBuilders, platform, "url builder");
-    return urlBuilder.buildUrl();
+    OidcProviderService provider = provider(platform);
+    return provider.buildUrl(stateService.createState());
   }
 
   public AccessTokenDto handleCallback(String code, String state, PlatformEnum platform) {
-    StateDto state_ = validateState(state);
-    TokenExchanger tokenExchanger = resolve(tokenExchangers, platform, "token exchanger");
-    ProfileFetcher profileFetcher = resolve(profileFetchers, platform, "profile fetcher");
-    AccessToken tokens = tokenExchanger.exchangeCodeForTokens(code);
-    ProfileDto profile = profileFetcher.fetchProfile(tokens);
-    stateService.deleteState(state_.id());
+    OidcProviderService provider = provider(platform);
+    stateService.consumeState(state);
+    ProfileDto profile = provider.fetchProfile(code);
 
     if (!profile.emailVerified()) {
       throw new UnverifiedEmailException(profile.email());
@@ -50,30 +55,13 @@ public class OidcService {
     return new AccessTokenDto(access);
   }
 
-  private StateDto validateState(String state) {
-    StateDto stateDto = stateService.readState(state);
-    boolean isExpired = stateDto.expiresAt().isBefore(Instant.now());
+  private OidcProviderService provider(PlatformEnum platform) {
+    OidcProviderService provider = providers.get(platform);
 
-    if (isExpired) {
-      throw new StateExpiredException(state);
-    }
-
-    return stateDto;
-  }
-
-  private <T extends PlatformScoped> T resolve(
-      List<T> candidates, PlatformEnum platform, String label) {
-    List<T> supported = candidates.stream().filter(s -> s.supports(platform)).toList();
-
-    if (supported.isEmpty()) {
+    if (provider == null) {
       throw new UnsupportedPlatformException(platform);
     }
 
-    if (supported.size() != 1) {
-      throw new IllegalStateException(
-          "Multiple " + label + " services found for platform: " + platform);
-    }
-
-    return supported.getFirst();
+    return provider;
   }
 }

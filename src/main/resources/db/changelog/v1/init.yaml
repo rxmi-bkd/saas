@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 1791044249564-1
+      id: 1791416011300-1
       author: bouka
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -9,7 +9,7 @@ databaseChangeLog:
             sequenceName: revinfo_seq
             startValue: 1
   - changeSet:
-      id: 1791044249564-2
+      id: 1791416011300-2
       author: bouka
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -40,57 +40,9 @@ databaseChangeLog:
                     nullable: false
                   name: created_at
                   type: DATETIME
-              - column:
-                  constraints:
-                    nullable: false
-                  name: updated_at
-                  type: DATETIME
             tableName: app_user
   - changeSet:
-      id: 1791044249564-3
-      author: bouka
-      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
-      changes:
-        - createTable:
-            columns:
-              - column:
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-                    primaryKeyName: pk_refresh_token
-                  name: id
-                  type: UUID
-              - column:
-                  constraints:
-                    nullable: false
-                  name: user_id
-                  type: UUID
-              - column:
-                  constraints:
-                    nullable: false
-                  name: hash
-                  type: VARCHAR(64)
-              - column:
-                  constraints:
-                    nullable: false
-                  name: family_id
-                  type: UUID
-              - column:
-                  constraints:
-                    nullable: false
-                  name: expires_at
-                  type: DATETIME
-              - column:
-                  name: revoked_at
-                  type: DATETIME
-              - column:
-                  constraints:
-                    nullable: false
-                  name: created_at
-                  type: DATETIME
-            tableName: refresh_token
-  - changeSet:
-      id: 1791044249564-4
+      id: 1791416011300-3
       author: bouka
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -106,7 +58,7 @@ databaseChangeLog:
                   type: VARCHAR(255)
             tableName: revchanges
   - changeSet:
-      id: 1791044249564-5
+      id: 1791416011300-4
       author: bouka
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -124,7 +76,7 @@ databaseChangeLog:
                   type: BIGINT
             tableName: revinfo
   - changeSet:
-      id: 1791044249564-6
+      id: 1791416011300-5
       author: bouka
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -149,16 +101,7 @@ databaseChangeLog:
                   type: DATETIME
             tableName: state
   - changeSet:
-      id: 1791044249564-7
-      author: bouka
-      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
-      changes:
-        - addUniqueConstraint:
-            columnNames: hash
-            constraintName: uc_refresh_token_hash
-            tableName: refresh_token
-  - changeSet:
-      id: 1791044249564-8
+      id: 1791416011300-6
       author: bouka
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -167,7 +110,7 @@ databaseChangeLog:
             constraintName: uc_state_value
             tableName: state
   - changeSet:
-      id: 1791044249564-9
+      id: 1791416011300-7
       author: bouka
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:

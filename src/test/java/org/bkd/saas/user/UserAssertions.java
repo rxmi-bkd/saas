@@ -20,7 +20,6 @@ public class UserAssertions {
     assertThat(user.email()).isEqualTo(expectedEmail);
     assertThat(user.role()).isEqualTo(RoleEnum.ROLE_USER);
     assertThat(user.createdAt()).isNotNull();
-    assertThat(user.updatedAt()).isNotNull();
   }
 
   public static void assertUserRead(
