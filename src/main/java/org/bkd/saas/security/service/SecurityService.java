@@ -100,13 +100,13 @@ public class SecurityService {
     }
 
     if (refreshTokenService.isRevokedToken(tokenDto)) {
+      refreshTokenService.revokeTokenFamily(tokenDto.familyId());
       throw new InvalidTokenException(token);
     }
 
     Optional<UserDto> user = userService.readOptionalUser(tokenDto.userId());
 
     if (user.isEmpty()) {
-      refreshTokenService.revokeTokenFamily(tokenDto.familyId());
       throw new UserNotFoundException(tokenDto.userId());
     }
 
