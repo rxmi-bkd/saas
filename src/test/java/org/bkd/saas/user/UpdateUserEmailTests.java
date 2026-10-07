@@ -9,6 +9,7 @@ import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;
+import org.bkd.saas.user.exception.EmailAlreadyUsedException;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.bkd.saas.user.rest.request.UpdateUserEmailRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +62,7 @@ public class UpdateUserEmailTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = userClient.updateUserEmailKo(updateRequest, accessToken);
 
     // assert
-    assertError(response, 409, "Conflict", "Email already used: " + OTHER_EMAIL);
+    assertError(response, 409, "Conflict", EmailAlreadyUsedException.ERROR_MSG + OTHER_EMAIL);
     assertThat(userRepository.findById(user.id()).orElseThrow().getEmail()).isEqualTo(EMAIL);
   }
 }

@@ -5,6 +5,7 @@ import static org.bkd.saas.security.SecurityAssertions.assertTokenPair;
 
 import org.bkd.saas.AbstractIntegrationTests;
 import org.bkd.saas.security.dto.TokenPairDto;
+import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.db.UserRepository;
@@ -48,7 +49,7 @@ public class LoginTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = securityClient.loginKo(loginRequest);
 
     // assert
-    assertError(response, 401, "Unauthorized", "Invalid email or password");
+    assertError(response, 401, "Unauthorized", InvalidCredentialsException.ERROR_MSG);
   }
 
   @Test
@@ -62,6 +63,6 @@ public class LoginTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = securityClient.loginKo(loginRequest);
 
     // assert
-    assertError(response, 401, "Unauthorized", "Invalid email or password");
+    assertError(response, 401, "Unauthorized", InvalidCredentialsException.ERROR_MSG);
   }
 }

@@ -9,6 +9,7 @@ import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;
+import org.bkd.saas.user.exception.PasswordMismatchException;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.bkd.saas.user.rest.request.UpdateUserPasswordRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,7 +64,7 @@ public class UpdateUserPasswordTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = userClient.updateUserPasswordKo(updateRequest, accessToken);
 
     // assert
-    assertError(response, 400, "Bad Request", "Old password is incorrect");
+    assertError(response, 400, "Bad Request", PasswordMismatchException.ERROR_MSG);
     String persistedPassword = userRepository.findById(user.id()).orElseThrow().getPassword();
     assertThat(passwordEncoder.matches(PASSWORD, persistedPassword)).isTrue();
   }

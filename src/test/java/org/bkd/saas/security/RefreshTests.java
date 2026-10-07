@@ -10,6 +10,7 @@ import org.bkd.saas.AbstractIntegrationTests;
 import org.bkd.saas.security.db.RefreshTokenEntity;
 import org.bkd.saas.security.db.RefreshTokenRepository;
 import org.bkd.saas.security.dto.TokenPairDto;
+import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.security.rest.request.RefreshTokenRequest;
 import org.bkd.saas.security.service.RefreshTokenService;
@@ -66,7 +67,8 @@ public class RefreshTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = securityClient.refreshKo(refreshRequest);
 
     // assert
-    assertError(response, 401, "Unauthorized", "Invalid token");
+    assertError(
+        response, 401, "Unauthorized", InvalidTokenException.ERROR_MSG + refreshRequest.refresh());
   }
 
   @Test
@@ -85,7 +87,8 @@ public class RefreshTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = securityClient.refreshKo(refreshRequest);
 
     // assert
-    assertError(response, 401, "Unauthorized", "Invalid token");
+    assertError(
+        response, 401, "Unauthorized", InvalidTokenException.ERROR_MSG + refreshRequest.refresh());
 
     // clean up
     ReflectionTestUtils.setField(refreshTokenService, "expirationInSeconds", baseValue);
@@ -105,7 +108,8 @@ public class RefreshTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = securityClient.refreshKo(refreshRequest);
 
     // assert
-    assertError(response, 401, "Unauthorized", "Invalid token");
+    assertError(
+        response, 401, "Unauthorized", InvalidTokenException.ERROR_MSG + refreshRequest.refresh());
     List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
     assertThat(tokens).hasSize(2);
     assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(1);
@@ -126,7 +130,8 @@ public class RefreshTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = securityClient.refreshKo(refreshRequest);
 
     // assert
-    assertError(response, 401, "Unauthorized", "Invalid token");
+    assertError(
+        response, 401, "Unauthorized", InvalidTokenException.ERROR_MSG + refreshRequest.refresh());
     List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
     assertThat(tokens).hasSize(2);
     assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(2);

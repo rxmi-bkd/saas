@@ -104,7 +104,7 @@ public class UserService {
     boolean isOldPasswordCorrect = passwordEncoder.matches(oldPassword, user.getPassword());
 
     if (!isOldPasswordCorrect) {
-      throw new PasswordMismatchException("Old password is incorrect");
+      throw new PasswordMismatchException();
     }
 
     setPassword(user, newPassword);

@@ -9,6 +9,7 @@ import org.bkd.saas.AbstractIntegrationTests;
 import org.bkd.saas.security.db.RefreshTokenEntity;
 import org.bkd.saas.security.db.RefreshTokenRepository;
 import org.bkd.saas.security.dto.TokenPairDto;
+import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.security.rest.request.LogoutRequest;
 import org.bkd.saas.shared.dto.ErrorDto;
@@ -54,13 +55,13 @@ public class LogoutTests extends AbstractIntegrationTests {
   @Test
   void logout_withUnknownToken_returnsUnauthorized() {
     // arrange
-      String refresh = "unknown-token";
+    String refresh = "unknown-token";
     LogoutRequest logoutRequest = new LogoutRequest(refresh);
 
     // act
     ResponseEntity<ErrorDto> response = securityClient.logoutKo(logoutRequest);
 
     // assert
-    assertError(response, 401, "Unauthorized", "Invalid token: " + refresh);
+    assertError(response, 401, "Unauthorized", InvalidTokenException.ERROR_MSG + refresh);
   }
 }

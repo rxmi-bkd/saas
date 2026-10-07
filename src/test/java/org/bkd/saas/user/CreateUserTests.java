@@ -7,6 +7,7 @@ import org.bkd.saas.AbstractIntegrationTests;
 import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;
+import org.bkd.saas.user.exception.EmailAlreadyUsedException;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,6 @@ public class CreateUserTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = userClient.createUserKo(createUserRequest);
 
     // assert
-    assertError(response, 409, "Conflict", "Email already used: " + EMAIL);
+    assertError(response, 409, "Conflict", EmailAlreadyUsedException.ERROR_MSG + EMAIL);
   }
 }
