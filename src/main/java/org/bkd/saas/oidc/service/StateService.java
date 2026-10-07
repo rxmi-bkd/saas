@@ -1,9 +1,9 @@
 package org.bkd.saas.oidc.service;
 
 import static java.time.Instant.now;
+import static org.bkd.saas.shared.SecurityUtils.SECURE_RANDOM;
 import static org.bkd.saas.shared.SecurityUtils.encodeToBase64;
 
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class StateService {
   private static final int STATE_EXPIRATION_SECONDS = 5 * 60;
-  private static final SecureRandom secureRandom = new SecureRandom();
 
   private final StateMapper stateMapper;
   private final StateRepository stateRepository;
@@ -41,7 +40,7 @@ public class StateService {
     return stateRepository
         .findByValue(value)
         .map(stateMapper::toStateDto)
-        .orElseThrow(StateNotFoundException::new);
+        .orElseThrow(() -> new StateNotFoundException(value));
   }
 
   public void deleteState(UUID stateId) {
@@ -55,7 +54,7 @@ public class StateService {
 
   private String generateRandomString() {
     byte[] randomBytes = new byte[32];
-    secureRandom.nextBytes(randomBytes);
+    SECURE_RANDOM.nextBytes(randomBytes);
     return encodeToBase64(randomBytes);
   }
 }

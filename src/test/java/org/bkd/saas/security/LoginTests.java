@@ -7,7 +7,6 @@ import org.bkd.saas.AbstractIntegrationTests;
 import org.bkd.saas.security.dto.TokenPairDto;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.shared.dto.ErrorDto;
-import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,26 +63,5 @@ public class LoginTests extends AbstractIntegrationTests {
 
     // assert
     assertError(response, 401, "Unauthorized", "Invalid email or password");
-  }
-
-  @Test
-  void login_withDisabledUser_returnsUnauthorized() {
-    // arrange
-    CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
-    LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
-
-    // act
-    userClient.createUserOk(createUserRequest);
-    disableUser(EMAIL);
-    ResponseEntity<ErrorDto> response = securityClient.loginKo(loginRequest);
-
-    // assert
-    assertError(response, 401, "Unauthorized", "Invalid email or password");
-  }
-
-  private void disableUser(String email) {
-    AppUserEntity user = userRepository.findByEmail(email).orElseThrow();
-    user.setEnabled(false);
-    userRepository.save(user);
   }
 }

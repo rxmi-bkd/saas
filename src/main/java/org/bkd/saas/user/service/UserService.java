@@ -3,6 +3,8 @@ package org.bkd.saas.user.service;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.bkd.saas.security.service.RefreshTokenService;
+import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;
@@ -23,16 +25,17 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
+  private final RefreshTokenService refreshTokenService;
 
   public UserDto createUser(String email, String password) {
-    email = email.trim().toLowerCase();
-    boolean isEmailUsed = userRepository.findByEmail(email).isPresent();
+    String normalized = StringUtils.normalizeEmail(email);
+    boolean isEmailUsed = userRepository.findByEmail(normalized).isPresent();
 
     if (isEmailUsed) {
-      throw new EmailAlreadyUsedException();
+      throw new EmailAlreadyUsedException(normalized);
     }
 
-    AppUserEntity user = new AppUserEntity(email, null);
+    AppUserEntity user = new AppUserEntity(normalized, null);
     setPassword(user, password);
     AppUserEntity saved = userRepository.save(user);
     return userMapper.toUserDto(saved);
@@ -42,7 +45,7 @@ public class UserService {
     return userRepository
         .findById(userId)
         .map(userMapper::toUserDto)
-        .orElseThrow(UserNotFoundException::new);
+        .orElseThrow(() -> new UserNotFoundException(userId));
   }
 
   public Optional<UserDto> readOptionalUser(UUID userId) {
@@ -50,17 +53,18 @@ public class UserService {
   }
 
   public UserDto readOrCreateUser(String email) {
+    String normalized = StringUtils.normalizeEmail(email);
     return userRepository
-        .findByEmail(email)
+        .findByEmail(normalized)
         .map(userMapper::toUserDto)
-        .orElseGet(() -> createUser(email, null));
+        .orElseGet(() -> createUser(normalized, null));
   }
 
   public UserWithPasswordDto readUserWithPassword(UUID userId) {
     return userRepository
         .findById(userId)
         .map(userMapper::toUserWithPasswordDto)
-        .orElseThrow(UserNotFoundException::new);
+        .orElseThrow(() -> new UserNotFoundException(userId));
   }
 
   public Optional<UserWithPasswordDto> readOptionalUserWithPassword(String email) {
@@ -68,30 +72,35 @@ public class UserService {
   }
 
   public void updateUserEmail(UUID userId, String email) {
-    AppUserEntity user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    String normalized = StringUtils.normalizeEmail(email);
+    AppUserEntity user =
+        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
     boolean isEmailUsedByAnotherUser =
         userRepository
-            .findByEmail(email)
+            .findByEmail(normalized)
             .filter(appUserEntity -> !appUserEntity.getId().equals(userId))
             .isPresent();
 
     if (isEmailUsedByAnotherUser) {
-      throw new EmailAlreadyUsedException();
+      throw new EmailAlreadyUsedException(normalized);
     }
 
-    user.setEmail(email);
+    user.setEmail(normalized);
     userRepository.save(user);
+    refreshTokenService.revokeUserTokens(user.getId());
   }
 
   public void updateUserPassword(UUID userId, String newPassword) {
-    AppUserEntity user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    AppUserEntity user =
+        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     setPassword(user, newPassword);
     userRepository.save(user);
   }
 
   public void updateUserPassword(UUID userId, String oldPassword, String newPassword) {
-    AppUserEntity user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    AppUserEntity user =
+        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     boolean isOldPasswordCorrect = passwordEncoder.matches(oldPassword, user.getPassword());
 
     if (!isOldPasswordCorrect) {
@@ -100,6 +109,7 @@ public class UserService {
 
     setPassword(user, newPassword);
     userRepository.save(user);
+    refreshTokenService.revokeUserTokens(user.getId());
   }
 
   private void setPassword(AppUserEntity user, String password) {

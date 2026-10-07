@@ -19,7 +19,6 @@ public class UserAssertions {
     assertThat(user.id()).isNotNull();
     assertThat(user.email()).isEqualTo(expectedEmail);
     assertThat(user.role()).isEqualTo(RoleEnum.ROLE_USER);
-    assertThat(user.enabled()).isTrue();
     assertThat(user.createdAt()).isNotNull();
     assertThat(user.updatedAt()).isNotNull();
   }
@@ -32,6 +31,5 @@ public class UserAssertions {
     assertThat(user.id()).isEqualTo(expectedId);
     assertThat(user.email()).isEqualTo(expectedEmail);
     assertThat(user.role()).isEqualTo(RoleEnum.ROLE_USER);
-    assertThat(user.enabled()).isTrue();
   }
 }

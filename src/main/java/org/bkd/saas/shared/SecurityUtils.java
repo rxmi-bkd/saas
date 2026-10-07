@@ -20,6 +20,8 @@ public class SecurityUtils {
       return HexFormat.of().formatHex(digest);
     } catch (NoSuchAlgorithmException e) {
       throw new IllegalStateException(e);
+    } catch (NullPointerException e) {
+      return null;
     }
   }
 

@@ -20,9 +20,6 @@ databaseChangeLog:
                   name: role
                   value: ROLE_ADMIN
               - column:
-                  name: enabled
-                  valueBoolean: true
-              - column:
                   name: created_at
                   valueComputed: now()
               - column:

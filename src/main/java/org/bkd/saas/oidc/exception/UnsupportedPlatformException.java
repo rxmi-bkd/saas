@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class UnsupportedPlatformException extends RuntimeException {
-
   public UnsupportedPlatformException(PlatformEnum platform) {
     super("Unsupported platform: " + platform);
   }

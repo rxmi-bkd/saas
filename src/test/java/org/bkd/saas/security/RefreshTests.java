@@ -14,7 +14,6 @@ import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.security.rest.request.RefreshTokenRequest;
 import org.bkd.saas.security.service.RefreshTokenService;
 import org.bkd.saas.shared.dto.ErrorDto;
-import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,7 +72,8 @@ public class RefreshTests extends AbstractIntegrationTests {
   @Test
   void refresh_withExpiredToken_returnsUnauthorized() {
     // arrange
-    long baseValue = (long) ReflectionTestUtils.getField(refreshTokenService, "expirationInSeconds");
+    long baseValue =
+        (long) ReflectionTestUtils.getField(refreshTokenService, "expirationInSeconds");
     ReflectionTestUtils.setField(refreshTokenService, "expirationInSeconds", -1l);
     CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
     LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
@@ -130,32 +130,6 @@ public class RefreshTests extends AbstractIntegrationTests {
     List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
     assertThat(tokens).hasSize(2);
     assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(2);
-  }
-
-  @Test
-  void refresh_withDisabledUser_returnsUnauthorizedAndRevokesFamily() {
-    // arrange
-    CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
-    LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
-
-    // act
-    userClient.createUserOk(createUserRequest);
-    TokenPairDto tokenPair = securityClient.loginOk(loginRequest).getBody();
-    disableUser(EMAIL);
-    RefreshTokenRequest refreshRequest = new RefreshTokenRequest(tokenPair.refresh());
-    ResponseEntity<ErrorDto> response = securityClient.refreshKo(refreshRequest);
-
-    // assert
-    assertError(response, 401, "Unauthorized", "Invalid token");
-    List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
-    assertThat(tokens).hasSize(1);
-    assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(1);
-  }
-
-  private void disableUser(String email) {
-    AppUserEntity user = userRepository.findByEmail(email).orElseThrow();
-    user.setEnabled(false);
-    userRepository.save(user);
   }
 
   private void expireGracePeriod() {

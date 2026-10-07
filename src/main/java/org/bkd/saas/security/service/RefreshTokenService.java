@@ -48,7 +48,7 @@ public class RefreshTokenService {
   }
 
   public RefreshTokenDto readToken(String token) {
-    return readOptionalToken(token).orElseThrow(InvalidTokenException::new);
+    return readOptionalToken(token).orElseThrow(() -> new InvalidTokenException(token));
   }
 
   public Optional<RefreshTokenDto> readOptionalToken(String token) {
@@ -74,7 +74,9 @@ public class RefreshTokenService {
 
   public void revokeToken(UUID tokenId) {
     RefreshTokenEntity refreshToken =
-        refreshTokenRepository.findById(tokenId).orElseThrow(InvalidTokenException::new);
+        refreshTokenRepository
+            .findById(tokenId)
+            .orElseThrow(() -> new InvalidTokenException(tokenId));
 
     if (refreshToken.getRevokedAt() == null) {
       refreshToken.setRevokedAt(now());

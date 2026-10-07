@@ -12,9 +12,9 @@ import org.bkd.saas.security.dto.RefreshTokenDto;
 import org.bkd.saas.security.dto.TokenPairDto;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
+import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
-import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,7 +42,8 @@ public class SecurityService {
   }
 
   public TokenPairDto login(String email, String password) {
-    Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(email);
+    String normalized = StringUtils.normalizeEmail(email);
+    Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(normalized);
 
     // Always run "passwordEncoder.matches", even for unknown emails,
     // so response time does not reveal whether an account exists.
@@ -54,11 +55,7 @@ public class SecurityService {
     }
 
     if (user.isEmpty()) {
-      throw new UserNotFoundException(email);
-    }
-
-    if (!user.get().enabled()) {
-      throw new DisabledUserException(user.get().id());
+      throw new UserNotFoundException(normalized);
     }
 
     String accessToken = accessTokenService.createJwt(user.get().id(), user.get().role());
@@ -67,7 +64,8 @@ public class SecurityService {
   }
 
   public void forgotPassword(String email) {
-    Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(email);
+    String normalized = StringUtils.normalizeEmail(email);
+    Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(normalized);
 
     if (user.isEmpty()) {
       return;
@@ -93,7 +91,9 @@ public class SecurityService {
   @Transactional(noRollbackFor = InvalidTokenException.class)
   public TokenPairDto refresh(String token) {
     RefreshTokenDto tokenDto =
-        refreshTokenService.readOptionalToken(token).orElseThrow(InvalidTokenException::new);
+        refreshTokenService
+            .readOptionalToken(token)
+            .orElseThrow(() -> new InvalidTokenException(token));
 
     if (refreshTokenService.isExpiredToken(tokenDto)) {
       throw new InvalidTokenException(token);
@@ -113,11 +113,6 @@ public class SecurityService {
     if (user.isEmpty()) {
       refreshTokenService.revokeTokenFamily(tokenDto.familyId());
       throw new UserNotFoundException(tokenDto.userId());
-    }
-
-    if (!user.get().enabled()) {
-      refreshTokenService.revokeTokenFamily(tokenDto.familyId());
-      throw new DisabledUserException(user.get().id());
     }
 
     refreshTokenService.revokeToken(tokenDto.id());

@@ -29,9 +29,6 @@ public class AppUserEntity {
   @Column(nullable = false)
   private RoleEnum role = RoleEnum.ROLE_USER;
 
-  @Column(nullable = false)
-  private boolean enabled = true;
-
   @Column(nullable = false, updatable = false)
   private Instant createdAt = Instant.now();
 
