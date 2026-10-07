@@ -6,7 +6,7 @@ import static org.bkd.saas.oidc.rest.Routes.HANDLE_CALLBACK;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.oidc.dto.PlatformEnum;
 import org.bkd.saas.oidc.service.OidcService;
-import org.bkd.saas.security.dto.TokenPairDto;
+import org.bkd.saas.security.dto.AccessTokenDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +24,7 @@ public class OidcController {
   }
 
   @GetMapping(HANDLE_CALLBACK)
-  public ResponseEntity<TokenPairDto> handleCallback(
+  public ResponseEntity<AccessTokenDto> handleCallback(
       @PathVariable PlatformEnum platform, @RequestParam String code, @RequestParam String state) {
     return ResponseEntity.ok(oidcService.handleCallback(code, state, platform));
   }

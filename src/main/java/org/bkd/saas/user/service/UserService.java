@@ -3,7 +3,6 @@ package org.bkd.saas.user.service;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.security.service.RefreshTokenService;
 import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
@@ -25,7 +24,6 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
-  private final RefreshTokenService refreshTokenService;
 
   public UserDto createUser(String email, String password) {
     String normalized = StringUtils.normalizeEmail(email);
@@ -88,7 +86,6 @@ public class UserService {
 
     user.setEmail(normalized);
     userRepository.save(user);
-    refreshTokenService.revokeUserTokens(user.getId());
   }
 
   public void updateUserPassword(UUID userId, String newPassword) {
@@ -109,7 +106,6 @@ public class UserService {
 
     setPassword(user, newPassword);
     userRepository.save(user);
-    refreshTokenService.revokeUserTokens(user.getId());
   }
 
   private void setPassword(AppUserEntity user, String password) {

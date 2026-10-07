@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: drop-refresh-token
+      author: bouka
+      changes:
+        - dropTable:
+            tableName: refresh_token

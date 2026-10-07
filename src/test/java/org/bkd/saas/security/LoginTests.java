@@ -1,10 +1,10 @@
 package org.bkd.saas.security;
 
 import static org.bkd.saas.SharedAssertions.assertError;
-import static org.bkd.saas.security.SecurityAssertions.assertTokenPair;
+import static org.bkd.saas.security.SecurityAssertions.assertAccessToken;
 
 import org.bkd.saas.AbstractIntegrationTests;
-import org.bkd.saas.security.dto.TokenPairDto;
+import org.bkd.saas.security.dto.AccessTokenDto;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.shared.dto.ErrorDto;
@@ -27,17 +27,17 @@ public class LoginTests extends AbstractIntegrationTests {
   }
 
   @Test
-  void login_returnsTokenPair() {
+  void login_returnsAccessToken() {
     // arrange
     CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
     LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
 
     // act
     userClient.createUserOk(createUserRequest);
-    ResponseEntity<TokenPairDto> response = securityClient.loginOk(loginRequest);
+    ResponseEntity<AccessTokenDto> response = securityClient.loginOk(loginRequest);
 
     // assert
-    assertTokenPair(response);
+    assertAccessToken(response);
   }
 
   @Test
