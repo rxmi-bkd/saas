@@ -33,7 +33,7 @@ public class UserService {
       throw new EmailAlreadyUsedException(normalized);
     }
 
-    AppUserEntity user = new AppUserEntity(normalized, null);
+    AppUserEntity user = new AppUserEntity(normalized);
     setPassword(user, password);
     AppUserEntity saved = userRepository.save(user);
     return userMapper.toUserDto(saved);
