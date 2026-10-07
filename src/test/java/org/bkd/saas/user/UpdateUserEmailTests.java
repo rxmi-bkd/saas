@@ -61,7 +61,7 @@ public class UpdateUserEmailTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = userClient.updateUserEmailKo(updateRequest, accessToken);
 
     // assert
-    assertError(response, 409, "Conflict", "Email already used");
+    assertError(response, 409, "Conflict", "Email already used: " + OTHER_EMAIL);
     assertThat(userRepository.findById(user.id()).orElseThrow().getEmail()).isEqualTo(EMAIL);
   }
 }

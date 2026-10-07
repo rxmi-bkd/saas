@@ -46,6 +46,6 @@ public class CreateUserTests extends AbstractIntegrationTests {
     ResponseEntity<ErrorDto> response = userClient.createUserKo(createUserRequest);
 
     // assert
-    assertError(response, 409, "Conflict", "Email already used");
+    assertError(response, 409, "Conflict", "Email already used: " + EMAIL);
   }
 }

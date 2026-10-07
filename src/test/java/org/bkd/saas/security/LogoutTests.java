@@ -54,12 +54,13 @@ public class LogoutTests extends AbstractIntegrationTests {
   @Test
   void logout_withUnknownToken_returnsUnauthorized() {
     // arrange
-    LogoutRequest logoutRequest = new LogoutRequest("unknown-token");
+      String refresh = "unknown-token";
+    LogoutRequest logoutRequest = new LogoutRequest(refresh);
 
     // act
     ResponseEntity<ErrorDto> response = securityClient.logoutKo(logoutRequest);
 
     // assert
-    assertError(response, 401, "Unauthorized", "Invalid token");
+    assertError(response, 401, "Unauthorized", "Invalid token: " + refresh);
   }
 }
