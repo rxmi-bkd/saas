@@ -39,6 +39,10 @@ public class UserService {
     return userMapper.toUserDto(saved);
   }
 
+  public UserDto createUser(String email) {
+    return createUser(email, null);
+  }
+
   public UserDto readUser(UUID userId) {
     return userRepository
         .findById(userId)
@@ -51,7 +55,7 @@ public class UserService {
     return userRepository
         .findByEmail(normalized)
         .map(userMapper::toUserDto)
-        .orElseGet(() -> createUser(normalized, null));
+        .orElseGet(() -> createUser(normalized));
   }
 
   public UserWithPasswordDto readUserWithPassword(UUID userId) {

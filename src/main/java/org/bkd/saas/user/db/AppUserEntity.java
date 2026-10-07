@@ -32,9 +32,6 @@ public class AppUserEntity {
   @Column(nullable = false, updatable = false)
   private Instant createdAt = Instant.now();
 
-  @Column(nullable = false)
-  private Instant updatedAt = Instant.now();
-
   public AppUserEntity(String email) {
     this.email = email;
   }
