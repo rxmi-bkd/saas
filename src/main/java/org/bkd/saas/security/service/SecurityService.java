@@ -100,11 +100,6 @@ public class SecurityService {
     }
 
     if (refreshTokenService.isRevokedToken(tokenDto)) {
-
-      if (!refreshTokenService.isWithinReuseGracePeriod(tokenDto)) {
-        refreshTokenService.revokeTokenFamily(tokenDto.familyId());
-      }
-
       throw new InvalidTokenException(token);
     }
 
