@@ -46,10 +46,6 @@ public class UserService {
         .orElseThrow(() -> new UserNotFoundException(userId));
   }
 
-  public Optional<UserDto> readOptionalUser(UUID userId) {
-    return userRepository.findById(userId).map(userMapper::toUserDto);
-  }
-
   public UserDto readOrCreateUser(String email) {
     String normalized = StringUtils.normalizeEmail(email);
     return userRepository

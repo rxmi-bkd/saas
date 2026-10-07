@@ -40,19 +40,7 @@ public class AppUserEntity {
     this.password = password;
   }
 
-  @PrePersist
-  public void onCreate() {
-    Instant now = Instant.now();
-
-    if (createdAt == null) {
-      createdAt = now;
-    }
-
-    updatedAt = now;
-  }
-
-  @PreUpdate
-  public void onUpdate() {
-    updatedAt = Instant.now();
+  public AppUserEntity(String email) {
+    this.email = email;
   }
 }
