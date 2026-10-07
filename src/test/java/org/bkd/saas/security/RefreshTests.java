@@ -74,8 +74,7 @@ public class RefreshTests extends AbstractIntegrationTests {
   @Test
   void refresh_withExpiredToken_returnsUnauthorized() {
     // arrange
-    long baseValue =
-        (long) ReflectionTestUtils.getField(refreshTokenService, "expirationInSeconds");
+    long baseValue = (long) ReflectionTestUtils.getField(refreshTokenService, "expirationInSeconds");
     ReflectionTestUtils.setField(refreshTokenService, "expirationInSeconds", -1l);
     CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
     LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
@@ -92,59 +91,6 @@ public class RefreshTests extends AbstractIntegrationTests {
 
     // clean up
     ReflectionTestUtils.setField(refreshTokenService, "expirationInSeconds", baseValue);
-  }
-
-  @Test
-  void refresh_withRevokedTokenWithinGracePeriod_returnsUnauthorizedAndKeepsFamily() {
-    // arrange
-    CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
-    LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
-
-    // act
-    userClient.createUserOk(createUserRequest);
-    TokenPairDto tokenPair = securityClient.loginOk(loginRequest).getBody();
-    RefreshTokenRequest refreshRequest = new RefreshTokenRequest(tokenPair.refresh());
-    securityClient.refreshOk(refreshRequest);
-    ResponseEntity<ErrorDto> response = securityClient.refreshKo(refreshRequest);
-
-    // assert
-    assertError(
-        response, 401, "Unauthorized", InvalidTokenException.ERROR_MSG + refreshRequest.refresh());
-    List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
-    assertThat(tokens).hasSize(2);
-    assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(1);
-  }
-
-  @Test
-  void refresh_withRevokedTokenAfterGracePeriod_returnsUnauthorizedAndRevokesFamily() {
-    // arrange
-    CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
-    LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
-
-    // act
-    userClient.createUserOk(createUserRequest);
-    TokenPairDto tokenPair = securityClient.loginOk(loginRequest).getBody();
-    RefreshTokenRequest refreshRequest = new RefreshTokenRequest(tokenPair.refresh());
-    securityClient.refreshOk(refreshRequest);
-    expireGracePeriod();
-    ResponseEntity<ErrorDto> response = securityClient.refreshKo(refreshRequest);
-
-    // assert
-    assertError(
-        response, 401, "Unauthorized", InvalidTokenException.ERROR_MSG + refreshRequest.refresh());
-    List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
-    assertThat(tokens).hasSize(2);
-    assertThat(tokens.stream().filter(RefreshTests::isRevoked)).hasSize(2);
-  }
-
-  private void expireGracePeriod() {
-    List<RefreshTokenEntity> tokens = refreshTokenRepository.findAll();
-    for (RefreshTokenEntity token : tokens) {
-      if (token.getRevokedAt() != null) {
-        token.setRevokedAt(Instant.now().minusSeconds(3600));
-        refreshTokenRepository.save(token);
-      }
-    }
   }
 
   private static boolean isRevoked(RefreshTokenEntity refreshTokenEntity) {

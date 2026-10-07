@@ -14,14 +14,16 @@ public class SecurityUtils {
   public static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
   public static String hash(String string) {
+    if (string == null) {
+      return null;
+    }
+
     try {
       byte[] digest =
           MessageDigest.getInstance("SHA-256").digest(string.getBytes(StandardCharsets.UTF_8));
       return HexFormat.of().formatHex(digest);
     } catch (NoSuchAlgorithmException e) {
       throw new IllegalStateException(e);
-    } catch (NullPointerException e) {
-      return null;
     }
   }
 

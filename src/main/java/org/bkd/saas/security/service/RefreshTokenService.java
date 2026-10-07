@@ -29,9 +29,6 @@ public class RefreshTokenService {
   @Value("${app.jwt.refresh-token.expiration}")
   private long expirationInSeconds;
 
-  @Value("${app.jwt.refresh-token.reuse-grace-period}")
-  private long reuseGracePeriodInSeconds;
-
   public String createToken(UUID userId) {
     return createToken(userId, UUID.randomUUID());
   }
