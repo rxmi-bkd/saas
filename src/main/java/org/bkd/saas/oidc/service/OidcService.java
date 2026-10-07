@@ -48,7 +48,6 @@ public class OidcService {
     }
 
     UserDto user = userService.readOrCreateUser(profile.email());
-
     String access = accessTokenService.createJwt(user.id(), user.role());
     String refresh = refreshTokenService.createToken(user.id());
     return new TokenPairDto(access, refresh);
