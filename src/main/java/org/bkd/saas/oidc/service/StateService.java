@@ -1,8 +1,7 @@
 package org.bkd.saas.oidc.service;
 
 import static java.time.Instant.now;
-import static org.bkd.saas.shared.SecurityUtils.SECURE_RANDOM;
-import static org.bkd.saas.shared.SecurityUtils.encodeToBase64;
+import static org.bkd.saas.shared.SecurityUtils.*;
 
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class StateService {
   public StateDto createState() {
     Instant now = now();
     Instant expiresAt = now.plusSeconds(STATE_EXPIRATION_SECONDS);
-    String value = generateRandomString();
+    String value = randomToken();
 
     StateEntity newStateEntity = StateEntity.builder().value(value).expiresAt(expiresAt).build();
 
@@ -56,11 +55,5 @@ public class StateService {
         .findByValue(value)
         .map(stateMapper::toStateDto)
         .orElseThrow(() -> new StateNotFoundException(value));
-  }
-
-  private String generateRandomString() {
-    byte[] randomBytes = new byte[32];
-    SECURE_RANDOM.nextBytes(randomBytes);
-    return encodeToBase64(randomBytes);
   }
 }
