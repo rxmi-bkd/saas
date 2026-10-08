@@ -5,9 +5,9 @@ import static java.util.stream.Collectors.toMap;
 
 import java.util.List;
 import java.util.Map;
-import org.bkd.saas.oidc.dto.PlatformEnum;
+import org.bkd.saas.oidc.dto.ProviderEnum;
 import org.bkd.saas.oidc.dto.ProfileDto;
-import org.bkd.saas.oidc.exception.UnsupportedPlatformException;
+import org.bkd.saas.oidc.exception.UnsupportedProviderException;
 import org.bkd.saas.oidc.exception.UnverifiedEmailException;
 import org.bkd.saas.security.dto.AccessTokenDto;
 import org.bkd.saas.security.service.AccessTokenService;
@@ -22,27 +22,27 @@ public class OidcService {
   private final UserService userService;
   private final StateService stateService;
   private final AccessTokenService accessTokenService;
-  private final Map<PlatformEnum, OidcProviderService> providers;
+  private final Map<ProviderEnum, AbstractOidcService> providers;
 
   public OidcService(
       UserService userService,
       StateService stateService,
       AccessTokenService accessTokenService,
-      List<OidcProviderService> providers) {
+      List<AbstractOidcService> providers) {
     this.userService = userService;
     this.stateService = stateService;
     this.accessTokenService = accessTokenService;
     this.providers =
-        providers.stream().collect(toMap(OidcProviderService::getPlatform, identity()));
+        providers.stream().collect(toMap(AbstractOidcService::getProvider, identity()));
   }
 
-  public String authorize(PlatformEnum platform) {
-    OidcProviderService provider = provider(platform);
+  public String authorize(ProviderEnum platform) {
+    AbstractOidcService provider = provider(platform);
     return provider.buildUrl(stateService.createState());
   }
 
-  public AccessTokenDto handleCallback(String code, String state, PlatformEnum platform) {
-    OidcProviderService provider = provider(platform);
+  public AccessTokenDto handleCallback(String code, String state, ProviderEnum platform) {
+    AbstractOidcService provider = provider(platform);
     stateService.consumeState(state);
     ProfileDto profile = provider.fetchProfile(code);
 
@@ -55,11 +55,11 @@ public class OidcService {
     return new AccessTokenDto(access);
   }
 
-  private OidcProviderService provider(PlatformEnum platform) {
-    OidcProviderService provider = providers.get(platform);
+  private AbstractOidcService provider(ProviderEnum platform) {
+    AbstractOidcService provider = providers.get(platform);
 
     if (provider == null) {
-      throw new UnsupportedPlatformException(platform);
+      throw new UnsupportedProviderException(platform);
     }
 
     return provider;

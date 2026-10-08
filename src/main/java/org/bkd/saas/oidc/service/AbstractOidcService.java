@@ -2,8 +2,8 @@ package org.bkd.saas.oidc.service;
 
 import lombok.Getter;
 import org.bkd.saas.oidc.configuration.OidcProperties;
-import org.bkd.saas.oidc.configuration.PlatformConfiguration;
-import org.bkd.saas.oidc.dto.PlatformEnum;
+import org.bkd.saas.oidc.configuration.ProviderProperties;
+import org.bkd.saas.oidc.dto.ProviderEnum;
 import org.bkd.saas.oidc.dto.ProfileDto;
 import org.bkd.saas.oidc.dto.TokenDto;
 import org.springframework.http.HttpHeaders;
@@ -13,21 +13,21 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public abstract class OidcProviderService {
+public abstract class AbstractOidcService {
+  @Getter
+  private final ProviderEnum provider;
   private final RestClient restClient;
-  private final PlatformConfiguration configuration;
+  private final ProviderProperties configuration;
 
-  @Getter private final PlatformEnum platform;
 
-  protected OidcProviderService(
-      PlatformEnum platform, RestClient restClient, OidcProperties properties) {
-    PlatformConfiguration configuration = properties.providers().get(platform);
+  protected AbstractOidcService(ProviderEnum provider, RestClient restClient, OidcProperties properties) {
+    ProviderProperties configuration = properties.providers().get(provider);
 
     if (configuration == null) {
-      throw new IllegalStateException("Missing social authentication configuration: " + platform);
+      throw new IllegalStateException("Missing social authentication configuration: " + provider);
     }
 
-    this.platform = platform;
+    this.provider = provider;
     this.restClient = restClient;
     this.configuration = configuration;
   }
