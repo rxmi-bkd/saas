@@ -99,6 +99,7 @@ public class UserService {
   public void updateUserPassword(UUID userId, String oldPassword, String newPassword) {
     AppUserEntity user =
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+
     boolean isOldPasswordCorrect = passwordEncoder.matches(oldPassword, user.getPassword());
 
     if (!isOldPasswordCorrect) {

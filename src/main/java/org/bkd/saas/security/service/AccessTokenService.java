@@ -10,6 +10,7 @@ import javax.crypto.SecretKey;
 import org.bkd.saas.security.dto.AuthenticationDto;
 import org.bkd.saas.user.dto.RoleEnum;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

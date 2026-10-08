@@ -8,16 +8,13 @@ import java.util.Base64;
 import java.util.HexFormat;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SecurityUtils {
-  public static final SecureRandom SECURE_RANDOM = new SecureRandom();
+  private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-  public static String hash(String string) {
-    if (string == null) {
-      return null;
-    }
-
+  public static String hash(@NonNull String string) {
     try {
       byte[] digest =
           MessageDigest.getInstance("SHA-256").digest(string.getBytes(StandardCharsets.UTF_8));
