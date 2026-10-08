@@ -7,6 +7,7 @@ import org.bkd.saas.security.dto.AccessTokenDto;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
+import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +34,10 @@ public class SecurityService {
 
     if (!isPasswordCorrect) {
       throw new InvalidCredentialsException();
+    }
+
+    if (!user.enabled()) {
+      throw new DisabledUserException(email);
     }
 
     String accessToken = accessTokenService.createJwt(user.id(), user.role(), user.enabled());

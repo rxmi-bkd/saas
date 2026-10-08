@@ -9,6 +9,7 @@ import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.db.UserRepository;
+import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ public class LoginTests extends AbstractIntegrationTests {
 
     // act
     userClient.createUserOk(createUserRequest);
+    enableAllUsers();
     ResponseEntity<AccessTokenDto> response = securityClient.loginOk(loginRequest);
 
     // assert
@@ -64,5 +66,29 @@ public class LoginTests extends AbstractIntegrationTests {
 
     // assert
     assertError(response, 401, "Unauthorized", InvalidCredentialsException.ERROR_MSG);
+  }
+
+  @Test
+  void login_withDisabledUser_returnsForbidden() {
+    // arrange
+    CreateUserRequest createUserRequest = new CreateUserRequest(EMAIL, PASSWORD);
+    LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
+
+    // act
+    userClient.createUserOk(createUserRequest);
+    ResponseEntity<ErrorDto> response = securityClient.loginKo(loginRequest);
+
+    // assert
+    assertError(response, 403, "Forbidden", DisabledUserException.ERROR_MSG);
+  }
+
+  private void enableAllUsers() {
+    userRepository
+        .findAll()
+        .forEach(
+            user -> {
+              user.setEnabled(true);
+              userRepository.save(user);
+            });
   }
 }
