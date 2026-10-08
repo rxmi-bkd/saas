@@ -1,9 +1,7 @@
 package org.bkd.saas.security.service;
 
-import static io.jsonwebtoken.Claims.SUBJECT;
 import static org.bkd.saas.shared.SecurityUtils.randomToken;
 
-import io.jsonwebtoken.Claims;
 import jakarta.annotation.PostConstruct;
 import java.util.Optional;
 import java.util.UUID;
@@ -66,8 +64,7 @@ public class SecurityService {
     boolean isValidJwt = passwordResetTokenService.isValidJwt(jwt);
 
     if (isValidJwt) {
-      Claims claims = passwordResetTokenService.readJwt(jwt);
-      UUID userId = UUID.fromString(claims.getSubject());
+      UUID userId = passwordResetTokenService.readSubject(jwt);
       userService.updateUserPassword(userId, newPassword);
       return;
     }

@@ -1,27 +1,21 @@
 package org.bkd.saas.security.service;
 
-import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import javax.crypto.SecretKey;
+import lombok.RequiredArgsConstructor;
 import org.bkd.saas.security.exception.InvalidTokenException;
 
+@RequiredArgsConstructor
 public class JwtService {
   private final SecretKey key;
   private final long expirationInSeconds;
-
-  public JwtService(String secret, long expirationInSeconds) {
-    this.key = hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-    this.expirationInSeconds = expirationInSeconds;
-  }
 
   public String sign(UUID subject, Map<String, Object> claims) {
     Instant now = Instant.now();

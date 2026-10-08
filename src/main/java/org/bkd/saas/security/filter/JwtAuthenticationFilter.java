@@ -1,18 +1,15 @@
 package org.bkd.saas.security.filter;
 
-import static org.bkd.saas.security.service.AccessTokenService.ROLE_CLAIM;
 import static org.springframework.util.StringUtils.hasText;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.bkd.saas.security.dto.AuthenticationDto;
 import org.bkd.saas.security.service.AccessTokenService;
-import org.bkd.saas.user.dto.RoleEnum;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -54,9 +51,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   private UsernamePasswordAuthenticationToken buildAuthenticationToken(String jwt) {
-    Claims claims = accessTokenService.readJwt(jwt);
-    UUID subject = UUID.fromString(claims.getSubject());
-    RoleEnum role = claims.get(ROLE_CLAIM, RoleEnum.class);
-    return new UsernamePasswordAuthenticationToken(subject, null, role.getAuthorities());
+    AuthenticationDto accessTokenDto = accessTokenService.readJwt(jwt);
+    return new UsernamePasswordAuthenticationToken(
+        accessTokenDto.userId(), null, accessTokenDto.role().getAuthorities());
   }
 }
