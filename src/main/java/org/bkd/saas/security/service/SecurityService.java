@@ -43,7 +43,7 @@ public class SecurityService {
     String hashToCheck = user.map(UserWithPasswordDto::password).orElse(dummyPasswordHash);
     boolean isPasswordCorrect = passwordEncoder.matches(password, hashToCheck);
 
-    if (!isPasswordCorrect) {
+    if (user.isEmpty() || !isPasswordCorrect) {
       throw new InvalidCredentialsException();
     }
 
@@ -67,7 +67,7 @@ public class SecurityService {
 
     if (isValidJwt) {
       Claims claims = passwordResetTokenService.readJwt(jwt);
-      UUID userId = claims.get(SUBJECT, UUID.class);
+      UUID userId = UUID.fromString(claims.getSubject());
       userService.updateUserPassword(userId, newPassword);
       return;
     }
