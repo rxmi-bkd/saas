@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.security.dto.AuthenticationDto;
 import org.bkd.saas.security.service.AccessTokenService;
@@ -28,26 +29,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   public void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    String jwt = extractJwt(request);
-    boolean isValidJwt = hasText(jwt) && accessTokenService.isValidJwt(jwt);
+
+    Optional<String> jwt = extractJwt(request);
+    boolean isValidJwt = jwt.isPresent() && accessTokenService.isValidJwt(jwt.get());
 
     if (isValidJwt) {
-      UsernamePasswordAuthenticationToken auth = buildAuthenticationToken(jwt);
+      UsernamePasswordAuthenticationToken auth = buildAuthenticationToken(jwt.get());
       SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     filterChain.doFilter(request, response);
   }
 
-  private String extractJwt(HttpServletRequest request) {
+  private Optional<String> extractJwt(HttpServletRequest request) {
     String authorization = request.getHeader(AUTHORIZATION_HEADER);
     boolean hasValidHeader = hasText(authorization) && authorization.startsWith(BEARER_PREFIX);
 
     if (hasValidHeader) {
-      return authorization.substring(BEARER_PREFIX.length());
+      return Optional.of(authorization.substring(BEARER_PREFIX.length()));
     }
 
-    return null;
+    return Optional.empty();
   }
 
   private UsernamePasswordAuthenticationToken buildAuthenticationToken(String jwt) {
