@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 public class Routes {
 
   public static final String PUBLIC_ENDPOINT = PUBLIC_BASE_PATH + "/social-authentication";
-  public static final String AUTHORIZE = PUBLIC_ENDPOINT + "/authorize/{provider}";
-  public static final String HANDLE_CALLBACK = PUBLIC_ENDPOINT + "/callback/{provider}";
+  public static final String AUTHORIZE = PUBLIC_ENDPOINT + "/authorize/{platform}";
+  public static final String HANDLE_CALLBACK = PUBLIC_ENDPOINT + "/callback/{platform}";
 }

@@ -1,5 +1,5 @@
 package org.bkd.saas.oidc.dto;
 
-public enum ProviderEnum {
+public enum PlatformEnum {
   google
 }

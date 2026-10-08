@@ -4,7 +4,7 @@ import static org.bkd.saas.oidc.rest.Routes.AUTHORIZE;
 import static org.bkd.saas.oidc.rest.Routes.HANDLE_CALLBACK;
 
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.oidc.dto.ProviderEnum;
+import org.bkd.saas.oidc.dto.PlatformEnum;
 import org.bkd.saas.oidc.service.OidcService;
 import org.bkd.saas.security.dto.AccessTokenDto;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +19,13 @@ public class OidcController {
   private final OidcService oidcService;
 
   @GetMapping(AUTHORIZE)
-  public ResponseEntity<String> authorize(@PathVariable ProviderEnum provider) {
-    return ResponseEntity.ok(oidcService.authorize(provider));
+  public ResponseEntity<String> authorize(@PathVariable PlatformEnum platform) {
+    return ResponseEntity.ok(oidcService.authorize(platform));
   }
 
   @GetMapping(HANDLE_CALLBACK)
   public ResponseEntity<AccessTokenDto> handleCallback(
-          @PathVariable ProviderEnum provider, @RequestParam String code, @RequestParam String state) {
-    return ResponseEntity.ok(oidcService.handleCallback(code, state, provider));
+      @PathVariable PlatformEnum platform, @RequestParam String code, @RequestParam String state) {
+    return ResponseEntity.ok(oidcService.handleCallback(code, state, platform));
   }
 }

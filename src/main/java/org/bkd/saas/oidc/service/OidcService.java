@@ -1,13 +1,11 @@
 package org.bkd.saas.oidc.service;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-
 import java.util.List;
-import java.util.Map;
-import org.bkd.saas.oidc.dto.ProviderEnum;
+import lombok.RequiredArgsConstructor;
+import org.bkd.saas.oidc.dto.AccessToken;
+import org.bkd.saas.oidc.dto.PlatformEnum;
 import org.bkd.saas.oidc.dto.ProfileDto;
-import org.bkd.saas.oidc.exception.UnsupportedProviderException;
+import org.bkd.saas.oidc.exception.UnsupportedPlatformException;
 import org.bkd.saas.oidc.exception.UnverifiedEmailException;
 import org.bkd.saas.security.dto.AccessTokenDto;
 import org.bkd.saas.security.service.AccessTokenService;
@@ -18,33 +16,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class OidcService {
   private final UserService userService;
   private final StateService stateService;
+  private final List<OidcPlatform> platforms;
   private final AccessTokenService accessTokenService;
-  private final Map<ProviderEnum, AbstractOidcService> providers;
 
-  public OidcService(
-      UserService userService,
-      StateService stateService,
-      AccessTokenService accessTokenService,
-      List<AbstractOidcService> providers) {
-    this.userService = userService;
-    this.stateService = stateService;
-    this.accessTokenService = accessTokenService;
-    this.providers =
-        providers.stream().collect(toMap(AbstractOidcService::getProvider, identity()));
+  public String authorize(PlatformEnum platform) {
+    return resolve(platform).buildUrl();
   }
 
-  public String authorize(ProviderEnum platform) {
-    AbstractOidcService provider = provider(platform);
-    return provider.buildUrl(stateService.createState());
-  }
-
-  public AccessTokenDto handleCallback(String code, String state, ProviderEnum platform) {
-    AbstractOidcService provider = provider(platform);
-    stateService.consumeState(state);
-    ProfileDto profile = provider.fetchProfile(code);
+  public AccessTokenDto handleCallback(String code, String state, PlatformEnum platform) {
+    stateService.consume(state);
+    OidcPlatform oidcPlatform = resolve(platform);
+    AccessToken tokens = oidcPlatform.exchangeCodeForTokens(code);
+    ProfileDto profile = oidcPlatform.fetchProfile(tokens);
 
     if (!profile.emailVerified()) {
       throw new UnverifiedEmailException(profile.email());
@@ -55,13 +42,17 @@ public class OidcService {
     return new AccessTokenDto(access);
   }
 
-  private AbstractOidcService provider(ProviderEnum platform) {
-    AbstractOidcService provider = providers.get(platform);
+  private OidcPlatform resolve(PlatformEnum platform) {
+    List<OidcPlatform> supported = platforms.stream().filter(p -> p.supports(platform)).toList();
 
-    if (provider == null) {
-      throw new UnsupportedProviderException(platform);
+    if (supported.isEmpty()) {
+      throw new UnsupportedPlatformException(platform);
     }
 
-    return provider;
+    if (supported.size() != 1) {
+      throw new IllegalStateException("Multiple services found for platform: " + platform);
+    }
+
+    return supported.getFirst();
   }
 }

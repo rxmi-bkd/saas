@@ -1,6 +1,6 @@
 package org.bkd.saas.oidc.configuration;
 
-public record ProviderProperties(
+public record PlatformConfiguration(
     String clientId,
     String clientSecret,
     String scope,
