@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: 1791416011300-1
-      author: bouka
+      id: 1791464551200-1
+      author: rami-boukadida
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - createSequence:
@@ -9,8 +9,8 @@ databaseChangeLog:
             sequenceName: revinfo_seq
             startValue: 1
   - changeSet:
-      id: 1791416011300-2
-      author: bouka
+      id: 1791464551200-2
+      author: rami-boukadida
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - createTable:
@@ -28,6 +28,8 @@ databaseChangeLog:
                   name: email
                   type: VARCHAR(255)
               - column:
+                  constraints:
+                    nullable: false
                   name: password
                   type: VARCHAR(255)
               - column:
@@ -39,11 +41,16 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                   name: created_at
-                  type: DATETIME
+                  type: DATETIME(6)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: enabled
+                  type: BOOLEAN
             tableName: app_user
   - changeSet:
-      id: 1791416011300-3
-      author: bouka
+      id: 1791464551200-3
+      author: rami-boukadida
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - createTable:
@@ -58,8 +65,8 @@ databaseChangeLog:
                   type: VARCHAR(255)
             tableName: revchanges
   - changeSet:
-      id: 1791416011300-4
-      author: bouka
+      id: 1791464551200-4
+      author: rami-boukadida
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - createTable:
@@ -76,42 +83,17 @@ databaseChangeLog:
                   type: BIGINT
             tableName: revinfo
   - changeSet:
-      id: 1791416011300-5
-      author: bouka
-      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
-      changes:
-        - createTable:
-            columns:
-              - column:
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-                    primaryKeyName: pk_state
-                  name: id
-                  type: UUID
-              - column:
-                  constraints:
-                    nullable: false
-                  name: value
-                  type: VARCHAR(255)
-              - column:
-                  constraints:
-                    nullable: false
-                  name: expires_at
-                  type: DATETIME
-            tableName: state
-  - changeSet:
-      id: 1791416011300-6
-      author: bouka
+      id: 1791464551200-5
+      author: rami-boukadida
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - addUniqueConstraint:
-            columnNames: value
-            constraintName: uc_state_value
-            tableName: state
+            columnNames: email
+            constraintName: uc_app_user_email
+            tableName: app_user
   - changeSet:
-      id: 1791416011300-7
-      author: bouka
+      id: 1791464551200-6
+      author: rami-boukadida
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - addForeignKeyConstraint:

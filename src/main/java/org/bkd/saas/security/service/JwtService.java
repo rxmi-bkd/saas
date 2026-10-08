@@ -17,7 +17,7 @@ public class JwtService {
   private final SecretKey key;
   private final long expirationInSeconds;
 
-  public String sign(UUID subject, Map<String, Object> claims) {
+  public String createJwt(UUID subject, Map<String, Object> claims) {
     Instant now = Instant.now();
     Date issuedAt = Date.from(now);
     Date expiration = Date.from(now.plusSeconds(expirationInSeconds));
@@ -29,20 +29,11 @@ public class JwtService {
     return builder.signWith(key).compact();
   }
 
-  public Claims parse(String jwt) {
+  public Claims readJwt(String jwt) throws InvalidTokenException {
     try {
       return Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt).getPayload();
     } catch (JwtException e) {
       throw new InvalidTokenException(jwt);
-    }
-  }
-
-  public boolean isValid(String jwt) {
-    try {
-      parse(jwt);
-      return true;
-    } catch (InvalidTokenException e) {
-      return false;
     }
   }
 }

@@ -35,17 +35,17 @@ public class PasswordResetTokenService {
   }
 
   public String createJwt(UUID subject, String passwordHash) {
-    return jwtService.sign(subject, Map.of(PASSWORD_HASH_CLAIM, hash(passwordHash)));
+    return jwtService.createJwt(subject, Map.of(PASSWORD_HASH_CLAIM, hash(passwordHash)));
   }
 
   public UUID readSubject(String jwt) {
-    Claims claims = readJwt(jwt);
+    Claims claims = jwtService.readJwt(jwt);
     return UUID.fromString(claims.getSubject());
   }
 
   public boolean isValidJwt(String jwt) {
     try {
-      Claims claims = readJwt(jwt);
+      Claims claims = jwtService.readJwt(jwt);
       UserWithPasswordDto user =
           userService.readUserWithPassword(UUID.fromString(claims.getSubject()));
       String pwh = claims.get(PASSWORD_HASH_CLAIM, String.class);
@@ -53,9 +53,5 @@ public class PasswordResetTokenService {
     } catch (InvalidTokenException | UserNotFoundException e) {
       return false;
     }
-  }
-
-  private Claims readJwt(String jwt) {
-    return jwtService.parse(jwt);
   }
 }

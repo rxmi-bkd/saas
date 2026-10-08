@@ -1,9 +1,5 @@
 package org.bkd.saas.security.service;
 
-import static org.bkd.saas.shared.SecurityUtils.randomToken;
-
-import jakarta.annotation.PostConstruct;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +7,7 @@ import org.bkd.saas.security.dto.AccessTokenDto;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
+import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,37 +23,30 @@ public class SecurityService {
   private final AccessTokenService accessTokenService;
   private final PasswordResetTokenService passwordResetTokenService;
 
-  private String dummyPasswordHash;
-
-  @PostConstruct
-  public void postConstruct() {
-    dummyPasswordHash = passwordEncoder.encode(randomToken());
-  }
-
   public AccessTokenDto login(String email, String password) {
-    Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(email);
+    UserWithPasswordDto user =
+        userService
+            .readOptionalUserWithPassword(email)
+            .orElseThrow(() -> new UserNotFoundException(email));
 
-    // Always run "passwordEncoder.matches", even for unknown emails,
-    // so response time does not reveal whether an account exists.
-    String hashToCheck = user.map(UserWithPasswordDto::password).orElse(dummyPasswordHash);
-    boolean isPasswordCorrect = passwordEncoder.matches(password, hashToCheck);
+    boolean isPasswordCorrect = passwordEncoder.matches(password, user.password());
 
-    if (user.isEmpty() || !isPasswordCorrect) {
+    if (!isPasswordCorrect) {
       throw new InvalidCredentialsException();
     }
 
-    String accessToken = accessTokenService.createJwt(user.get().id(), user.get().role());
+    String accessToken = accessTokenService.createJwt(user.id(), user.role(), user.enabled());
     return new AccessTokenDto(accessToken);
   }
 
   public void forgotPassword(String email) {
-    Optional<UserWithPasswordDto> user = userService.readOptionalUserWithPassword(email);
+    UserWithPasswordDto user =
+        userService
+            .readOptionalUserWithPassword(email)
+            .orElseThrow(() -> new UserNotFoundException(email));
 
-    if (user.isEmpty()) {
-      return;
-    }
+    String jwt = passwordResetTokenService.createJwt(user.id(), user.password());
 
-    String jwt = passwordResetTokenService.createJwt(user.get().id(), user.get().password());
     log.info("jwt = {}", jwt);
   }
 

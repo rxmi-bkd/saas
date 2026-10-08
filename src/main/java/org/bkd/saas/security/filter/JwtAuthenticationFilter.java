@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.security.dto.AuthenticationDto;
+import org.bkd.saas.security.dto.AccessTokenClaimsDto;
 import org.bkd.saas.security.service.AccessTokenService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +19,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
   private static final String AUTHORIZATION_HEADER = "Authorization";
   private static final String BEARER_PREFIX = "Bearer ";
 
@@ -53,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   private UsernamePasswordAuthenticationToken buildAuthenticationToken(String jwt) {
-    AuthenticationDto accessTokenDto = accessTokenService.readJwt(jwt);
+    AccessTokenClaimsDto accessTokenDto = accessTokenService.readJwt(jwt);
     return new UsernamePasswordAuthenticationToken(
         accessTokenDto.userId(), null, accessTokenDto.role().getAuthorities());
   }

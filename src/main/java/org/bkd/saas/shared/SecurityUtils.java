@@ -30,7 +30,7 @@ public class SecurityUtils {
     return encodeToBase64(randomBytes);
   }
 
-  public static String encodeToBase64(byte[] bytes) {
+  public static String encodeToBase64(@NonNull byte[] bytes) {
     return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
   }
 }

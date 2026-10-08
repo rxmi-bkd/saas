@@ -15,22 +15,25 @@ import org.bkd.saas.user.dto.RoleEnum;
 public class AppUserEntity {
 
   @Id
-  @Column(nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false, unique = true)
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
-  @Column(nullable = false)
+  @Column(nullable = false, updatable = true, unique = true)
   private String email;
 
-  @Column(nullable = true)
+  @Column(nullable = false, updatable = true, unique = false)
   private String password;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column(nullable = false, updatable = true, unique = false)
   private RoleEnum role = RoleEnum.ROLE_USER;
 
-  @Column(nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false, unique = false)
   private Instant createdAt = Instant.now();
+
+  @Column(nullable = false, updatable = true, unique = false)
+  private boolean enabled = false;
 
   public AppUserEntity(String email) {
     this.email = email;

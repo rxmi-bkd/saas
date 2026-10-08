@@ -11,4 +11,8 @@ public class UserNotFoundException extends RuntimeException {
   public UserNotFoundException(UUID userId) {
     super(ERROR_MSG + userId);
   }
+
+  public UserNotFoundException(String email) {
+    super(ERROR_MSG + email);
+  }
 }
