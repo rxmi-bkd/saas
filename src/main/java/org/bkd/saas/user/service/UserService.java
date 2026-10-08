@@ -39,23 +39,11 @@ public class UserService {
     return userMapper.toUserDto(saved);
   }
 
-  public UserDto createUser(String email) {
-    return createUser(email, null);
-  }
-
   public UserDto readUser(UUID userId) {
     return userRepository
         .findById(userId)
         .map(userMapper::toUserDto)
         .orElseThrow(() -> new UserNotFoundException(userId));
-  }
-
-  public UserDto readOrCreateUser(String email) {
-    String normalized = StringUtils.normalizeEmail(email);
-    return userRepository
-        .findByEmail(normalized)
-        .map(userMapper::toUserDto)
-        .orElseGet(() -> createUser(normalized));
   }
 
   public UserWithPasswordDto readUserWithPassword(UUID userId) {
