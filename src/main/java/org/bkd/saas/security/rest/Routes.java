@@ -11,5 +11,6 @@ public class Routes {
   public static final String PUBLIC_ENDPOINT = PUBLIC_BASE_PATH + "/authentication";
   public static final String LOGIN = PUBLIC_ENDPOINT + "/login";
   public static final String FORGOT_PASSWORD = PUBLIC_ENDPOINT + "/password/forgot";
+  public static final String ACTIVATE_ACCOUNT = PUBLIC_ENDPOINT + "/activate";
   public static final String RESET_PASSWORD = PUBLIC_ENDPOINT + "/password/reset";
 }

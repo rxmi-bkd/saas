@@ -23,6 +23,7 @@ public class SecurityService {
   private final PasswordEncoder passwordEncoder;
   private final AccessTokenService accessTokenService;
   private final PasswordResetTokenService passwordResetTokenService;
+  private final ActivationTokenService activationTokenService;
 
   public AccessTokenDto login(String email, String password) {
     UserWithPasswordDto user =
@@ -42,6 +43,11 @@ public class SecurityService {
 
     String accessToken = accessTokenService.createJwt(user.id(), user.role(), user.enabled());
     return new AccessTokenDto(accessToken);
+  }
+
+  public void activateAccount(String jwt) {
+    UUID userId = activationTokenService.readSubject(jwt);
+    userService.enableUser(userId);
   }
 
   public void forgotPassword(String email) {

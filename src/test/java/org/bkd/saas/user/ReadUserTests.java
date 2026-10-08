@@ -33,6 +33,7 @@ public class ReadUserTests extends AbstractIntegrationTests {
 
     // act
     UserDto user = userClient.createUserOk(createUserRequest).getBody();
+    enableUser(EMAIL);
     String accessToken = securityClient.loginOk(loginRequest).getBody().access();
     ResponseEntity<UserDto> response = userClient.meOk(accessToken);
 

@@ -37,8 +37,8 @@ public class AccessTokenService {
     Claims claims = jwtService.readJwt(jwt);
     return new AccessTokenClaimsDto(
         UUID.fromString(claims.getSubject()),
-        claims.get(ROLE_CLAIM, RoleEnum.class),
-        claims.get(ENABLED_CLAIM, boolean.class));
+        RoleEnum.valueOf(claims.get(ROLE_CLAIM, String.class)),
+        claims.get(ENABLED_CLAIM, Boolean.class));
   }
 
   public boolean isValidJwt(String jwt) {

@@ -6,12 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
+import org.bkd.saas.user.dto.UserCreatedDto;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.EmailAlreadyUsedException;
 import org.bkd.saas.user.exception.PasswordMismatchException;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.mapper.UserMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
+  private final ApplicationEventPublisher eventPublisher;
 
   public UserDto createUser(String email, String password) {
     String normalized = StringUtils.normalizeEmail(email);
@@ -36,6 +39,7 @@ public class UserService {
     AppUserEntity user = new AppUserEntity(normalized);
     setPassword(user, password);
     AppUserEntity saved = userRepository.save(user);
+    eventPublisher.publishEvent(new UserCreatedDto(saved.getId(), saved.getEmail()));
     return userMapper.toUserDto(saved);
   }
 
@@ -56,6 +60,13 @@ public class UserService {
   public Optional<UserWithPasswordDto> readOptionalUserWithPassword(String email) {
     String normalized = StringUtils.normalizeEmail(email);
     return userRepository.findByEmail(normalized).map(userMapper::toUserWithPasswordDto);
+  }
+
+  public void enableUser(UUID userId) {
+    AppUserEntity user =
+        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    user.setEnabled(true);
+    userRepository.save(user);
   }
 
   public void updateUserEmail(UUID userId, String email) {

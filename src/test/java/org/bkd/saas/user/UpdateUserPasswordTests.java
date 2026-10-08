@@ -41,6 +41,7 @@ public class UpdateUserPasswordTests extends AbstractIntegrationTests {
 
     // act
     UserDto user = userClient.createUserOk(createUserRequest).getBody();
+    enableUser(EMAIL);
     String accessToken = securityClient.loginOk(loginRequest).getBody().access();
     ResponseEntity<Void> response = userClient.updateUserPasswordOk(updateRequest, accessToken);
 
@@ -60,6 +61,7 @@ public class UpdateUserPasswordTests extends AbstractIntegrationTests {
 
     // act
     UserDto user = userClient.createUserOk(createUserRequest).getBody();
+    enableUser(EMAIL);
     String accessToken = securityClient.loginOk(loginRequest).getBody().access();
     ResponseEntity<ErrorDto> response = userClient.updateUserPasswordKo(updateRequest, accessToken);
 

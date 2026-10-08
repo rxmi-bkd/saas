@@ -1,10 +1,12 @@
 package org.bkd.saas.security;
 
+import static org.bkd.saas.security.rest.Routes.ACTIVATE_ACCOUNT;
 import static org.bkd.saas.security.rest.Routes.LOGIN;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.security.dto.AccessTokenDto;
+import org.bkd.saas.security.rest.request.ActivateAccountRequest;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.shared.dto.ErrorDto;
 import org.springframework.http.HttpStatusCode;
@@ -21,6 +23,26 @@ public class SecurityTestClient {
 
   public ResponseEntity<ErrorDto> loginKo(LoginRequest body) {
     return login(body, ErrorDto.class);
+  }
+
+  public ResponseEntity<Void> activateAccountOk(ActivateAccountRequest body) {
+    return activateAccount(body, Void.class);
+  }
+
+  public ResponseEntity<ErrorDto> activateAccountKo(ActivateAccountRequest body) {
+    return activateAccount(body, ErrorDto.class);
+  }
+
+  private <T> ResponseEntity<T> activateAccount(
+      ActivateAccountRequest body, Class<T> responseType) {
+    return restClient
+        .post()
+        .uri(ACTIVATE_ACCOUNT)
+        .contentType(APPLICATION_JSON)
+        .body(body)
+        .retrieve()
+        .onStatus(HttpStatusCode::isError, (request, response) -> {})
+        .toEntity(responseType);
   }
 
   private <T> ResponseEntity<T> login(LoginRequest body, Class<T> responseType) {

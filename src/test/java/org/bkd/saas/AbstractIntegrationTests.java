@@ -3,6 +3,8 @@ package org.bkd.saas;
 import jakarta.annotation.PostConstruct;
 import org.bkd.saas.security.SecurityTestClient;
 import org.bkd.saas.user.UserTestClient;
+import org.bkd.saas.user.db.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -21,6 +23,8 @@ public abstract class AbstractIntegrationTests {
   private static final PostgreSQLContainer postgresql =
       new PostgreSQLContainer("postgres:17-alpine");
 
+  @Autowired private UserRepository userRepository;
+
   protected SecurityTestClient securityClient;
   protected UserTestClient userClient;
 
@@ -29,6 +33,16 @@ public abstract class AbstractIntegrationTests {
     RestClient restClient = RestClient.builder().baseUrl(host()).build();
     securityClient = new SecurityTestClient(restClient);
     userClient = new UserTestClient(restClient);
+  }
+
+  protected void enableUser(String email) {
+    userRepository
+        .findByEmail(email)
+        .ifPresent(
+            user -> {
+              user.setEnabled(true);
+              userRepository.save(user);
+            });
   }
 
   private String host() {
