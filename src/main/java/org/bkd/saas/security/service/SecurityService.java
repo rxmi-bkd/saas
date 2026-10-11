@@ -3,16 +3,12 @@ package org.bkd.saas.security.service;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
-import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
-import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.service.UserEmailService;
 import org.bkd.saas.user.service.UserService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,26 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SecurityService {
   private final UserService userService;
-  private final PasswordEncoder passwordEncoder;
   private final PasswordResetTokenService passwordResetTokenService;
   private final UserEmailService userEmailService;
-
-  public UserDto login(String email, String password) {
-    UserWithPasswordDto user =
-        userService
-            .readOptionalUserWithPassword(email)
-            .orElseThrow(InvalidCredentialsException::new);
-
-    if (!passwordEncoder.matches(password, user.password())) {
-      throw new InvalidCredentialsException();
-    }
-
-    if (!user.enabled()) {
-      throw new DisabledUserException(user.email());
-    }
-
-    return userService.readUser(user.id());
-  }
 
   public void sendActivationEmail(String email) {
     UserWithPasswordDto user =

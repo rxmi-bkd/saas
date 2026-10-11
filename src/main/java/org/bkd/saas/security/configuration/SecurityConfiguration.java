@@ -28,7 +28,6 @@ public class SecurityConfiguration {
     return new BCryptPasswordEncoder();
   }
 
-
   @Bean
   public AuthenticationEntryPoint authenticationEntryPoint() {
     return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
