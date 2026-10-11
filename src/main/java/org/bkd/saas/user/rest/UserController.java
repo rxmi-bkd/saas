@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.user.dto.UserDto;
+import org.bkd.saas.user.rest.request.ActivateUserRequest;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.bkd.saas.user.rest.request.UpdateUserEmailRequest;
 import org.bkd.saas.user.rest.request.UpdateUserPasswordRequest;
@@ -43,6 +44,12 @@ public class UserController {
   public ResponseEntity<Void> updateUserEmail(
       @AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateUserEmailRequest request) {
     userService.updateUserEmail(userId, request.email());
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping(ACTIVATE_USER)
+  public ResponseEntity<Void> activateUser(@Valid @RequestBody ActivateUserRequest request) {
+    userService.activateUser(request.jwt());
     return ResponseEntity.noContent().build();
   }
 }

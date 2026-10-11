@@ -3,6 +3,7 @@ package org.bkd.saas.user.service;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.bkd.saas.security.service.ActivationTokenService;
 import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
@@ -25,6 +26,7 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
   private final UserEmailService userEmailService;
+  private final ActivationTokenService activationTokenService;
 
   public UserDto createUser(String email, String password) {
     String normalized = StringUtils.normalizeEmail(email);
@@ -62,6 +64,11 @@ public class UserService {
   public Optional<UserWithPasswordDto> readOptionalUserWithPassword(String email) {
     String normalized = StringUtils.normalizeEmail(email);
     return userRepository.findByEmail(normalized).map(userMapper::toUserWithPasswordDto);
+  }
+
+  public void activateUser(String jwt) {
+    UUID userId = activationTokenService.readSubject(jwt);
+    enableUser(userId);
   }
 
   public void enableUser(UUID userId) {

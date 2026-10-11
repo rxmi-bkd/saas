@@ -24,7 +24,6 @@ public class SecurityService {
   private final UserService userService;
   private final PasswordEncoder passwordEncoder;
   private final PasswordResetTokenService passwordResetTokenService;
-  private final ActivationTokenService activationTokenService;
   private final UserEmailService userEmailService;
 
   public UserDto login(String email, String password) {
@@ -42,11 +41,6 @@ public class SecurityService {
     }
 
     return userService.readUser(user.id());
-  }
-
-  public void activateAccount(String jwt) {
-    UUID userId = activationTokenService.readSubject(jwt);
-    userService.enableUser(userId);
   }
 
   public void sendActivationEmail(String email) {
