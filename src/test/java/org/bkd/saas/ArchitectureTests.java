@@ -94,6 +94,7 @@ class ArchitectureTests {
     checkSuffixResidesIn(classes, "Event", "..event");
     checkSuffixResidesIn(classes, "Publisher", "..event");
     checkSuffixResidesIn(classes, "Listener", "..listener");
+    checkSuffixResidesIn(classes, "Channel", "..channel");
     checkSuffixResidesIn(classes, "Mapper", "..mapper");
     checkSuffixResidesIn(classes, "Exception", "..exception");
   }
@@ -108,6 +109,7 @@ class ArchitectureTests {
     checkPackageHasSuffix(classes, "..dto", "Dto", "Enum");
     checkPackageHasSuffix(classes, "..event", "Event", "Publisher");
     checkPackageHasSuffix(classes, "..listener", "Listener");
+    checkPackageHasSuffix(classes, "..channel", "Channel");
     checkPackageHasSuffix(classes, "..mapper", "Mapper", "MapperImpl");
     checkPackageHasSuffix(classes, "..exception", "Exception");
   }
