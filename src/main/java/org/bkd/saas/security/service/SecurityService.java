@@ -10,7 +10,7 @@ import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
-import org.bkd.saas.user.service.EmailService;
+import org.bkd.saas.user.service.UserEmailService;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class SecurityService {
   private final PasswordEncoder passwordEncoder;
   private final PasswordResetTokenService passwordResetTokenService;
   private final ActivationTokenService activationTokenService;
-  private final EmailService emailService;
+  private final UserEmailService userEmailService;
 
   public UserDto login(String email, String password) {
     UserWithPasswordDto user =
@@ -59,7 +59,7 @@ public class SecurityService {
       throw new UserAlreadyEnabledException(email);
     }
 
-    emailService.sendActivationEmail(user.id(), user.email());
+    userEmailService.sendActivationEmail(user.id(), user.email());
   }
 
   public void forgotPassword(String email) {
