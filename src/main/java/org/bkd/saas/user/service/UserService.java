@@ -3,6 +3,10 @@ package org.bkd.saas.user.service;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.bkd.saas.notification.dto.ChannelEnum;
+import org.bkd.saas.notification.dto.NotificationDto;
+import org.bkd.saas.notification.service.NotificationService;
+import org.bkd.saas.security.service.ActivationTokenService;
 import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
@@ -24,6 +28,8 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
+  private final ActivationTokenService activationTokenService;
+  private final NotificationService notificationService;
 
   public UserDto createUser(String email, String password) {
     String normalized = StringUtils.normalizeEmail(email);
@@ -36,7 +42,20 @@ public class UserService {
     AppUserEntity user = new AppUserEntity(normalized);
     setPassword(user, password);
     user = userRepository.save(user);
+    sendActivationEmail(user.getId(), user.getEmail());
     return userMapper.toUserDto(user);
+  }
+
+  private void sendActivationEmail(UUID userId, String userEmail) {
+    String jwt = activationTokenService.createJwt(userId);
+    notificationService.sendNotification(
+        ChannelEnum.EMAIL,
+        new NotificationDto(
+            userEmail, "Activate your account", "Use this token to activate your account: " + jwt));
+  }
+
+  private void setPassword(AppUserEntity user, String password) {
+    user.setPassword(passwordEncoder.encode(password));
   }
 
   public UserDto readUser(UUID userId) {
@@ -103,9 +122,5 @@ public class UserService {
 
     setPassword(user, newPassword);
     userRepository.save(user);
-  }
-
-  private void setPassword(AppUserEntity user, String password) {
-    user.setPassword(passwordEncoder.encode(password));
   }
 }
