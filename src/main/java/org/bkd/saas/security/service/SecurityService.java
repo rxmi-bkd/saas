@@ -49,7 +49,7 @@ public class SecurityService {
     userService.enableUser(userId);
   }
 
-  public void resendActivationEmail(String email) {
+  public void sendActivationEmail(String email) {
     UserWithPasswordDto user =
         userService
             .readOptionalUserWithPassword(email)

@@ -39,7 +39,7 @@ public class SecurityController {
   @PostMapping(RESEND_ACTIVATION_EMAIL)
   public ResponseEntity<Void> resendActivationEmail(
       @Valid @RequestBody ResendActivationEmailRequest request) {
-    securityService.resendActivationEmail(request.email());
+    securityService.sendActivationEmail(request.email());
     return ResponseEntity.noContent().build();
   }
 
