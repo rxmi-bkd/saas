@@ -8,7 +8,9 @@ import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.DisabledUserException;
+import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
+import org.bkd.saas.user.service.UserEmailService;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class SecurityService {
   private final AccessTokenService accessTokenService;
   private final PasswordResetTokenService passwordResetTokenService;
   private final ActivationTokenService activationTokenService;
+  private final UserEmailService userEmailService;
 
   public AccessTokenDto login(String email, String password) {
     UserWithPasswordDto user =
@@ -48,6 +51,19 @@ public class SecurityService {
   public void activateAccount(String jwt) {
     UUID userId = activationTokenService.readSubject(jwt);
     userService.enableUser(userId);
+  }
+
+  public void resendActivationEmail(String email) {
+    UserWithPasswordDto user =
+        userService
+            .readOptionalUserWithPassword(email)
+            .orElseThrow(() -> new UserNotFoundException(email));
+
+    if (user.enabled()) {
+      throw new UserAlreadyEnabledException(email);
+    }
+
+    userEmailService.sendActivationEmail(user.id(), user.email());
   }
 
   public void forgotPassword(String email) {
