@@ -8,7 +8,6 @@ import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
-import org.bkd.saas.user.event.UserEventPublisher;
 import org.bkd.saas.user.exception.EmailAlreadyUsedException;
 import org.bkd.saas.user.exception.PasswordMismatchException;
 import org.bkd.saas.user.exception.UserNotFoundException;
@@ -25,7 +24,6 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
-  private final UserEventPublisher userEventPublisher;
 
   public UserDto createUser(String email, String password) {
     String normalized = StringUtils.normalizeEmail(email);
@@ -38,7 +36,6 @@ public class UserService {
     AppUserEntity user = new AppUserEntity(normalized);
     setPassword(user, password);
     user = userRepository.save(user);
-    userEventPublisher.publishUserCreated(user.getId(), user.getEmail());
     return userMapper.toUserDto(user);
   }
 
