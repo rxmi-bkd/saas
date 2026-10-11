@@ -3,14 +3,11 @@ package org.bkd.saas.security.service;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bkd.saas.security.dto.AccessTokenDto;
-import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
-import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
-import org.bkd.saas.user.service.UserEmailService;
+import org.bkd.saas.user.service.EmailService;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,30 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class SecurityService {
   private final UserService userService;
   private final PasswordEncoder passwordEncoder;
-  private final AccessTokenService accessTokenService;
   private final PasswordResetTokenService passwordResetTokenService;
   private final ActivationTokenService activationTokenService;
-  private final UserEmailService userEmailService;
-
-  public AccessTokenDto login(String email, String password) {
-    UserWithPasswordDto user =
-        userService
-            .readOptionalUserWithPassword(email)
-            .orElseThrow(() -> new UserNotFoundException(email));
-
-    boolean isPasswordCorrect = passwordEncoder.matches(password, user.password());
-
-    if (!isPasswordCorrect) {
-      throw new InvalidCredentialsException();
-    }
-
-    if (!user.enabled()) {
-      throw new DisabledUserException(email);
-    }
-
-    String accessToken = accessTokenService.createJwt(user.id(), user.role(), user.enabled());
-    return new AccessTokenDto(accessToken);
-  }
+  private final EmailService emailService;
 
   public void activateAccount(String jwt) {
     UUID userId = activationTokenService.readSubject(jwt);
@@ -63,7 +39,7 @@ public class SecurityService {
       throw new UserAlreadyEnabledException(email);
     }
 
-    userEmailService.sendActivationEmail(user.id(), user.email());
+    emailService.sendActivationEmail(user.id(), user.email());
   }
 
   public void forgotPassword(String email) {

@@ -24,7 +24,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
-  private final UserEmailService userEmailService;
+  private final EmailService emailService;
 
   public UserDto createUser(String email, String password) {
     String normalized = StringUtils.normalizeEmail(email);
@@ -37,7 +37,7 @@ public class UserService {
     AppUserEntity user = new AppUserEntity(normalized);
     setPassword(user, password);
     user = userRepository.save(user);
-    userEmailService.sendActivationEmail(user.getId(), user.getEmail());
+    emailService.sendActivationEmail(user.getId(), user.getEmail());
     return userMapper.toUserDto(user);
   }
 

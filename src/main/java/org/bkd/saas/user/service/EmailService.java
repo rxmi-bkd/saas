@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserEmailService {
+public class EmailService {
 
   private final ActivationTokenService activationTokenService;
   private final NotificationService notificationService;

@@ -1,7 +1,6 @@
 package org.bkd.saas;
 
 import jakarta.annotation.PostConstruct;
-import org.bkd.saas.security.SecurityTestClient;
 import org.bkd.saas.user.UserTestClient;
 import org.bkd.saas.user.db.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +24,11 @@ public abstract class AbstractIntegrationTests {
 
   @Autowired private UserRepository userRepository;
 
-  protected SecurityTestClient securityClient;
   protected UserTestClient userClient;
 
   @PostConstruct
   void postConstruct() {
     RestClient restClient = RestClient.builder().baseUrl(host()).build();
-    securityClient = new SecurityTestClient(restClient);
     userClient = new UserTestClient(restClient);
   }
 
