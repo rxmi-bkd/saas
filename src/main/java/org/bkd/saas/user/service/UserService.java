@@ -6,14 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
-import org.bkd.saas.user.dto.UserCreatedDto;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
+import org.bkd.saas.user.event.UserEventPublisher;
 import org.bkd.saas.user.exception.EmailAlreadyUsedException;
 import org.bkd.saas.user.exception.PasswordMismatchException;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.mapper.UserMapper;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
-  private final ApplicationEventPublisher eventPublisher;
+  private final UserEventPublisher userEventPublisher;
 
   public UserDto createUser(String email, String password) {
     String normalized = StringUtils.normalizeEmail(email);
@@ -38,9 +37,9 @@ public class UserService {
 
     AppUserEntity user = new AppUserEntity(normalized);
     setPassword(user, password);
-    AppUserEntity saved = userRepository.save(user);
-    eventPublisher.publishEvent(new UserCreatedDto(saved.getId(), saved.getEmail()));
-    return userMapper.toUserDto(saved);
+    user = userRepository.save(user);
+    userEventPublisher.publishUserCreated(user.getId(), user.getEmail());
+    return userMapper.toUserDto(user);
   }
 
   public UserDto readUser(UUID userId) {
