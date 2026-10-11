@@ -32,16 +32,6 @@ public abstract class AbstractIntegrationTests {
     userClient = new UserTestClient(restClient);
   }
 
-  protected void enableUser(String email) {
-    userRepository
-        .findByEmail(email)
-        .ifPresent(
-            user -> {
-              user.setEnabled(true);
-              userRepository.save(user);
-            });
-  }
-
   private String host() {
     return "http://localhost:" + port;
   }

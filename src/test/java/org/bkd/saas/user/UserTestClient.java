@@ -40,21 +40,21 @@ public class UserTestClient {
         .toEntity(responseType);
   }
 
-  public ResponseEntity<Void> updateUserEmailOk(UpdateUserEmailRequest body, String accessToken) {
-    return updateUserEmail(body, accessToken, Void.class);
+  public ResponseEntity<Void> updateUserEmailOk(UpdateUserEmailRequest body, String sessionCookie) {
+    return updateUserEmail(body, sessionCookie, Void.class);
   }
 
   public ResponseEntity<ErrorDto> updateUserEmailKo(
-      UpdateUserEmailRequest body, String accessToken) {
-    return updateUserEmail(body, accessToken, ErrorDto.class);
+      UpdateUserEmailRequest body, String sessionCookie) {
+    return updateUserEmail(body, sessionCookie, ErrorDto.class);
   }
 
   private <T> ResponseEntity<T> updateUserEmail(
-      UpdateUserEmailRequest body, String accessToken, Class<T> responseType) {
+      UpdateUserEmailRequest body, String sessionCookie, Class<T> responseType) {
     return restClient
         .put()
         .uri(UPDATE_USER_EMAIL)
-        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+        .header(HttpHeaders.COOKIE, sessionCookie)
         .contentType(APPLICATION_JSON)
         .body(body)
         .retrieve()
@@ -63,21 +63,21 @@ public class UserTestClient {
   }
 
   public ResponseEntity<Void> updateUserPasswordOk(
-      UpdateUserPasswordRequest body, String accessToken) {
-    return updateUserPassword(body, accessToken, Void.class);
+      UpdateUserPasswordRequest body, String sessionCookie) {
+    return updateUserPassword(body, sessionCookie, Void.class);
   }
 
   public ResponseEntity<ErrorDto> updateUserPasswordKo(
-      UpdateUserPasswordRequest body, String accessToken) {
-    return updateUserPassword(body, accessToken, ErrorDto.class);
+      UpdateUserPasswordRequest body, String sessionCookie) {
+    return updateUserPassword(body, sessionCookie, ErrorDto.class);
   }
 
   private <T> ResponseEntity<T> updateUserPassword(
-      UpdateUserPasswordRequest body, String accessToken, Class<T> responseType) {
+      UpdateUserPasswordRequest body, String sessionCookie, Class<T> responseType) {
     return restClient
         .put()
         .uri(UPDATE_USER_PASSWORD)
-        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+        .header(HttpHeaders.COOKIE, sessionCookie)
         .contentType(APPLICATION_JSON)
         .body(body)
         .retrieve()
@@ -85,19 +85,19 @@ public class UserTestClient {
         .toEntity(responseType);
   }
 
-  public ResponseEntity<UserDto> meOk(String accessToken) {
-    return me(accessToken, UserDto.class);
+  public ResponseEntity<UserDto> meOk(String sessionCookie) {
+    return me(sessionCookie, UserDto.class);
   }
 
-  public ResponseEntity<ErrorDto> meKo(String accessToken) {
-    return me(accessToken, ErrorDto.class);
+  public ResponseEntity<ErrorDto> meKo(String sessionCookie) {
+    return me(sessionCookie, ErrorDto.class);
   }
 
-  private <T> ResponseEntity<T> me(String accessToken, Class<T> responseType) {
+  private <T> ResponseEntity<T> me(String sessionCookie, Class<T> responseType) {
     return restClient
         .get()
         .uri(ME)
-        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+        .header(HttpHeaders.COOKIE, sessionCookie)
         .retrieve()
         .onStatus(HttpStatusCode::isError, (request, response) -> {})
         .toEntity(responseType);

@@ -2,6 +2,7 @@ package org.bkd.saas.security.rest;
 
 import static org.bkd.saas.security.rest.Routes.ACTIVATE_ACCOUNT;
 import static org.bkd.saas.security.rest.Routes.FORGOT_PASSWORD;
+import static org.bkd.saas.security.rest.Routes.LOGIN;
 import static org.bkd.saas.security.rest.Routes.RESEND_ACTIVATION_EMAIL;
 import static org.bkd.saas.security.rest.Routes.RESET_PASSWORD;
 
@@ -9,9 +10,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.security.rest.request.ActivateAccountRequest;
 import org.bkd.saas.security.rest.request.ForgotPasswordRequest;
+import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.security.rest.request.PasswordResetRequest;
 import org.bkd.saas.security.rest.request.ResendActivationEmailRequest;
 import org.bkd.saas.security.service.SecurityService;
+import org.bkd.saas.user.dto.UserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SecurityController {
   private final SecurityService securityService;
+
+  @PostMapping(LOGIN)
+  public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequest request) {
+    return null;
+  }
 
   @PostMapping(ACTIVATE_ACCOUNT)
   public ResponseEntity<Void> activateAccount(@Valid @RequestBody ActivateAccountRequest request) {

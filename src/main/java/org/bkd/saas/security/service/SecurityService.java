@@ -3,8 +3,11 @@ package org.bkd.saas.security.service;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
+import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
+import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.service.EmailService;
@@ -23,6 +26,23 @@ public class SecurityService {
   private final PasswordResetTokenService passwordResetTokenService;
   private final ActivationTokenService activationTokenService;
   private final EmailService emailService;
+
+  public UserDto login(String email, String password) {
+    UserWithPasswordDto user =
+        userService
+            .readOptionalUserWithPassword(email)
+            .orElseThrow(InvalidCredentialsException::new);
+
+    if (!passwordEncoder.matches(password, user.password())) {
+      throw new InvalidCredentialsException();
+    }
+
+    if (!user.enabled()) {
+      throw new DisabledUserException(user.email());
+    }
+
+    return userService.readUser(user.id());
+  }
 
   public void activateAccount(String jwt) {
     UUID userId = activationTokenService.readSubject(jwt);
