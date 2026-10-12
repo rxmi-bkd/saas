@@ -1,14 +1,34 @@
 package org.bkd.saas.security.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
+import org.bkd.saas.shared.StringUtils;
+import org.bkd.saas.user.db.AppUserEntity;
+import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
+import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
+import org.bkd.saas.user.mapper.UserMapper;
 import org.bkd.saas.user.service.UserEmailService;
 import org.bkd.saas.user.service.UserService;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +37,54 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class SecurityService {
+  private final UserMapper userMapper;
   private final UserService userService;
-  private final PasswordResetTokenService passwordResetTokenService;
   private final UserEmailService userEmailService;
+  private final AuthenticationManager authenticationManager;
+  private final SecurityContextRepository securityContextRepository;
+  private final PasswordResetTokenService passwordResetTokenService;
+  private final ApplicationEventPublisher applicationEventPublisher;
+  private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
+
+  public UserDto login(
+      String email, String password, HttpServletRequest request, HttpServletResponse response) {
+    String normalized = StringUtils.normalizeEmail(email);
+    UsernamePasswordAuthenticationToken token =
+        UsernamePasswordAuthenticationToken.unauthenticated(normalized, password);
+    return authenticate(token, request, response);
+  }
+
+  private void publishInteractiveAuthenticationSuccessEvent(Authentication authentication) {
+    InteractiveAuthenticationSuccessEvent event =
+        new InteractiveAuthenticationSuccessEvent(authentication, SecurityService.class);
+    applicationEventPublisher.publishEvent(event);
+  }
+
+  private UserDto authenticate(
+      UsernamePasswordAuthenticationToken token,
+      HttpServletRequest request,
+      HttpServletResponse response) {
+    try {
+      Authentication authenticated = authenticationManager.authenticate(token);
+      AppUserEntity appUserEntity = (AppUserEntity) authenticated.getPrincipal();
+      Authentication authentication =
+          UsernamePasswordAuthenticationToken.authenticated(
+              appUserEntity.getId(), null, authenticated.getAuthorities());
+      sessionAuthenticationStrategy.onAuthentication(authentication, request, response);
+      SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+      securityContext.setAuthentication(authentication);
+      SecurityContextHolder.setContext(securityContext);
+      securityContextRepository.saveContext(securityContext, request, response);
+      publishInteractiveAuthenticationSuccessEvent(authentication);
+      return userMapper.toUserDto(appUserEntity);
+    } catch (DisabledException | LockedException e) {
+      SecurityContextHolder.clearContext();
+      throw new DisabledUserException((String) token.getPrincipal());
+    } catch (BadCredentialsException e) {
+      SecurityContextHolder.clearContext();
+      throw new InvalidCredentialsException();
+    }
+  }
 
   public void sendActivationEmail(String email) {
     UserWithPasswordDto user =
