@@ -48,28 +48,25 @@ public class SecurityService {
 
   public UserDto login(
       String email, String password, HttpServletRequest request, HttpServletResponse response) {
-    String normalized = StringUtils.normalizeEmail(email);
-    UsernamePasswordAuthenticationToken token =
-        UsernamePasswordAuthenticationToken.unauthenticated(normalized, password);
-    return authenticate(token, request, response);
-  }
-
-  private UserDto authenticate(
-      UsernamePasswordAuthenticationToken token,
-      HttpServletRequest request,
-      HttpServletResponse response) {
     try {
+      String normalized = StringUtils.normalizeEmail(email);
+
+      UsernamePasswordAuthenticationToken token =
+          UsernamePasswordAuthenticationToken.unauthenticated(normalized, password);
+
       Authentication authenticated = authenticationManager.authenticate(token);
       AppUserEntity appUserEntity = (AppUserEntity) authenticated.getPrincipal();
+
       Authentication authentication =
           UsernamePasswordAuthenticationToken.authenticated(
               appUserEntity.getId(), null, authenticated.getAuthorities());
+
       sessionAuthenticationStrategy.onAuthentication(authentication, request, response);
       saveSecurityContext(authentication, request, response);
       publishInteractiveAuthenticationSuccessEvent(authentication);
       return userMapper.toUserDto(appUserEntity);
     } catch (DisabledException | LockedException e) {
-      throw new DisabledUserException((String) token.getPrincipal());
+      throw new DisabledUserException(email);
     } catch (BadCredentialsException e) {
       throw new InvalidCredentialsException();
     }
