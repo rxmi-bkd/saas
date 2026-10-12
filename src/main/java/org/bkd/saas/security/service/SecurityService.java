@@ -54,12 +54,6 @@ public class SecurityService {
     return authenticate(token, request, response);
   }
 
-  private void publishInteractiveAuthenticationSuccessEvent(Authentication authentication) {
-    InteractiveAuthenticationSuccessEvent event =
-        new InteractiveAuthenticationSuccessEvent(authentication, SecurityService.class);
-    applicationEventPublisher.publishEvent(event);
-  }
-
   private UserDto authenticate(
       UsernamePasswordAuthenticationToken token,
       HttpServletRequest request,
@@ -71,19 +65,28 @@ public class SecurityService {
           UsernamePasswordAuthenticationToken.authenticated(
               appUserEntity.getId(), null, authenticated.getAuthorities());
       sessionAuthenticationStrategy.onAuthentication(authentication, request, response);
-      SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-      securityContext.setAuthentication(authentication);
-      SecurityContextHolder.setContext(securityContext);
-      securityContextRepository.saveContext(securityContext, request, response);
+      saveSecurityContext(authentication, request, response);
       publishInteractiveAuthenticationSuccessEvent(authentication);
       return userMapper.toUserDto(appUserEntity);
     } catch (DisabledException | LockedException e) {
-      SecurityContextHolder.clearContext();
       throw new DisabledUserException((String) token.getPrincipal());
     } catch (BadCredentialsException e) {
-      SecurityContextHolder.clearContext();
       throw new InvalidCredentialsException();
     }
+  }
+
+  private void publishInteractiveAuthenticationSuccessEvent(Authentication authentication) {
+    InteractiveAuthenticationSuccessEvent event =
+        new InteractiveAuthenticationSuccessEvent(authentication, SecurityService.class);
+    applicationEventPublisher.publishEvent(event);
+  }
+
+  private void saveSecurityContext(
+      Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+    SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+    securityContext.setAuthentication(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    securityContextRepository.saveContext(securityContext, request, response);
   }
 
   public void sendActivationEmail(String email) {
