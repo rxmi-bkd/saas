@@ -7,6 +7,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.security.service.ActivationTokenService;
 import org.bkd.saas.shared.StringUtils;
+import org.bkd.saas.shared.service.EmailService;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;
@@ -20,17 +21,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
-  private final UserEmailService userEmailService;
+  private final EmailService emailService;
   private final ActivationTokenService activationTokenService;
 
   public UserDto createUser(String email, String password) {
@@ -44,7 +44,7 @@ public class UserService implements UserDetailsService {
     AppUserEntity user = new AppUserEntity(normalized);
     setPassword(user, password);
     user = userRepository.save(user);
-    userEmailService.sendActivationEmail(user.getId(), user.getEmail());
+    emailService.sendActivationEmail(user.getId(), user.getEmail());
     return userMapper.toUserDto(user);
   }
 

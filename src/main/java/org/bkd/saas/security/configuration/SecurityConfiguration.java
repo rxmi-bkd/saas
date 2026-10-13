@@ -35,13 +35,13 @@ import org.springframework.security.web.context.SecurityContextRepository;
 public class SecurityConfiguration {
 
   @Bean
-  SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                          AuthenticationManager authenticationManager,
-                                          SessionAuthenticationStrategy sessionAuthenticationStrategy,
-                                          SecurityContextRepository securityContextRepository,
-                                          AuthenticationEntryPoint authenticationEntryPoint,
-                                          AccessDeniedHandler accessDeniedHandler,
-                                          LogoutSuccessHandler logoutSuccessHandler) {
+  public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                 AuthenticationManager authenticationManager,
+                                                 SessionAuthenticationStrategy sessionAuthenticationStrategy,
+                                                 SecurityContextRepository securityContextRepository,
+                                                 AuthenticationEntryPoint authenticationEntryPoint,
+                                                 AccessDeniedHandler accessDeniedHandler,
+                                                 LogoutSuccessHandler logoutSuccessHandler) {
 
     return http.csrf(csrfConfigurer())
                .logout(logoutConfigurer(LOGOUT, logoutSuccessHandler))
@@ -55,6 +55,7 @@ public class SecurityConfiguration {
 
   private static Customizer<CsrfConfigurer<HttpSecurity>> csrfConfigurer() {
     return CsrfConfigurer::spa;
+    // return CsrfConfigurer::disable;
   }
 
   private Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeHttpRequestsConfigurer() {

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.shared.StringUtils;
+import org.bkd.saas.shared.service.EmailService;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
@@ -15,7 +16,6 @@ import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.mapper.UserMapper;
-import org.bkd.saas.user.service.UserEmailService;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,16 +30,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional
+
 @RequiredArgsConstructor
 public class SecurityService {
   private final UserMapper userMapper;
   private final UserService userService;
-  private final UserEmailService userEmailService;
+  private final EmailService emailService;
   private final AuthenticationManager authenticationManager;
   private final SecurityContextRepository securityContextRepository;
   private final PasswordResetTokenService passwordResetTokenService;
@@ -93,7 +92,7 @@ public class SecurityService {
       throw new UserAlreadyEnabledException(email);
     }
 
-    userEmailService.sendActivationEmail(user.id(), user.email());
+    emailService.sendActivationEmail(user.id(), user.email());
   }
 
   public void forgotPassword(String email) {

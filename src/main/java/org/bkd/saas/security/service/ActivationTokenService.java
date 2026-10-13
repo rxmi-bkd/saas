@@ -9,10 +9,9 @@ import javax.crypto.SecretKey;
 import org.bkd.saas.security.exception.InvalidTokenException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+
 public class ActivationTokenService {
   private final JwtService jwtService;
 

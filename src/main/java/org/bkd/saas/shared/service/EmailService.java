@@ -1,4 +1,4 @@
-package org.bkd.saas.user.service;
+package org.bkd.saas.shared.service;
 
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -8,12 +8,11 @@ import org.bkd.saas.notification.service.NotificationService;
 import org.bkd.saas.security.service.ActivationTokenService;
 import org.bkd.saas.shared.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+
 @RequiredArgsConstructor
-public class UserEmailService {
+public class EmailService {
 
   private final ActivationTokenService activationTokenService;
   private final NotificationService notificationService;
