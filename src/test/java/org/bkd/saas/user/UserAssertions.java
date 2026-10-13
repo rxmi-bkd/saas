@@ -22,8 +22,7 @@ public class UserAssertions {
     assertThat(user.createdAt()).isNotNull();
   }
 
-  public static void assertUserRead(
-      ResponseEntity<UserDto> response, UUID expectedId, String expectedEmail) {
+  public static void assertUserRead(ResponseEntity<UserDto> response, UUID expectedId, String expectedEmail) {
     assertThat(response.getStatusCode().value()).isEqualTo(200);
     UserDto user = response.getBody();
     assertThat(user).isNotNull();

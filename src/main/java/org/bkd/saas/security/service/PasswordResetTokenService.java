@@ -24,10 +24,9 @@ public class PasswordResetTokenService {
   private final UserService userService;
   public static final String PASSWORD_HASH_CLAIM = "pwh";
 
-  public PasswordResetTokenService(
-      @Value("${app.jwt.reset-password-token.secret}") String secret,
-      @Value("${app.jwt.reset-password-token.expiration}") long expirationInSeconds,
-      UserService userService) {
+  public PasswordResetTokenService(@Value("${app.jwt.reset-password-token.secret}") String secret,
+                                   @Value("${app.jwt.reset-password-token.expiration}") long expirationInSeconds,
+                                   UserService userService) {
 
     SecretKey key = hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     this.jwtService = new JwtService(key, expirationInSeconds);
@@ -46,11 +45,11 @@ public class PasswordResetTokenService {
   public boolean isValidJwt(String jwt) {
     try {
       Claims claims = jwtService.readJwt(jwt);
-      UserWithPasswordDto user =
-          userService.readUserWithPassword(UUID.fromString(claims.getSubject()));
+      UserWithPasswordDto user = userService.readUserWithPassword(UUID.fromString(claims.getSubject()));
       String pwh = claims.get(PASSWORD_HASH_CLAIM, String.class);
       return pwh != null && Objects.equals(hash(user.password()), pwh);
-    } catch (InvalidTokenException | UserNotFoundException e) {
+    }
+    catch (InvalidTokenException | UserNotFoundException e) {
       return false;
     }
   }

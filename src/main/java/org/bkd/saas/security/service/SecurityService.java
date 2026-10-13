@@ -46,40 +46,43 @@ public class SecurityService {
   private final ApplicationEventPublisher applicationEventPublisher;
   private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
 
-  public UserDto login(
-      String email, String password, HttpServletRequest request, HttpServletResponse response) {
+  public UserDto login(String email, String password, HttpServletRequest request, HttpServletResponse response) {
     try {
       String normalized = StringUtils.normalizeEmail(email);
 
-      UsernamePasswordAuthenticationToken token =
-          UsernamePasswordAuthenticationToken.unauthenticated(normalized, password);
+      UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(normalized,
+                                                                                                      password);
 
       Authentication authenticated = authenticationManager.authenticate(token);
       AppUserEntity appUserEntity = (AppUserEntity) authenticated.getPrincipal();
 
-      Authentication authentication =
-          UsernamePasswordAuthenticationToken.authenticated(
-              appUserEntity.getId(), null, authenticated.getAuthorities());
+      Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(appUserEntity.getId(),
+                                                                                        null,
+                                                                                        authenticated.getAuthorities());
 
       sessionAuthenticationStrategy.onAuthentication(authentication, request, response);
       saveSecurityContext(authentication, request, response);
       publishInteractiveAuthenticationSuccessEvent(authentication);
       return userMapper.toUserDto(appUserEntity);
-    } catch (DisabledException | LockedException e) {
+    }
+    catch (DisabledException | LockedException e) {
       throw new DisabledUserException(email);
-    } catch (BadCredentialsException e) {
+    }
+    catch (BadCredentialsException e) {
       throw new InvalidCredentialsException();
     }
   }
 
   private void publishInteractiveAuthenticationSuccessEvent(Authentication authentication) {
-    InteractiveAuthenticationSuccessEvent event =
-        new InteractiveAuthenticationSuccessEvent(authentication, SecurityService.class);
+    InteractiveAuthenticationSuccessEvent event = new InteractiveAuthenticationSuccessEvent(authentication,
+                                                                                            SecurityService.class);
     applicationEventPublisher.publishEvent(event);
   }
 
-  private void saveSecurityContext(
-      Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+  private void saveSecurityContext(Authentication authentication,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response) {
+
     SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
     securityContext.setAuthentication(authentication);
     SecurityContextHolder.setContext(securityContext);
@@ -87,10 +90,8 @@ public class SecurityService {
   }
 
   public void sendActivationEmail(String email) {
-    UserWithPasswordDto user =
-        userService
-            .readOptionalUserWithPassword(email)
-            .orElseThrow(() -> new UserNotFoundException(email));
+    UserWithPasswordDto user = userService.readOptionalUserWithPassword(email)
+                                          .orElseThrow(() -> new UserNotFoundException(email));
 
     if (user.enabled()) {
       throw new UserAlreadyEnabledException(email);
@@ -100,10 +101,8 @@ public class SecurityService {
   }
 
   public void forgotPassword(String email) {
-    UserWithPasswordDto user =
-        userService
-            .readOptionalUserWithPassword(email)
-            .orElseThrow(() -> new UserNotFoundException(email));
+    UserWithPasswordDto user = userService.readOptionalUserWithPassword(email)
+                                          .orElseThrow(() -> new UserNotFoundException(email));
 
     String jwt = passwordResetTokenService.createJwt(user.id(), user.password());
 

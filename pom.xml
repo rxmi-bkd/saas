@@ -204,7 +204,9 @@
                 <version>${spotless.version}</version>
                 <configuration>
                     <java>
-                        <googleJavaFormat/>
+                        <eclipse>
+                            <file>${project.basedir}/format.xml</file>
+                        </eclipse>
                     </java>
                 </configuration>
             </plugin>

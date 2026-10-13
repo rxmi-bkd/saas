@@ -16,10 +16,6 @@ public class EmailChannel implements NotificationChannel {
 
   @Override
   public void sendNotification(NotificationDto notification) {
-    log.info(
-        "email to {}: {} - {}",
-        notification.recipient(),
-        notification.subject(),
-        notification.body());
+    log.info("email to {}: {} - {}", notification.recipient(), notification.subject(), notification.body());
   }
 }

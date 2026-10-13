@@ -29,20 +29,19 @@ public class UserController {
 
   @PostMapping(CREATE_USER)
   public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserRequest request) {
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(userService.createUser(request.email(), request.password()));
+    return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request.email(), request.password()));
   }
 
   @PutMapping(UPDATE_USER_PASSWORD)
-  public ResponseEntity<Void> updateUserPassword(
-      @AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateUserPasswordRequest request) {
+  public ResponseEntity<Void> updateUserPassword(@AuthenticationPrincipal UUID userId,
+                                                 @Valid @RequestBody UpdateUserPasswordRequest request) {
     userService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
     return ResponseEntity.noContent().build();
   }
 
   @PutMapping(UPDATE_USER_EMAIL)
-  public ResponseEntity<Void> updateUserEmail(
-      @AuthenticationPrincipal UUID userId, @Valid @RequestBody UpdateUserEmailRequest request) {
+  public ResponseEntity<Void> updateUserEmail(@AuthenticationPrincipal UUID userId,
+                                              @Valid @RequestBody UpdateUserEmailRequest request) {
     userService.updateUserEmail(userId, request.email());
     return ResponseEntity.noContent().build();
   }

@@ -16,9 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ActivationTokenService {
   private final JwtService jwtService;
 
-  public ActivationTokenService(
-      @Value("${app.jwt.activation-token.secret}") String secret,
-      @Value("${app.jwt.activation-token.expiration}") long expirationInSeconds) {
+  public ActivationTokenService(@Value("${app.jwt.activation-token.secret}") String secret,
+                                @Value("${app.jwt.activation-token.expiration}") long expirationInSeconds) {
 
     SecretKey key = hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     this.jwtService = new JwtService(key, expirationInSeconds);

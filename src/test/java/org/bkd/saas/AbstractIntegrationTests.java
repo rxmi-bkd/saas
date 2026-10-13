@@ -11,18 +11,17 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestClient;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    classes = SaasApplication.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = SaasApplication.class)
 @ActiveProfiles("test")
 public abstract class AbstractIntegrationTests {
-  @LocalServerPort private int port;
+  @LocalServerPort
+  private int port;
 
   @ServiceConnection
-  private static final PostgreSQLContainer postgresql =
-      new PostgreSQLContainer("postgres:17-alpine");
+  private static final PostgreSQLContainer postgresql = new PostgreSQLContainer("postgres:17-alpine");
 
-  @Autowired private UserRepository userRepository;
+  @Autowired
+  private UserRepository userRepository;
 
   protected UserTestClient userClient;
 

@@ -30,35 +30,30 @@ import org.springframework.security.web.csrf.CsrfException;
 public class SecurityConfiguration {
 
   @Bean
-  SecurityFilterChain securityFilterChain(
-      HttpSecurity http,
-      AuthenticationManager authenticationManager,
-      SessionAuthenticationStrategy sessionAuthenticationStrategy,
-      SecurityContextRepository securityContextRepository,
-      AuthenticationEntryPoint authenticationEntryPoint,
-      AccessDeniedHandler accessDeniedHandler,
-      LogoutSuccessHandler logoutSuccessHandler) {
+  SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                          AuthenticationManager authenticationManager,
+                                          SessionAuthenticationStrategy sessionAuthenticationStrategy,
+                                          SecurityContextRepository securityContextRepository,
+                                          AuthenticationEntryPoint authenticationEntryPoint,
+                                          AccessDeniedHandler accessDeniedHandler,
+                                          LogoutSuccessHandler logoutSuccessHandler) {
+
     return http.csrf(CsrfConfigurer::disable)
-        .logout(x -> x.logoutUrl(LOGOUT).logoutSuccessHandler(logoutSuccessHandler))
-        .authenticationManager(authenticationManager)
-        .sessionManagement(x -> x.sessionAuthenticationStrategy(sessionAuthenticationStrategy))
-        .securityContext(x -> x.securityContextRepository(securityContextRepository))
-        .exceptionHandling(
-            x ->
-                x.authenticationEntryPoint(authenticationEntryPoint)
-                    .accessDeniedHandler(accessDeniedHandler))
-        .authorizeHttpRequests(
-            x ->
-                x.requestMatchers(PUBLIC_BASE_PATH + "/**", "/error")
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
-        .build();
+               .logout(x -> x.logoutUrl(LOGOUT).logoutSuccessHandler(logoutSuccessHandler))
+               .authenticationManager(authenticationManager)
+               .sessionManagement(x -> x.sessionAuthenticationStrategy(sessionAuthenticationStrategy))
+               .securityContext(x -> x.securityContextRepository(securityContextRepository))
+               .exceptionHandling(x -> x.authenticationEntryPoint(authenticationEntryPoint)
+                                        .accessDeniedHandler(accessDeniedHandler))
+               .authorizeHttpRequests(x -> x.requestMatchers(PUBLIC_BASE_PATH + "/**", "/error")
+                                            .permitAll()
+                                            .anyRequest()
+                                            .authenticated())
+               .build();
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(
-      UserService userService, PasswordEncoder passwordEncoder) {
+  public AuthenticationManager authenticationManager(UserService userService, PasswordEncoder passwordEncoder) {
     DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userService);
     authenticationProvider.setPasswordEncoder(passwordEncoder);
     return new ProviderManager(authenticationProvider);
@@ -76,18 +71,16 @@ public class SecurityConfiguration {
 
   @Bean
   public AuthenticationEntryPoint authenticationEntryPoint() {
-    return (request, response, exception) ->
-        response.sendError(
-            HttpStatus.UNAUTHORIZED.value(), "Authentication required. Please log in.");
+    return (request, response, exception) -> response.sendError(HttpStatus.UNAUTHORIZED.value(),
+                                                                "Authentication required. Please log in.");
   }
 
   @Bean
   public AccessDeniedHandler accessDeniedHandler() {
     return (request, response, exception) -> {
-      String message =
-          exception instanceof CsrfException
-              ? "Missing or invalid CSRF token."
-              : "You don't have access to this resource.";
+      String message = exception instanceof CsrfException ?
+          "Missing or invalid CSRF token." :
+          "You don't have access to this resource.";
       response.sendError(HttpStatus.FORBIDDEN.value(), message);
     };
   }

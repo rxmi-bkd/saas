@@ -21,9 +21,9 @@ public class UserEmailService {
   public void sendActivationEmail(UUID userId, String userEmail) {
     String email = StringUtils.normalizeEmail(userEmail);
     String jwt = activationTokenService.createJwt(userId);
-    notificationService.sendNotification(
-        ChannelEnum.EMAIL,
-        new NotificationDto(
-            email, "Activate your account", "Use this token to activate your account: " + jwt));
+    notificationService.sendNotification(ChannelEnum.EMAIL,
+                                         new NotificationDto(email,
+                                                             "Activate your account",
+                                                             "Use this token to activate your account: " + jwt));
   }
 }

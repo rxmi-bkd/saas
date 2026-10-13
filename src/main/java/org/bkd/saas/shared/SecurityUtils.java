@@ -16,10 +16,10 @@ public class SecurityUtils {
 
   public static String hash(@NonNull String string) {
     try {
-      byte[] digest =
-          MessageDigest.getInstance("SHA-256").digest(string.getBytes(StandardCharsets.UTF_8));
+      byte[] digest = MessageDigest.getInstance("SHA-256").digest(string.getBytes(StandardCharsets.UTF_8));
       return HexFormat.of().formatHex(digest);
-    } catch (NoSuchAlgorithmException e) {
+    }
+    catch (NoSuchAlgorithmException e) {
       throw new IllegalStateException(e);
     }
   }

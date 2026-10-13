@@ -26,17 +26,15 @@ public class SecurityController {
   private final SecurityService securityService;
 
   @PostMapping(LOGIN)
-  public ResponseEntity<UserDto> login(
-      @Valid @RequestBody LoginRequest request_,
-      HttpServletRequest request,
-      HttpServletResponse response) {
+  public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequest request_,
+                                       HttpServletRequest request,
+                                       HttpServletResponse response) {
     UserDto user = securityService.login(request_.email(), request_.password(), request, response);
     return ResponseEntity.ok().body(user);
   }
 
   @PostMapping(RESEND_ACTIVATION_EMAIL)
-  public ResponseEntity<Void> resendActivationEmail(
-      @Valid @RequestBody ResendActivationEmailRequest request) {
+  public ResponseEntity<Void> resendActivationEmail(@Valid @RequestBody ResendActivationEmailRequest request) {
     securityService.sendActivationEmail(request.email());
     return ResponseEntity.noContent().build();
   }

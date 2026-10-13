@@ -53,17 +53,15 @@ public class UserService implements UserDetailsService {
   }
 
   public UserDto readUser(UUID userId) {
-    return userRepository
-        .findById(userId)
-        .map(userMapper::toUserDto)
-        .orElseThrow(() -> new UserNotFoundException(userId));
+    return userRepository.findById(userId)
+                         .map(userMapper::toUserDto)
+                         .orElseThrow(() -> new UserNotFoundException(userId));
   }
 
   public UserWithPasswordDto readUserWithPassword(UUID userId) {
-    return userRepository
-        .findById(userId)
-        .map(userMapper::toUserWithPasswordDto)
-        .orElseThrow(() -> new UserNotFoundException(userId));
+    return userRepository.findById(userId)
+                         .map(userMapper::toUserWithPasswordDto)
+                         .orElseThrow(() -> new UserNotFoundException(userId));
   }
 
   public Optional<UserWithPasswordDto> readOptionalUserWithPassword(String email) {
@@ -77,22 +75,18 @@ public class UserService implements UserDetailsService {
   }
 
   public void enableUser(UUID userId) {
-    AppUserEntity user =
-        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     user.setEnabled(true);
     userRepository.save(user);
   }
 
   public void updateUserEmail(UUID userId, String email) {
     String normalized = StringUtils.normalizeEmail(email);
-    AppUserEntity user =
-        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
-    boolean isEmailUsedByAnotherUser =
-        userRepository
-            .findByEmail(normalized)
-            .filter(appUserEntity -> !appUserEntity.getId().equals(userId))
-            .isPresent();
+    boolean isEmailUsedByAnotherUser = userRepository.findByEmail(normalized)
+                                                     .filter(appUserEntity -> !appUserEntity.getId().equals(userId))
+                                                     .isPresent();
 
     if (isEmailUsedByAnotherUser) {
       throw new EmailAlreadyUsedException(normalized);
@@ -103,15 +97,13 @@ public class UserService implements UserDetailsService {
   }
 
   public void updateUserPassword(UUID userId, String newPassword) {
-    AppUserEntity user =
-        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     setPassword(user, newPassword);
     userRepository.save(user);
   }
 
   public void updateUserPassword(UUID userId, String oldPassword, String newPassword) {
-    AppUserEntity user =
-        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+    AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
     boolean isOldPasswordCorrect = passwordEncoder.matches(oldPassword, user.getPassword());
 
@@ -125,8 +117,6 @@ public class UserService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return userRepository
-        .findByEmail(username)
-        .orElseThrow(() -> new UsernameNotFoundException(ERROR_MSG + username));
+    return userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException(ERROR_MSG + username));
   }
 }

@@ -30,59 +30,58 @@ public class UserTestClient {
   }
 
   private <T> ResponseEntity<T> createUser(CreateUserRequest body, Class<T> responseType) {
-    return restClient
-        .post()
-        .uri(CREATE_USER)
-        .contentType(APPLICATION_JSON)
-        .body(body)
-        .retrieve()
-        .onStatus(HttpStatusCode::isError, (request, response) -> {})
-        .toEntity(responseType);
+    return restClient.post()
+                     .uri(CREATE_USER)
+                     .contentType(APPLICATION_JSON)
+                     .body(body)
+                     .retrieve()
+                     .onStatus(HttpStatusCode::isError, (request, response) -> {
+                     })
+                     .toEntity(responseType);
   }
 
   public ResponseEntity<Void> updateUserEmailOk(UpdateUserEmailRequest body, String sessionCookie) {
     return updateUserEmail(body, sessionCookie, Void.class);
   }
 
-  public ResponseEntity<ErrorDto> updateUserEmailKo(
-      UpdateUserEmailRequest body, String sessionCookie) {
+  public ResponseEntity<ErrorDto> updateUserEmailKo(UpdateUserEmailRequest body, String sessionCookie) {
     return updateUserEmail(body, sessionCookie, ErrorDto.class);
   }
 
-  private <T> ResponseEntity<T> updateUserEmail(
-      UpdateUserEmailRequest body, String sessionCookie, Class<T> responseType) {
-    return restClient
-        .put()
-        .uri(UPDATE_USER_EMAIL)
-        .header(HttpHeaders.COOKIE, sessionCookie)
-        .contentType(APPLICATION_JSON)
-        .body(body)
-        .retrieve()
-        .onStatus(HttpStatusCode::isError, (request, response) -> {})
-        .toEntity(responseType);
+  private <T> ResponseEntity<T> updateUserEmail(UpdateUserEmailRequest body,
+                                                String sessionCookie,
+                                                Class<T> responseType) {
+    return restClient.put()
+                     .uri(UPDATE_USER_EMAIL)
+                     .header(HttpHeaders.COOKIE, sessionCookie)
+                     .contentType(APPLICATION_JSON)
+                     .body(body)
+                     .retrieve()
+                     .onStatus(HttpStatusCode::isError, (request, response) -> {
+                     })
+                     .toEntity(responseType);
   }
 
-  public ResponseEntity<Void> updateUserPasswordOk(
-      UpdateUserPasswordRequest body, String sessionCookie) {
+  public ResponseEntity<Void> updateUserPasswordOk(UpdateUserPasswordRequest body, String sessionCookie) {
     return updateUserPassword(body, sessionCookie, Void.class);
   }
 
-  public ResponseEntity<ErrorDto> updateUserPasswordKo(
-      UpdateUserPasswordRequest body, String sessionCookie) {
+  public ResponseEntity<ErrorDto> updateUserPasswordKo(UpdateUserPasswordRequest body, String sessionCookie) {
     return updateUserPassword(body, sessionCookie, ErrorDto.class);
   }
 
-  private <T> ResponseEntity<T> updateUserPassword(
-      UpdateUserPasswordRequest body, String sessionCookie, Class<T> responseType) {
-    return restClient
-        .put()
-        .uri(UPDATE_USER_PASSWORD)
-        .header(HttpHeaders.COOKIE, sessionCookie)
-        .contentType(APPLICATION_JSON)
-        .body(body)
-        .retrieve()
-        .onStatus(HttpStatusCode::isError, (request, response) -> {})
-        .toEntity(responseType);
+  private <T> ResponseEntity<T> updateUserPassword(UpdateUserPasswordRequest body,
+                                                   String sessionCookie,
+                                                   Class<T> responseType) {
+    return restClient.put()
+                     .uri(UPDATE_USER_PASSWORD)
+                     .header(HttpHeaders.COOKIE, sessionCookie)
+                     .contentType(APPLICATION_JSON)
+                     .body(body)
+                     .retrieve()
+                     .onStatus(HttpStatusCode::isError, (request, response) -> {
+                     })
+                     .toEntity(responseType);
   }
 
   public ResponseEntity<UserDto> meOk(String sessionCookie) {
@@ -94,12 +93,12 @@ public class UserTestClient {
   }
 
   private <T> ResponseEntity<T> me(String sessionCookie, Class<T> responseType) {
-    return restClient
-        .get()
-        .uri(ME)
-        .header(HttpHeaders.COOKIE, sessionCookie)
-        .retrieve()
-        .onStatus(HttpStatusCode::isError, (request, response) -> {})
-        .toEntity(responseType);
+    return restClient.get()
+                     .uri(ME)
+                     .header(HttpHeaders.COOKIE, sessionCookie)
+                     .retrieve()
+                     .onStatus(HttpStatusCode::isError, (request, response) -> {
+                     })
+                     .toEntity(responseType);
   }
 }

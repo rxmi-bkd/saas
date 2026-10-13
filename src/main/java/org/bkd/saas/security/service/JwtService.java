@@ -22,8 +22,7 @@ public class JwtService {
     Date issuedAt = Date.from(now);
     Date expiration = Date.from(now.plusSeconds(expirationInSeconds));
 
-    JwtBuilder builder =
-        Jwts.builder().subject(subject.toString()).issuedAt(issuedAt).expiration(expiration);
+    JwtBuilder builder = Jwts.builder().subject(subject.toString()).issuedAt(issuedAt).expiration(expiration);
 
     claims.forEach(builder::claim);
     return builder.signWith(key).compact();
@@ -32,7 +31,8 @@ public class JwtService {
   public Claims readJwt(String jwt) throws InvalidTokenException {
     try {
       return Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt).getPayload();
-    } catch (JwtException e) {
+    }
+    catch (JwtException e) {
       throw new InvalidTokenException(jwt);
     }
   }

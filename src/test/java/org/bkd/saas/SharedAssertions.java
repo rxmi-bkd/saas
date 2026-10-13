@@ -10,11 +10,10 @@ import org.springframework.http.ResponseEntity;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SharedAssertions {
 
-  public static void assertError(
-      ResponseEntity<ErrorDto> response,
-      int expectedStatus,
-      String expectedError,
-      String expectedMessage) {
+  public static void assertError(ResponseEntity<ErrorDto> response,
+                                 int expectedStatus,
+                                 String expectedError,
+                                 String expectedMessage) {
     assertThat(response.getStatusCode().value()).isEqualTo(expectedStatus);
     ErrorDto body = response.getBody();
     assertThat(body).isNotNull();
