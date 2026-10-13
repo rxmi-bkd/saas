@@ -21,9 +21,7 @@ public class JwtService {
     Instant now = Instant.now();
     Date issuedAt = Date.from(now);
     Date expiration = Date.from(now.plusSeconds(expirationInSeconds));
-
     JwtBuilder builder = Jwts.builder().subject(subject.toString()).issuedAt(issuedAt).expiration(expiration);
-
     claims.forEach(builder::claim);
     return builder.signWith(key).compact();
   }

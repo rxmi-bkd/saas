@@ -207,6 +207,8 @@
                         <eclipse>
                             <file>${project.basedir}/format.xml</file>
                         </eclipse>
+                        <importOrder/>
+                        <removeUnusedImports />
                     </java>
                 </configuration>
             </plugin>

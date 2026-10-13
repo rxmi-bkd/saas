@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.bkd.saas.security.rest.request.ForgotPasswordRequest;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.security.rest.request.PasswordResetRequest;
-import org.bkd.saas.security.rest.request.ResendActivationEmailRequest;
+import org.bkd.saas.security.rest.request.SendActivationEmailRequest;
 import org.bkd.saas.security.service.SecurityService;
 import org.bkd.saas.user.dto.UserDto;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +34,7 @@ public class SecurityController {
   }
 
   @PostMapping(RESEND_ACTIVATION_EMAIL)
-  public ResponseEntity<Void> resendActivationEmail(@Valid @RequestBody ResendActivationEmailRequest request) {
+  public ResponseEntity<Void> sendActivationEmail(@Valid @RequestBody SendActivationEmailRequest request) {
     securityService.sendActivationEmail(request.email());
     return ResponseEntity.noContent().build();
   }

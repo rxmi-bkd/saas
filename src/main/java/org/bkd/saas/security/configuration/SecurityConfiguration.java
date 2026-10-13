@@ -10,9 +10,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SecurityContextConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,7 +29,6 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.security.web.csrf.CsrfException;
 
 @Configuration
 @EnableWebSecurity
@@ -38,18 +43,44 @@ public class SecurityConfiguration {
                                           AccessDeniedHandler accessDeniedHandler,
                                           LogoutSuccessHandler logoutSuccessHandler) {
 
-    return http.csrf(CsrfConfigurer::disable)
-               .logout(x -> x.logoutUrl(LOGOUT).logoutSuccessHandler(logoutSuccessHandler))
+    return http.csrf(csrfConfigurer())
+               .logout(logoutConfigurer(LOGOUT, logoutSuccessHandler))
                .authenticationManager(authenticationManager)
-               .sessionManagement(x -> x.sessionAuthenticationStrategy(sessionAuthenticationStrategy))
-               .securityContext(x -> x.securityContextRepository(securityContextRepository))
-               .exceptionHandling(x -> x.authenticationEntryPoint(authenticationEntryPoint)
-                                        .accessDeniedHandler(accessDeniedHandler))
-               .authorizeHttpRequests(x -> x.requestMatchers(PUBLIC_BASE_PATH + "/**", "/error")
-                                            .permitAll()
-                                            .anyRequest()
-                                            .authenticated())
+               .sessionManagement(sessionManagementConfigurer(sessionAuthenticationStrategy))
+               .securityContext(securityContextConfigurer(securityContextRepository))
+               .exceptionHandling(exceptionHandlingConfigurer(authenticationEntryPoint, accessDeniedHandler))
+               .authorizeHttpRequests(authorizeHttpRequestsConfigurer())
                .build();
+  }
+
+  private static Customizer<CsrfConfigurer<HttpSecurity>> csrfConfigurer() {
+    return CsrfConfigurer::spa;
+  }
+
+  private Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeHttpRequestsConfigurer() {
+    return authorizeHttpRequests -> authorizeHttpRequests.requestMatchers(PUBLIC_BASE_PATH + "/**", "/error")
+                                                         .permitAll()
+                                                         .anyRequest()
+                                                         .authenticated();
+  }
+
+  private Customizer<LogoutConfigurer<HttpSecurity>> logoutConfigurer(String logoutUrl,
+                                                                      LogoutSuccessHandler logoutSuccessHandler) {
+    return logout -> logout.logoutUrl(logoutUrl).logoutSuccessHandler(logoutSuccessHandler);
+  }
+
+  private Customizer<SessionManagementConfigurer<HttpSecurity>> sessionManagementConfigurer(SessionAuthenticationStrategy sessionAuthenticationStrategy) {
+    return sessionManagement -> sessionManagement.sessionAuthenticationStrategy(sessionAuthenticationStrategy);
+  }
+
+  private Customizer<SecurityContextConfigurer<HttpSecurity>> securityContextConfigurer(SecurityContextRepository securityContextRepository) {
+    return securityContext -> securityContext.securityContextRepository(securityContextRepository);
+  }
+
+  private Customizer<ExceptionHandlingConfigurer<HttpSecurity>> exceptionHandlingConfigurer(AuthenticationEntryPoint authenticationEntryPoint,
+                                                                                            AccessDeniedHandler accessDeniedHandler) {
+    return exceptionHandling -> exceptionHandling.authenticationEntryPoint(authenticationEntryPoint)
+                                                 .accessDeniedHandler(accessDeniedHandler);
   }
 
   @Bean
@@ -77,12 +108,9 @@ public class SecurityConfiguration {
 
   @Bean
   public AccessDeniedHandler accessDeniedHandler() {
-    return (request, response, exception) -> {
-      String message = exception instanceof CsrfException ?
-          "Missing or invalid CSRF token." :
-          "You don't have access to this resource.";
-      response.sendError(HttpStatus.FORBIDDEN.value(), message);
-    };
+    return (request, response, exception) -> response.sendError(HttpStatus.FORBIDDEN.value(),
+                                                                "You don't have access to this resource.");
+
   }
 
   @Bean
