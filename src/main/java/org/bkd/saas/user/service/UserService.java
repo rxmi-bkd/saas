@@ -21,9 +21,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
@@ -33,6 +34,7 @@ public class UserService implements UserDetailsService {
   private final EmailService emailService;
   private final ActivationTokenService activationTokenService;
 
+  @Transactional
   public UserDto createUser(String email, String password) {
     String normalized = StringUtils.normalizeEmail(email);
     boolean isEmailUsed = userRepository.findByEmail(normalized).isPresent();
@@ -69,17 +71,20 @@ public class UserService implements UserDetailsService {
     return userRepository.findByEmail(normalized).map(userMapper::toUserWithPasswordDto);
   }
 
+  @Transactional
   public void activateUser(String jwt) {
     UUID userId = activationTokenService.readSubject(jwt);
     enableUser(userId);
   }
 
+  @Transactional
   public void enableUser(UUID userId) {
     AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     user.setEnabled(true);
     userRepository.save(user);
   }
 
+  @Transactional
   public void updateUserEmail(UUID userId, String email) {
     String normalized = StringUtils.normalizeEmail(email);
     AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
@@ -96,12 +101,14 @@ public class UserService implements UserDetailsService {
     userRepository.save(user);
   }
 
+  @Transactional
   public void updateUserPassword(UUID userId, String newPassword) {
     AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     setPassword(user, newPassword);
     userRepository.save(user);
   }
 
+  @Transactional
   public void updateUserPassword(UUID userId, String oldPassword, String newPassword) {
     AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 

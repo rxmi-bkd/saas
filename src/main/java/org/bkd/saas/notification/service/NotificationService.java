@@ -9,9 +9,10 @@ import org.bkd.saas.notification.dto.ChannelEnum;
 import org.bkd.saas.notification.dto.NotificationDto;
 import org.bkd.saas.notification.exception.UnsupportedChannelException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-
+@Transactional(readOnly = true)
 public class NotificationService {
 
   private final Map<ChannelEnum, NotificationChannel> channels = new EnumMap<>(ChannelEnum.class);
