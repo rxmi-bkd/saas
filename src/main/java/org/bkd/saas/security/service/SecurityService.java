@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.shared.StringUtils;
-import org.bkd.saas.shared.service.EmailService;
+import org.bkd.saas.notification.service.EmailService;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.dto.UserWithPasswordDto;
@@ -100,7 +100,7 @@ public class SecurityService {
 
     String jwt = passwordResetTokenService.createJwt(user.id(), user.password());
 
-    log.info("jwt = {}", jwt);
+    emailService.sendResetPasswordEmail(user.email(), jwt);
   }
 
   public void resetPassword(String jwt, String newPassword) {

@@ -7,7 +7,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.security.service.ActivationTokenService;
 import org.bkd.saas.shared.StringUtils;
-import org.bkd.saas.shared.service.EmailService;
+import org.bkd.saas.notification.service.EmailService;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;

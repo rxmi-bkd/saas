@@ -1,10 +1,9 @@
-package org.bkd.saas.shared.service;
+package org.bkd.saas.notification.service;
 
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.notification.dto.ChannelEnum;
 import org.bkd.saas.notification.dto.NotificationDto;
-import org.bkd.saas.notification.service.NotificationService;
 import org.bkd.saas.security.service.ActivationTokenService;
 import org.bkd.saas.shared.StringUtils;
 import org.springframework.stereotype.Service;
@@ -23,5 +22,13 @@ public class EmailService {
                                          new NotificationDto(email,
                                                              "Activate your account",
                                                              "Use this token to activate your account: " + jwt));
+  }
+
+  public void sendResetPasswordEmail(String userEmail, String jwt) {
+    String email = StringUtils.normalizeEmail(userEmail);
+    notificationService.sendNotification(ChannelEnum.EMAIL,
+                                         new NotificationDto(email,
+                                                             "Reset your password",
+                                                             "Use this token to reset your password: " + jwt));
   }
 }
