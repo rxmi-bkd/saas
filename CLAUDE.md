@@ -10,10 +10,10 @@ The following commands are standard for this project:
 
 ```
 docker compose up -d                                                                   # Starts PostgreSQL (via compose.yml); also auto-starts via spring.docker.compose.file
-./mvnw spring-boot:run                                                                 # Runs the application (requires environment variables)
+./mvnw spring-boot:run                                                                 # Runs the application (requires env vars, see .env.example; add -Dspring-boot.run.profiles=local for dev defaults)
 ./mvnw test                                                                            # Runs all tests
 ./mvnw test -Dtest=ArchitectureTests#all_services_should_have_transactional_annotation # Runs a single designated test
-./mvnw spotless:apply                                                                  # Formats code using google-java-format (use spotless:check to verify)
+./mvnw spotless:apply                                                                  # Formats code with the Eclipse formatter in format.xml (use spotless:check to verify)
 ```
 
 ## Project Structure
