@@ -103,7 +103,7 @@ public class SecurityService {
     log.info("jwt = {}", jwt);
   }
 
-    public void resetPassword(String jwt, String newPassword) {
+  public void resetPassword(String jwt, String newPassword) {
     boolean isValidJwt = passwordResetTokenService.isValidJwt(jwt);
 
     if (isValidJwt) {

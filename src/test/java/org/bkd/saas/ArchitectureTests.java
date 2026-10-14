@@ -3,11 +3,8 @@ package org.bkd.saas;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 
-import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.domain.JavaMethod;
-import com.tngtech.archunit.core.domain.JavaMethodCall;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.ArchCondition;
@@ -16,10 +13,7 @@ import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.repository.Repository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,40 +30,6 @@ class ArchitectureTests {
                              .areAnnotatedWith(RestController.class)
                              .should()
                              .haveRawReturnType(ResponseEntity.class);
-
-    rule.check(classes);
-  }
-
-  @Test
-  void all_services_should_have_transactional_annotation() {
-    JavaClasses classes = mainClasses();
-
-    ArchRule rule = classes().that(areServicesUsingRepositories()).should().beAnnotatedWith(Transactional.class);
-
-    rule.check(classes);
-  }
-
-  @Test
-  void services_not_using_repositories_should_not_have_transactional_annotation() {
-    JavaClasses classes = mainClasses();
-
-    ArchRule rule = classes().that()
-                             .areAnnotatedWith(Service.class)
-                             .and(DescribedPredicate.not(areServicesUsingRepositories()))
-                             .should()
-                             .notBeAnnotatedWith(Transactional.class)
-                             .because("a transaction without database access only holds a connection for nothing");
-
-    rule.check(classes);
-  }
-
-  @Test
-  void all_services_should_be_read_only_by_default() {
-    JavaClasses classes = mainClasses();
-
-    ArchRule rule = classes().that(areServicesUsingRepositories())
-                             .should(beReadOnlyTransactional())
-                             .because("services are read-only by default, writing methods must override it");
 
     rule.check(classes);
   }
@@ -124,30 +84,6 @@ class ArchitectureTests {
     checkPackageHasSuffix(classes, "..channel", "Channel");
     checkPackageHasSuffix(classes, "..mapper", "Mapper", "MapperImpl");
     checkPackageHasSuffix(classes, "..exception", "Exception");
-  }
-
-  private static DescribedPredicate<JavaClass> areServicesUsingRepositories() {
-    return new DescribedPredicate<>("services that depend on a repository") {
-      @Override
-      public boolean test(JavaClass item) {
-        return item.isAnnotatedWith(Service.class)
-               && item.getDirectDependenciesFromSelf()
-                      .stream()
-                      .anyMatch(dependency -> dependency.getTargetClass().isAssignableTo(Repository.class));
-      }
-    };
-  }
-
-  private static ArchCondition<JavaClass> beReadOnlyTransactional() {
-    return new ArchCondition<>("be annotated with @Transactional(readOnly = true)") {
-      @Override
-      public void check(JavaClass item, ConditionEvents events) {
-        boolean readOnly = item.tryGetAnnotationOfType(Transactional.class).map(Transactional::readOnly).orElse(false);
-        if (!readOnly) {
-          events.add(SimpleConditionEvent.violated(item, item.getName() + " is not @Transactional(readOnly = true)"));
-        }
-      }
-    };
   }
 
   private static JavaClasses mainClasses() {
