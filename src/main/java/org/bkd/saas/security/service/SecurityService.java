@@ -30,11 +30,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SecurityService {
   private final UserMapper userMapper;
@@ -105,8 +103,7 @@ public class SecurityService {
     log.info("jwt = {}", jwt);
   }
 
-  @Transactional
-  public void resetPassword(String jwt, String newPassword) {
+    public void resetPassword(String jwt, String newPassword) {
     boolean isValidJwt = passwordResetTokenService.isValidJwt(jwt);
 
     if (isValidJwt) {
