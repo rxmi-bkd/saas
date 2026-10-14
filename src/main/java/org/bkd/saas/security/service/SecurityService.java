@@ -6,15 +6,14 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bkd.saas.notification.service.EmailService;
+import org.bkd.saas.security.dto.UserDetailsDto;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.shared.StringUtils;
-import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
-import org.bkd.saas.user.mapper.UserMapper;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,7 +33,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SecurityService {
-  private final UserMapper userMapper;
   private final UserService userService;
   private final EmailService emailService;
   private final AuthenticationManager authenticationManager;
@@ -46,17 +44,20 @@ public class SecurityService {
   public UserDto login(String email, String password, HttpServletRequest request, HttpServletResponse response) {
     try {
       String normalized = StringUtils.normalizeEmail(email);
+
       UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(normalized,
                                                                                                       password);
       Authentication authenticated = authenticationManager.authenticate(token);
-      AppUserEntity appUserEntity = (AppUserEntity) authenticated.getPrincipal();
-      Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(appUserEntity.getId(),
+      UserDetailsDto userDetails = (UserDetailsDto) authenticated.getPrincipal();
+
+      Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(userDetails.getId(),
                                                                                         null,
                                                                                         authenticated.getAuthorities());
+
       sessionAuthenticationStrategy.onAuthentication(authentication, request, response);
       saveSecurityContext(authentication, request, response);
       publishInteractiveAuthenticationSuccessEvent(authentication);
-      return userMapper.toUserDto(appUserEntity);
+      return userService.readUser(userDetails.getId());
     }
     catch (DisabledException | LockedException e) {
       throw new DisabledUserException(email);
@@ -94,9 +95,7 @@ public class SecurityService {
 
   public void forgotPassword(String email) {
     UserDto user = userService.readOptionalUser(email).orElseThrow(() -> new UserNotFoundException(email));
-
     String jwt = passwordResetTokenService.createJwt(user.id(), user.passwordVersion());
-
     emailService.sendResetPasswordEmail(user.email(), jwt);
   }
 

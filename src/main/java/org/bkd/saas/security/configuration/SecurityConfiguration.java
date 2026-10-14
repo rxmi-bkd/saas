@@ -2,7 +2,9 @@ package org.bkd.saas.security.configuration;
 
 import static org.bkd.saas.security.rest.Routes.LOGOUT;
 import static org.bkd.saas.shared.rest.Routes.PUBLIC_BASE_PATH;
+import static org.bkd.saas.user.exception.UserNotFoundException.ERROR_MSG;
 
+import org.bkd.saas.security.mapper.UserDetailsMapper;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +21,8 @@ import org.springframework.security.config.annotation.web.configurers.ExceptionH
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SecurityContextConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -85,8 +89,9 @@ public class SecurityConfiguration {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(UserService userService, PasswordEncoder passwordEncoder) {
-    DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userService);
+  public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
+                                                     PasswordEncoder passwordEncoder) {
+    DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
     authenticationProvider.setPasswordEncoder(passwordEncoder);
     return new ProviderManager(authenticationProvider);
   }
@@ -117,5 +122,12 @@ public class SecurityConfiguration {
   @Bean
   public LogoutSuccessHandler logoutSuccessHandler() {
     return new HttpStatusReturningLogoutSuccessHandler();
+  }
+
+  @Bean
+  public UserDetailsService userDetailsService(UserService userService, UserDetailsMapper userDetailsMapper) {
+    return username -> userService.readOptionalUser(username)
+                                  .map(userDetailsMapper::toUserDetailsDto)
+                                  .orElseThrow(() -> new UsernameNotFoundException(ERROR_MSG + username));
   }
 }

@@ -2,20 +2,17 @@ package org.bkd.saas.user.db;
 
 import jakarta.persistence.*;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bkd.saas.user.dto.RoleEnum;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity(name = "app_user")
 @Getter
 @Setter
 @NoArgsConstructor
-public class AppUserEntity implements UserDetails {
+public class AppUserEntity {
 
   @Id
   @Column(nullable = false, updatable = false, unique = true)
@@ -43,30 +40,5 @@ public class AppUserEntity implements UserDetails {
 
   public AppUserEntity(String email) {
     this.email = email;
-  }
-
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return role.getAuthorities();
-  }
-
-  @Override
-  public String getUsername() {
-    return email;
-  }
-
-  @Override
-  public boolean isAccountNonExpired() {
-    return enabled;
-  }
-
-  @Override
-  public boolean isAccountNonLocked() {
-    return enabled;
-  }
-
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return enabled;
   }
 }
