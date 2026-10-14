@@ -76,23 +76,24 @@ public class UserService {
   }
 
   /**
-  @Transactional
-  public void updateUserEmail(UUID userId, String email) {
-    String normalized = StringUtils.normalizeEmail(email);
-    AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-
-    boolean isEmailUsedByAnotherUser = userRepository.findByEmail(normalized)
-                                                     .filter(appUserEntity -> !appUserEntity.getId().equals(userId))
-                                                     .isPresent();
-
-    if (isEmailUsedByAnotherUser) {
-      throw new EmailAlreadyUsedException(normalized);
-    }
-
-    user.setEmail(normalized);
-    userRepository.save(user);
-  }
-  **/
+   * @Transactional
+   *                public void updateUserEmail(UUID userId, String email) {
+   *                String normalized = StringUtils.normalizeEmail(email);
+   *                AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new
+   *                UserNotFoundException(userId));
+   * 
+   *                boolean isEmailUsedByAnotherUser = userRepository.findByEmail(normalized)
+   *                .filter(appUserEntity -> !appUserEntity.getId().equals(userId))
+   *                .isPresent();
+   * 
+   *                if (isEmailUsedByAnotherUser) {
+   *                throw new EmailAlreadyUsedException(normalized);
+   *                }
+   * 
+   *                user.setEmail(normalized);
+   *                userRepository.save(user);
+   *                }
+   **/
 
   @Transactional
   public void updateUserPassword(UUID userId, String newPassword) {
