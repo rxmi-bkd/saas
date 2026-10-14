@@ -5,13 +5,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bkd.saas.notification.service.EmailService;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.shared.StringUtils;
-import org.bkd.saas.notification.service.EmailService;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.dto.UserDto;
-import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
@@ -84,8 +83,7 @@ public class SecurityService {
   }
 
   public void sendActivationEmail(String email) {
-    UserWithPasswordDto user = userService.readOptionalUserWithPassword(email)
-                                          .orElseThrow(() -> new UserNotFoundException(email));
+    UserDto user = userService.readOptionalUser(email).orElseThrow(() -> new UserNotFoundException(email));
 
     if (user.enabled()) {
       throw new UserAlreadyEnabledException(email);
@@ -95,10 +93,9 @@ public class SecurityService {
   }
 
   public void forgotPassword(String email) {
-    UserWithPasswordDto user = userService.readOptionalUserWithPassword(email)
-                                          .orElseThrow(() -> new UserNotFoundException(email));
+    UserDto user = userService.readOptionalUser(email).orElseThrow(() -> new UserNotFoundException(email));
 
-    String jwt = passwordResetTokenService.createJwt(user.id(), user.password());
+    String jwt = passwordResetTokenService.createJwt(user.id(), user.passwordVersion());
 
     emailService.sendResetPasswordEmail(user.email(), jwt);
   }

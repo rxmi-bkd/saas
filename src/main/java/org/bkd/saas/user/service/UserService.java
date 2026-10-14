@@ -5,13 +5,12 @@ import static org.bkd.saas.user.exception.UserNotFoundException.ERROR_MSG;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.bkd.saas.notification.service.EmailService;
 import org.bkd.saas.security.service.ActivationTokenService;
 import org.bkd.saas.shared.StringUtils;
-import org.bkd.saas.notification.service.EmailService;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;
-import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.EmailAlreadyUsedException;
 import org.bkd.saas.user.exception.PasswordMismatchException;
 import org.bkd.saas.user.exception.UserNotFoundException;
@@ -52,6 +51,7 @@ public class UserService implements UserDetailsService {
 
   private void setPassword(AppUserEntity user, String password) {
     user.setPassword(passwordEncoder.encode(password));
+    user.setPasswordVersion(user.getPasswordVersion() + 1);
   }
 
   public UserDto readUser(UUID userId) {
@@ -60,15 +60,9 @@ public class UserService implements UserDetailsService {
                          .orElseThrow(() -> new UserNotFoundException(userId));
   }
 
-  public UserWithPasswordDto readUserWithPassword(UUID userId) {
-    return userRepository.findById(userId)
-                         .map(userMapper::toUserWithPasswordDto)
-                         .orElseThrow(() -> new UserNotFoundException(userId));
-  }
-
-  public Optional<UserWithPasswordDto> readOptionalUserWithPassword(String email) {
+  public Optional<UserDto> readOptionalUser(String email) {
     String normalized = StringUtils.normalizeEmail(email);
-    return userRepository.findByEmail(normalized).map(userMapper::toUserWithPasswordDto);
+    return userRepository.findByEmail(normalized).map(userMapper::toUserDto);
   }
 
   @Transactional

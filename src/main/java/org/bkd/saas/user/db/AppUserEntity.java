@@ -28,6 +28,9 @@ public class AppUserEntity implements UserDetails {
   @Column(nullable = false, updatable = true, unique = false)
   private String password;
 
+  @Column(nullable = false, updatable = true, unique = false)
+  private int passwordVersion = 0;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, updatable = true, unique = false)
   private RoleEnum role = RoleEnum.ROLE_USER;
