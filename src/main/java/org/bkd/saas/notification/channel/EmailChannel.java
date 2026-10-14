@@ -3,10 +3,10 @@ package org.bkd.saas.notification.channel;
 import lombok.extern.slf4j.Slf4j;
 import org.bkd.saas.notification.dto.ChannelEnum;
 import org.bkd.saas.notification.dto.NotificationDto;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 @Slf4j
-@Component
+@Service
 public class EmailChannel implements NotificationChannel {
 
   @Override
