@@ -41,12 +41,14 @@ public class UserController {
     return ResponseEntity.noContent().build();
   }
 
+  /**
   @PutMapping(UPDATE_USER_EMAIL)
   public ResponseEntity<Void> updateUserEmail(@AuthenticationPrincipal UUID userId,
                                               @Valid @RequestBody UpdateUserEmailRequest request) {
     userService.updateUserEmail(userId, request.email());
     return ResponseEntity.noContent().build();
   }
+  **/
 
   @PostMapping(ACTIVATE_USER)
   public ResponseEntity<Void> activateUser(@Valid @RequestBody ActivateUserRequest request) {

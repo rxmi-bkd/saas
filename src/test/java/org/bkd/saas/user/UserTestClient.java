@@ -2,7 +2,6 @@ package org.bkd.saas.user;
 
 import static org.bkd.saas.user.rest.Routes.CREATE_USER;
 import static org.bkd.saas.user.rest.Routes.ME;
-import static org.bkd.saas.user.rest.Routes.UPDATE_USER_EMAIL;
 import static org.bkd.saas.user.rest.Routes.UPDATE_USER_PASSWORD;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.bkd.saas.shared.dto.ErrorDto;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
-import org.bkd.saas.user.rest.request.UpdateUserEmailRequest;
 import org.bkd.saas.user.rest.request.UpdateUserPasswordRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -32,28 +30,6 @@ public class UserTestClient {
   private <T> ResponseEntity<T> createUser(CreateUserRequest body, Class<T> responseType) {
     return restClient.post()
                      .uri(CREATE_USER)
-                     .contentType(APPLICATION_JSON)
-                     .body(body)
-                     .retrieve()
-                     .onStatus(HttpStatusCode::isError, (request, response) -> {
-                     })
-                     .toEntity(responseType);
-  }
-
-  public ResponseEntity<Void> updateUserEmailOk(UpdateUserEmailRequest body, String sessionCookie) {
-    return updateUserEmail(body, sessionCookie, Void.class);
-  }
-
-  public ResponseEntity<ErrorDto> updateUserEmailKo(UpdateUserEmailRequest body, String sessionCookie) {
-    return updateUserEmail(body, sessionCookie, ErrorDto.class);
-  }
-
-  private <T> ResponseEntity<T> updateUserEmail(UpdateUserEmailRequest body,
-                                                String sessionCookie,
-                                                Class<T> responseType) {
-    return restClient.put()
-                     .uri(UPDATE_USER_EMAIL)
-                     .header(HttpHeaders.COOKIE, sessionCookie)
                      .contentType(APPLICATION_JSON)
                      .body(body)
                      .retrieve()

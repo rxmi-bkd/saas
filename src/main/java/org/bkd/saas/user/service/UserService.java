@@ -75,6 +75,7 @@ public class UserService {
     userRepository.save(user);
   }
 
+  /**
   @Transactional
   public void updateUserEmail(UUID userId, String email) {
     String normalized = StringUtils.normalizeEmail(email);
@@ -91,6 +92,7 @@ public class UserService {
     user.setEmail(normalized);
     userRepository.save(user);
   }
+  **/
 
   @Transactional
   public void updateUserPassword(UUID userId, String newPassword) {
