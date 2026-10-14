@@ -17,6 +17,7 @@ public class UserDetailsDto implements UserDetails {
   private final String email;
   private final RoleEnum role;
   private final boolean enabled;
+  private final String password;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -25,7 +26,7 @@ public class UserDetailsDto implements UserDetails {
 
   @Override
   public @Nullable String getPassword() {
-    return null;
+    return password;
   }
 
   @Override

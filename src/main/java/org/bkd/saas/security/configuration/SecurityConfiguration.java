@@ -6,6 +6,7 @@ import static org.bkd.saas.user.exception.UserNotFoundException.ERROR_MSG;
 
 import org.bkd.saas.security.mapper.UserDetailsMapper;
 import org.bkd.saas.user.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,7 @@ public class SecurityConfiguration {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                 @Value("${app.security.csrf.enabled:true}") boolean csrfEnabled,
                                                  AuthenticationManager authenticationManager,
                                                  SessionAuthenticationStrategy sessionAuthenticationStrategy,
                                                  SecurityContextRepository securityContextRepository,
@@ -47,7 +49,7 @@ public class SecurityConfiguration {
                                                  AccessDeniedHandler accessDeniedHandler,
                                                  LogoutSuccessHandler logoutSuccessHandler) {
 
-    return http.csrf(csrfConfigurer())
+    return http.csrf(csrfConfigurer(csrfEnabled))
                .logout(logoutConfigurer(LOGOUT, logoutSuccessHandler))
                .authenticationManager(authenticationManager)
                .sessionManagement(sessionManagementConfigurer(sessionAuthenticationStrategy))
@@ -57,9 +59,8 @@ public class SecurityConfiguration {
                .build();
   }
 
-  private static Customizer<CsrfConfigurer<HttpSecurity>> csrfConfigurer() {
-    return CsrfConfigurer::spa;
-    // return CsrfConfigurer::disable;
+  private static Customizer<CsrfConfigurer<HttpSecurity>> csrfConfigurer(boolean enabled) {
+    return enabled ? CsrfConfigurer::spa : CsrfConfigurer::disable;
   }
 
   private Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeHttpRequestsConfigurer() {
