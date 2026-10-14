@@ -2,7 +2,7 @@ package org.bkd.saas.security.rest;
 
 import static org.bkd.saas.security.rest.Routes.FORGOT_PASSWORD;
 import static org.bkd.saas.security.rest.Routes.LOGIN;
-import static org.bkd.saas.security.rest.Routes.RESEND_ACTIVATION_EMAIL;
+import static org.bkd.saas.security.rest.Routes.SEND_ACTIVATION_EMAIL;
 import static org.bkd.saas.security.rest.Routes.RESET_PASSWORD;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ public class SecurityController {
     return ResponseEntity.ok().body(user);
   }
 
-  @PostMapping(RESEND_ACTIVATION_EMAIL)
+  @PostMapping(SEND_ACTIVATION_EMAIL)
   public ResponseEntity<Void> sendActivationEmail(@Valid @RequestBody SendActivationEmailRequest request) {
     securityService.sendActivationEmail(request.email());
     return ResponseEntity.noContent().build();
