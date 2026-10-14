@@ -5,6 +5,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.notification.service.EmailService;
 import org.bkd.saas.security.service.ActivationTokenService;
+import org.bkd.saas.security.service.SessionService;
 import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
@@ -27,6 +28,7 @@ public class UserService {
   private final UserMapper userMapper;
   private final EmailService emailService;
   private final ActivationTokenService activationTokenService;
+  private final SessionService sessionService;
 
   @Transactional
   public UserDto createUser(String email, String password) {
@@ -95,10 +97,11 @@ public class UserService {
     AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     setPassword(user, newPassword);
     userRepository.save(user);
+    sessionService.invalidateAllSessions(userId);
   }
 
   @Transactional
-  public void updateUserPassword(UUID userId, String oldPassword, String newPassword) {
+  public void updateUserPassword(UUID userId, String oldPassword, String newPassword, String currentSessionId) {
     AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
     boolean isOldPasswordCorrect = passwordEncoder.matches(oldPassword, user.getPassword());
@@ -109,5 +112,6 @@ public class UserService {
 
     setPassword(user, newPassword);
     userRepository.save(user);
+    sessionService.invalidateOtherSessions(userId, currentSessionId);
   }
 }

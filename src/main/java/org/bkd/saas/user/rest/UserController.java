@@ -2,6 +2,7 @@ package org.bkd.saas.user.rest;
 
 import static org.bkd.saas.user.rest.Routes.*;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +35,9 @@ public class UserController {
 
   @PutMapping(UPDATE_USER_PASSWORD)
   public ResponseEntity<Void> updateUserPassword(@AuthenticationPrincipal UUID userId,
-                                                 @Valid @RequestBody UpdateUserPasswordRequest request) {
-    userService.updateUserPassword(userId, request.oldPassword(), request.newPassword());
+                                                 @Valid @RequestBody UpdateUserPasswordRequest request,
+                                                 HttpSession session) {
+    userService.updateUserPassword(userId, request.oldPassword(), request.newPassword(), session.getId());
     return ResponseEntity.noContent().build();
   }
 
