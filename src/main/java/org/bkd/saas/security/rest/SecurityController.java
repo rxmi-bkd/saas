@@ -2,8 +2,8 @@ package org.bkd.saas.security.rest;
 
 import static org.bkd.saas.security.rest.Routes.FORGOT_PASSWORD;
 import static org.bkd.saas.security.rest.Routes.LOGIN;
-import static org.bkd.saas.security.rest.Routes.SEND_ACTIVATION_EMAIL;
 import static org.bkd.saas.security.rest.Routes.RESET_PASSWORD;
+import static org.bkd.saas.security.rest.Routes.SEND_ACTIVATION_EMAIL;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

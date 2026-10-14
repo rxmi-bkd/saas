@@ -47,11 +47,13 @@ public class SecurityConfiguration {
                                                  SecurityContextRepository securityContextRepository,
                                                  AuthenticationEntryPoint authenticationEntryPoint,
                                                  AccessDeniedHandler accessDeniedHandler,
-                                                 LogoutSuccessHandler logoutSuccessHandler) {
+                                                 LogoutSuccessHandler logoutSuccessHandler,
+                                                 UserDetailsService userDetailsService) {
 
     return http.csrf(csrfConfigurer(csrfEnabled))
                .logout(logoutConfigurer(LOGOUT, logoutSuccessHandler))
                .authenticationManager(authenticationManager)
+               .userDetailsService(userDetailsService)
                .sessionManagement(sessionManagementConfigurer(sessionAuthenticationStrategy))
                .securityContext(securityContextConfigurer(securityContextRepository))
                .exceptionHandling(exceptionHandlingConfigurer(authenticationEntryPoint, accessDeniedHandler))
