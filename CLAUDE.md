@@ -30,5 +30,8 @@ src/main/java/org/bkd/saas/<feature>/
 ├── db/               # Entities, Repositories
 ├── dto/              # Dtos, Enums
 ├── mapper/           # MapStruct Mappers
+├── event/            # Events
+├── publisher/        # Event publishers
+├── listener/         # Event listeners
 └── exception/        # Exceptions
 ```

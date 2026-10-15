@@ -71,6 +71,9 @@ class ArchitectureTests {
     checkSuffixResidesIn(classes, "Channel", "..channel");
     checkSuffixResidesIn(classes, "Mapper", "..mapper");
     checkSuffixResidesIn(classes, "Exception", "..exception");
+    checkSuffixResidesIn(classes, "Event", "..event");
+    checkSuffixResidesIn(classes, "EventPublisher", "..publisher");
+    checkSuffixResidesIn(classes, "EventListener", "..listener");
   }
 
   @Test
@@ -84,6 +87,9 @@ class ArchitectureTests {
     checkPackageHasSuffix(classes, "..channel", "Channel");
     checkPackageHasSuffix(classes, "..mapper", "Mapper", "MapperImpl");
     checkPackageHasSuffix(classes, "..exception", "Exception");
+    checkPackageHasSuffix(classes, "..event", "Event");
+    checkPackageHasSuffix(classes, "..publisher", "EventPublisher");
+    checkPackageHasSuffix(classes, "..listener", "EventListener");
   }
 
   private static JavaClasses mainClasses() {

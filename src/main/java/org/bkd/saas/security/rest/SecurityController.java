@@ -1,5 +1,6 @@
 package org.bkd.saas.security.rest;
 
+import static org.bkd.saas.security.rest.Routes.ENABLE_USER;
 import static org.bkd.saas.security.rest.Routes.LOGIN;
 import static org.bkd.saas.security.rest.Routes.RESET_PASSWORD;
 import static org.bkd.saas.security.rest.Routes.SEND_ACTIVATION_EMAIL;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.bkd.saas.security.rest.request.EnableUserRequest;
 import org.bkd.saas.security.rest.request.ForgotPasswordRequest;
 import org.bkd.saas.security.rest.request.LoginRequest;
 import org.bkd.saas.security.rest.request.PasswordResetRequest;
@@ -31,6 +33,12 @@ public class SecurityController {
                                        HttpServletResponse response) {
     UserDto user = securityService.login(request_.email(), request_.password(), request, response);
     return ResponseEntity.ok().body(user);
+  }
+
+  @PostMapping(ENABLE_USER)
+  public ResponseEntity<Void> enableUser(@Valid @RequestBody EnableUserRequest request) {
+    securityService.enableUser(request.jwt());
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping(SEND_ACTIVATION_EMAIL)

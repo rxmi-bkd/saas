@@ -7,7 +7,6 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bkd.saas.user.dto.UserDto;
-import org.bkd.saas.user.rest.request.ActivateUserRequest;
 import org.bkd.saas.user.rest.request.CreateUserRequest;
 import org.bkd.saas.user.rest.request.UpdateUserPasswordRequest;
 import org.bkd.saas.user.service.UserService;
@@ -48,10 +47,4 @@ public class UserController {
    *        return ResponseEntity.noContent().build();
    *        }
    **/
-
-  @PostMapping(ENABLE_USER)
-  public ResponseEntity<Void> enableUser(@Valid @RequestBody ActivateUserRequest request) {
-    userService.enableUser(request.jwt());
-    return ResponseEntity.noContent().build();
-  }
 }

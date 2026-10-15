@@ -8,19 +8,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.bkd.saas.security.dto.UserDetailsDto;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
+import org.bkd.saas.security.publisher.SecurityEventPublisher;
 import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.service.UserService;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,7 +36,8 @@ public class SecurityService {
   private final AuthenticationManager authenticationManager;
   private final SecurityContextRepository securityContextRepository;
   private final PasswordResetTokenService passwordResetTokenService;
-  private final ApplicationEventPublisher applicationEventPublisher;
+  private final ActivationTokenService activationTokenService;
+  private final SecurityEventPublisher securityEventPublisher;
   private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
 
   public UserDto login(String email, String password, HttpServletRequest request, HttpServletResponse response) {
@@ -55,7 +55,7 @@ public class SecurityService {
 
       sessionAuthenticationStrategy.onAuthentication(authentication, request, response);
       saveSecurityContext(authentication, request, response);
-      publishInteractiveAuthenticationSuccessEvent(authentication);
+      securityEventPublisher.publishInteractiveAuthenticationSuccessEvent(authentication);
       return userService.readUser(userDetails.getId());
     }
     catch (DisabledException | LockedException e) {
@@ -66,12 +66,6 @@ public class SecurityService {
     }
   }
 
-  private void publishInteractiveAuthenticationSuccessEvent(Authentication authentication) {
-    InteractiveAuthenticationSuccessEvent event = new InteractiveAuthenticationSuccessEvent(authentication,
-                                                                                            SecurityService.class);
-    applicationEventPublisher.publishEvent(event);
-  }
-
   private void saveSecurityContext(Authentication authentication,
                                    HttpServletRequest request,
                                    HttpServletResponse response) {
@@ -80,6 +74,11 @@ public class SecurityService {
     securityContext.setAuthentication(authentication);
     SecurityContextHolder.setContext(securityContext);
     securityContextRepository.saveContext(securityContext, request, response);
+  }
+
+  public void enableUser(String jwt) {
+    UUID userId = activationTokenService.readSubject(jwt);
+    userService.enableUser(userId);
   }
 
   public void sendActivationEmail(String email) {

@@ -3,9 +3,6 @@ package org.bkd.saas.user.service;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.security.service.ActivationTokenService;
-import org.bkd.saas.security.service.EmailService;
-import org.bkd.saas.security.service.SessionService;
 import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
@@ -14,6 +11,7 @@ import org.bkd.saas.user.exception.EmailAlreadyUsedException;
 import org.bkd.saas.user.exception.PasswordMismatchException;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.mapper.UserMapper;
+import org.bkd.saas.user.publisher.UserEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +24,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
-  private final EmailService emailService;
-  private final ActivationTokenService activationTokenService;
-  private final SessionService sessionService;
+  private final UserEventPublisher userEventPublisher;
 
   @Transactional
   public UserDto createUser(String email, String password) {
@@ -42,7 +38,7 @@ public class UserService {
     AppUserEntity user = new AppUserEntity(normalized);
     setPassword(user, password);
     user = userRepository.save(user);
-    emailService.sendActivationEmail(user.getId(), user.getEmail());
+    userEventPublisher.publishUserCreatedEvent(user.getId(), user.getEmail());
     return userMapper.toUserDto(user);
   }
 
@@ -60,12 +56,6 @@ public class UserService {
   public Optional<UserDto> readOptionalUser(String email) {
     String normalized = StringUtils.normalizeEmail(email);
     return userRepository.findByEmail(normalized).map(userMapper::toUserDto);
-  }
-
-  @Transactional
-  public void enableUser(String jwt) {
-    UUID userId = activationTokenService.readSubject(jwt);
-    enableUser(userId);
   }
 
   @Transactional
@@ -100,7 +90,7 @@ public class UserService {
     AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     setPassword(user, newPassword);
     userRepository.save(user);
-    sessionService.deleteAllSessions(userId);
+    userEventPublisher.publishUserPasswordUpdatedEvent(userId);
   }
 
   @Transactional
@@ -115,6 +105,6 @@ public class UserService {
 
     setPassword(user, newPassword);
     userRepository.save(user);
-    sessionService.deleteOtherSessions(userId, currentSessionId);
+    userEventPublisher.publishUserPasswordUpdatedEvent(userId, currentSessionId);
   }
 }
