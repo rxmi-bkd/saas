@@ -5,7 +5,6 @@ import org.bkd.saas.security.service.EmailService;
 import org.bkd.saas.security.service.SessionService;
 import org.bkd.saas.user.event.UserCreatedEvent;
 import org.bkd.saas.user.event.UserPasswordUpdatedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
 

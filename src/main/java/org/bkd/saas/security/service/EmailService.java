@@ -24,7 +24,7 @@ public class EmailService {
                                                              "Use this token to activate your account: " + jwt));
   }
 
-  public void sendForgotPasswordEmail(String userEmail, String jwt) {
+  public void sendForgottenPasswordEmail(String userEmail, String jwt) {
     String email = StringUtils.normalizeEmail(userEmail);
     notificationService.sendNotification(ChannelEnum.EMAIL,
                                          new NotificationDto(email,

@@ -9,6 +9,7 @@ import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;
 import org.bkd.saas.user.exception.EmailAlreadyUsedException;
 import org.bkd.saas.user.exception.PasswordMismatchException;
+import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.mapper.UserMapper;
 import org.bkd.saas.user.publisher.UserEventPublisher;
@@ -61,6 +62,10 @@ public class UserService {
   @Transactional
   public void enableUser(UUID userId) {
     AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+
+    if (user.isEnabled()) {
+      throw new UserAlreadyEnabledException(userId);
+    }
     user.setEnabled(true);
     userRepository.save(user);
   }

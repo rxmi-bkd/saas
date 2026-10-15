@@ -1,5 +1,6 @@
 package org.bkd.saas.user.exception;
 
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -9,5 +10,9 @@ public class UserAlreadyEnabledException extends RuntimeException {
 
   public UserAlreadyEnabledException(String email) {
     super(ERROR_MSG + email);
+  }
+
+  public UserAlreadyEnabledException(UUID userId) {
+    super(ERROR_MSG + userId);
   }
 }
