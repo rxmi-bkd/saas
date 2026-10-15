@@ -1,16 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: 1791464551200-1
-      author: rami-boukadida
-      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
-      changes:
-        - createSequence:
-            incrementBy: 50
-            sequenceName: revinfo_seq
-            startValue: 1
-  - changeSet:
-      id: 1791464551200-2
-      author: rami-boukadida
+      id: 1792069700150-1
+      author: rxmi-bkd
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - createTable:
@@ -35,6 +26,11 @@ databaseChangeLog:
               - column:
                   constraints:
                     nullable: false
+                  name: password_version
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
                   name: role
                   type: VARCHAR(255)
               - column:
@@ -49,57 +45,12 @@ databaseChangeLog:
                   type: BOOLEAN
             tableName: app_user
   - changeSet:
-      id: 1791464551200-3
-      author: rami-boukadida
-      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
-      changes:
-        - createTable:
-            columns:
-              - column:
-                  constraints:
-                    nullable: false
-                  name: rev
-                  type: BIGINT
-              - column:
-                  name: entityname
-                  type: VARCHAR(255)
-            tableName: revchanges
-  - changeSet:
-      id: 1791464551200-4
-      author: rami-boukadida
-      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
-      changes:
-        - createTable:
-            columns:
-              - column:
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-                    primaryKeyName: pk_revinfo
-                  name: rev
-                  type: BIGINT
-              - column:
-                  name: revtstmp
-                  type: BIGINT
-            tableName: revinfo
-  - changeSet:
-      id: 1791464551200-5
-      author: rami-boukadida
+      id: 1792069700150-2
+      author: rxmi-bkd
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - addUniqueConstraint:
             columnNames: email
             constraintName: uc_app_user_email
             tableName: app_user
-  - changeSet:
-      id: 1791464551200-6
-      author: rami-boukadida
-      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
-      changes:
-        - addForeignKeyConstraint:
-            baseColumnNames: rev
-            baseTableName: revchanges
-            constraintName: fk_revchanges_on_default_tracking_modified_entities_changelog
-            referencedColumnNames: rev
-            referencedTableName: revinfo
 
