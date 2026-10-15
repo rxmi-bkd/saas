@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PasswordResetTokenService {
-  private final JwtService jwtService;
+  private final JsonWebTokenService jsonWebTokenService;
   private final UserService userService;
   public static final String PASSWORD_VERSION_CLAIM = "pwv";
 
@@ -25,22 +25,22 @@ public class PasswordResetTokenService {
                                    UserService userService) {
 
     SecretKey key = hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-    this.jwtService = new JwtService(key, expirationInSeconds);
+    this.jsonWebTokenService = new JsonWebTokenService(key, expirationInSeconds);
     this.userService = userService;
   }
 
   public String createJwt(UUID subject, int passwordVersion) {
-    return jwtService.createJwt(subject, Map.of(PASSWORD_VERSION_CLAIM, passwordVersion));
+    return jsonWebTokenService.createJwt(subject, Map.of(PASSWORD_VERSION_CLAIM, passwordVersion));
   }
 
   public UUID readSubject(String jwt) {
-    Claims claims = jwtService.readJwt(jwt);
+    Claims claims = jsonWebTokenService.readJwt(jwt);
     return UUID.fromString(claims.getSubject());
   }
 
   public boolean isValidJwt(String jwt) {
     try {
-      Claims claims = jwtService.readJwt(jwt);
+      Claims claims = jsonWebTokenService.readJwt(jwt);
       UserDto user = userService.readUser(UUID.fromString(claims.getSubject()));
       Integer passwordVersion = claims.get(PASSWORD_VERSION_CLAIM, Integer.class);
       return passwordVersion != null && passwordVersion == user.passwordVersion();

@@ -92,7 +92,7 @@ public class SecurityService {
     emailService.sendActivationEmail(user.id(), user.email());
   }
 
-  public void sendForgotPasswordEmail(String email) {
+  public void sendForgottenPasswordEmail(String email) {
     UserDto user = userService.readOptionalUser(email).orElseThrow(() -> new UserNotFoundException(email));
     String jwt = passwordResetTokenService.createJwt(user.id(), user.passwordVersion());
     emailService.sendForgotPasswordEmail(user.email(), jwt);

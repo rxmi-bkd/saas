@@ -1,9 +1,9 @@
 package org.bkd.saas.security.rest;
 
-import static org.bkd.saas.security.rest.Routes.FORGOT_PASSWORD;
 import static org.bkd.saas.security.rest.Routes.LOGIN;
 import static org.bkd.saas.security.rest.Routes.RESET_PASSWORD;
 import static org.bkd.saas.security.rest.Routes.SEND_ACTIVATION_EMAIL;
+import static org.bkd.saas.security.rest.Routes.SEND_FORGOTTEN_PASSWORD_EMAIL;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,9 +39,9 @@ public class SecurityController {
     return ResponseEntity.noContent().build();
   }
 
-  @PostMapping(FORGOT_PASSWORD)
-  public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-    securityService.sendForgotPasswordEmail(request.email());
+  @PostMapping(SEND_FORGOTTEN_PASSWORD_EMAIL)
+  public ResponseEntity<Void> sendForgottenPasswordEmail(@Valid @RequestBody ForgotPasswordRequest request) {
+    securityService.sendForgottenPasswordEmail(request.email());
     return ResponseEntity.noContent().build();
   }
 

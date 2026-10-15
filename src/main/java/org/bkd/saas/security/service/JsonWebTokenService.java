@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.bkd.saas.security.exception.InvalidTokenException;
 
 @RequiredArgsConstructor
-public class JwtService {
+public class JsonWebTokenService {
   private final SecretKey key;
   private final long expirationInSeconds;
 

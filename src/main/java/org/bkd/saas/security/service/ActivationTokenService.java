@@ -12,20 +12,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ActivationTokenService {
-  private final JwtService jwtService;
+  private final JsonWebTokenService jsonWebTokenService;
 
   public ActivationTokenService(@Value("${app.jwt.activation-token.secret}") String secret,
                                 @Value("${app.jwt.activation-token.expiration}") long expirationInSeconds) {
 
     SecretKey key = hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-    this.jwtService = new JwtService(key, expirationInSeconds);
+    this.jsonWebTokenService = new JsonWebTokenService(key, expirationInSeconds);
   }
 
   public String createJwt(UUID subject) {
-    return jwtService.createJwt(subject, Map.of());
+    return jsonWebTokenService.createJwt(subject, Map.of());
   }
 
   public UUID readSubject(String jwt) throws InvalidTokenException {
-    return UUID.fromString(jwtService.readJwt(jwt).getSubject());
+    return UUID.fromString(jsonWebTokenService.readJwt(jwt).getSubject());
   }
 }

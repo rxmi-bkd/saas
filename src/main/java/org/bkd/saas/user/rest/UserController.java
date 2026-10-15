@@ -49,8 +49,8 @@ public class UserController {
    *        }
    **/
 
-  @PostMapping(ACTIVATE_USER)
-  public ResponseEntity<Void> activateUser(@Valid @RequestBody ActivateUserRequest request) {
+  @PostMapping(ENABLE_USER)
+  public ResponseEntity<Void> enableUser(@Valid @RequestBody ActivateUserRequest request) {
     userService.enableUser(request.jwt());
     return ResponseEntity.noContent().build();
   }
