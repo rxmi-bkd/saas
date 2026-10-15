@@ -41,7 +41,7 @@ public class SecurityController {
 
   @PostMapping(FORGOT_PASSWORD)
   public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-    securityService.forgotPassword(request.email());
+    securityService.sendForgotPasswordEmail(request.email());
     return ResponseEntity.noContent().build();
   }
 

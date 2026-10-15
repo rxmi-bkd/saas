@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bkd.saas.notification.service.EmailService;
 import org.bkd.saas.security.dto.UserDetailsDto;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
@@ -93,10 +92,10 @@ public class SecurityService {
     emailService.sendActivationEmail(user.id(), user.email());
   }
 
-  public void forgotPassword(String email) {
+  public void sendForgotPasswordEmail(String email) {
     UserDto user = userService.readOptionalUser(email).orElseThrow(() -> new UserNotFoundException(email));
     String jwt = passwordResetTokenService.createJwt(user.id(), user.passwordVersion());
-    emailService.sendResetPasswordEmail(user.email(), jwt);
+    emailService.sendForgotPasswordEmail(user.email(), jwt);
   }
 
   public void resetPassword(String jwt, String newPassword) {

@@ -3,8 +3,8 @@ package org.bkd.saas.user.service;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.notification.service.EmailService;
 import org.bkd.saas.security.service.ActivationTokenService;
+import org.bkd.saas.security.service.EmailService;
 import org.bkd.saas.security.service.SessionService;
 import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.db.AppUserEntity;
@@ -63,7 +63,7 @@ public class UserService {
   }
 
   @Transactional
-  public void activateUser(String jwt) {
+  public void enableUser(String jwt) {
     UUID userId = activationTokenService.readSubject(jwt);
     enableUser(userId);
   }
@@ -100,7 +100,7 @@ public class UserService {
     AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     setPassword(user, newPassword);
     userRepository.save(user);
-    sessionService.invalidateAllSessions(userId);
+    sessionService.deleteAllSessions(userId);
   }
 
   @Transactional
@@ -115,6 +115,6 @@ public class UserService {
 
     setPassword(user, newPassword);
     userRepository.save(user);
-    sessionService.invalidateOtherSessions(userId, currentSessionId);
+    sessionService.deleteOtherSessions(userId, currentSessionId);
   }
 }
