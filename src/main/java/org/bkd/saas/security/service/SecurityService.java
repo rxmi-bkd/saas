@@ -11,6 +11,7 @@ import org.bkd.saas.security.exception.InvalidTokenException;
 import org.bkd.saas.security.publisher.SecurityEventPublisher;
 import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.dto.UserDto;
+import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.DisabledUserException;
 import org.bkd.saas.user.exception.UserAlreadyEnabledException;
 import org.bkd.saas.user.exception.UserNotFoundException;
@@ -82,7 +83,7 @@ public class SecurityService {
   }
 
   public void sendActivationEmail(String email) {
-    UserDto user = userService.readOptionalUser(email).orElseThrow(() -> new UserNotFoundException(email));
+    UserDto user = userService.readUser(email).orElseThrow(() -> new UserNotFoundException(email));
 
     if (user.enabled()) {
       throw new UserAlreadyEnabledException(email);
@@ -92,7 +93,8 @@ public class SecurityService {
   }
 
   public void sendForgottenPasswordEmail(String email) {
-    UserDto user = userService.readOptionalUser(email).orElseThrow(() -> new UserNotFoundException(email));
+    UserWithPasswordDto user = userService.readOptionalUserWithPassword(email)
+                                          .orElseThrow(() -> new UserNotFoundException(email));
     String jwt = passwordResetTokenService.createJwt(user.id(), user.passwordVersion());
     emailService.sendForgottenPasswordEmail(user.email(), jwt);
   }

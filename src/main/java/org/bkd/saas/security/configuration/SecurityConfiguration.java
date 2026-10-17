@@ -129,7 +129,7 @@ public class SecurityConfiguration {
 
   @Bean
   public UserDetailsService userDetailsService(UserService userService, UserDetailsMapper userDetailsMapper) {
-    return username -> userService.readOptionalUser(username)
+    return username -> userService.readOptionalUserWithPassword(username)
                                   .map(userDetailsMapper::toUserDetailsDto)
                                   .orElseThrow(() -> new UsernameNotFoundException(ERROR_MSG + username));
   }

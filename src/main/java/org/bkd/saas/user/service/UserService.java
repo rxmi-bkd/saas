@@ -7,6 +7,7 @@ import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;
+import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.EmailAlreadyUsedException;
 import org.bkd.saas.user.exception.PasswordMismatchException;
 import org.bkd.saas.user.exception.UserAlreadyEnabledException;
@@ -54,9 +55,14 @@ public class UserService {
                          .orElseThrow(() -> new UserNotFoundException(userId));
   }
 
-  public Optional<UserDto> readOptionalUser(String email) {
+  public Optional<UserDto> readUser(String email) {
     String normalized = StringUtils.normalizeEmail(email);
     return userRepository.findByEmail(normalized).map(userMapper::toUserDto);
+  }
+
+  public Optional<UserWithPasswordDto> readOptionalUserWithPassword(String email) {
+    String normalized = StringUtils.normalizeEmail(email);
+    return userRepository.findByEmail(normalized).map(userMapper::toUserWithPasswordDto);
   }
 
   @Transactional
