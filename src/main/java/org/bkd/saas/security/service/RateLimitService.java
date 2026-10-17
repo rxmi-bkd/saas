@@ -28,11 +28,7 @@ public class RateLimitService {
                                    .max(Duration::compareTo)
                                    .orElseThrow();
 
-    this.buckets = Caffeine.newBuilder()
-                           .maximumSize(maxTrackedKeys)
-                           .executor(Runnable::run)
-                           .expireAfterAccess(longestPeriod)
-                           .build();
+    this.buckets = Caffeine.newBuilder().maximumSize(maxTrackedKeys).expireAfterAccess(longestPeriod).build();
   }
 
   public void consumeOrThrow(RateLimitPolicyEnum policy, String key) {

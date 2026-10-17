@@ -27,17 +27,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class RateLimitFilter extends OncePerRequestFilter {
 
   private static final Map<String, RateLimitPolicyEnum> POLICY_BY_PATH = Map.of(LOGIN,
-                                                                                RateLimitPolicyEnum.LOGIN_IP,
+                                                                                RateLimitPolicyEnum.LOGIN_BY_IP,
                                                                                 SEND_FORGOTTEN_PASSWORD_EMAIL,
-                                                                                RateLimitPolicyEnum.EMAIL_IP,
+                                                                                RateLimitPolicyEnum.SEND_EMAIL_BY_IP,
                                                                                 SEND_ACTIVATION_EMAIL,
-                                                                                RateLimitPolicyEnum.EMAIL_IP,
+                                                                                RateLimitPolicyEnum.SEND_EMAIL_BY_IP,
                                                                                 CREATE_USER,
-                                                                                RateLimitPolicyEnum.SIGNUP_IP,
+                                                                                RateLimitPolicyEnum.SIGNUP_BY_IP,
                                                                                 RESET_PASSWORD,
-                                                                                RateLimitPolicyEnum.TOKEN_IP,
+                                                                                RateLimitPolicyEnum.TOKEN_SUBMISSION_BY_IP,
                                                                                 ENABLE_USER,
-                                                                                RateLimitPolicyEnum.TOKEN_IP);
+                                                                                RateLimitPolicyEnum.TOKEN_SUBMISSION_BY_IP);
 
   private final RateLimitService rateLimitService;
 

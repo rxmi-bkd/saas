@@ -45,7 +45,7 @@ public class SecurityService {
 
   public UserDto login(String email, String password, HttpServletRequest request, HttpServletResponse response) {
     String normalized = StringUtils.normalizeEmail(email);
-    rateLimitService.checkAvailableOrThrow(RateLimitPolicyEnum.LOGIN_EMAIL, normalized);
+    rateLimitService.checkAvailableOrThrow(RateLimitPolicyEnum.LOGIN_FAILURES_BY_EMAIL, normalized);
 
     try {
       UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(normalized,
@@ -63,11 +63,11 @@ public class SecurityService {
       return userService.readUser(userDetails.getId());
     }
     catch (DisabledException | LockedException e) {
-      rateLimitService.consume(RateLimitPolicyEnum.LOGIN_EMAIL, normalized);
+      rateLimitService.consume(RateLimitPolicyEnum.LOGIN_FAILURES_BY_EMAIL, normalized);
       throw new DisabledUserException(email);
     }
     catch (BadCredentialsException e) {
-      rateLimitService.consume(RateLimitPolicyEnum.LOGIN_EMAIL, normalized);
+      rateLimitService.consume(RateLimitPolicyEnum.LOGIN_FAILURES_BY_EMAIL, normalized);
       throw new InvalidCredentialsException();
     }
   }
@@ -88,7 +88,7 @@ public class SecurityService {
   }
 
   public void sendActivationEmail(String email) {
-    rateLimitService.consumeOrThrow(RateLimitPolicyEnum.EMAIL_ADDRESS, StringUtils.normalizeEmail(email));
+    rateLimitService.consumeOrThrow(RateLimitPolicyEnum.SEND_EMAIL_BY_RECIPIENT, StringUtils.normalizeEmail(email));
     UserDto user = userService.readUser(email).orElseThrow(() -> new UserNotFoundException(email));
 
     if (user.enabled()) {
@@ -99,7 +99,7 @@ public class SecurityService {
   }
 
   public void sendForgottenPasswordEmail(String email) {
-    rateLimitService.consumeOrThrow(RateLimitPolicyEnum.EMAIL_ADDRESS, StringUtils.normalizeEmail(email));
+    rateLimitService.consumeOrThrow(RateLimitPolicyEnum.SEND_EMAIL_BY_RECIPIENT, StringUtils.normalizeEmail(email));
     UserWithPasswordDto user = userService.readOptionalUserWithPassword(email)
                                           .orElseThrow(() -> new UserNotFoundException(email));
     String jwt = passwordResetTokenService.createJwt(user.id(), user.passwordVersion());
