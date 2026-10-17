@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.crypto.SecretKey;
 import org.bkd.saas.security.exception.InvalidTokenException;
-import org.bkd.saas.user.dto.UserDto;
+import org.bkd.saas.user.dto.UserWithPasswordDto;
 import org.bkd.saas.user.exception.UserNotFoundException;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +41,7 @@ public class PasswordResetTokenService {
   public boolean isValidJwt(String jwt) {
     try {
       Claims claims = jsonWebTokenService.readJwt(jwt);
-      UserDto user = userService.readUser(UUID.fromString(claims.getSubject()));
+      UserWithPasswordDto user = userService.readUserWithPassword(UUID.fromString(claims.getSubject()));
       Integer passwordVersion = claims.get(PASSWORD_VERSION_CLAIM, Integer.class);
       return passwordVersion != null && passwordVersion == user.passwordVersion();
     }

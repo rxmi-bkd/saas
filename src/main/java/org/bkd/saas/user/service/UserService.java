@@ -65,6 +65,12 @@ public class UserService {
     return userRepository.findByEmail(normalized).map(userMapper::toUserWithPasswordDto);
   }
 
+  public UserWithPasswordDto readUserWithPassword(UUID userId) {
+    return userRepository.findById(userId)
+                         .map(userMapper::toUserWithPasswordDto)
+                         .orElseThrow(() -> new UserNotFoundException(userId));
+  }
+
   @Transactional
   public void enableUser(UUID userId) {
     AppUserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
