@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bkd.saas.security.dto.RateLimitPolicyEnum;
 import org.bkd.saas.security.dto.UserDetailsDto;
 import org.bkd.saas.security.exception.InvalidCredentialsException;
 import org.bkd.saas.security.exception.InvalidTokenException;
@@ -40,11 +41,13 @@ public class SecurityService {
   private final ActivationTokenService activationTokenService;
   private final SecurityEventPublisher securityEventPublisher;
   private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
+  private final RateLimitService rateLimitService;
 
   public UserDto login(String email, String password, HttpServletRequest request, HttpServletResponse response) {
-    try {
-      String normalized = StringUtils.normalizeEmail(email);
+    String normalized = StringUtils.normalizeEmail(email);
+    rateLimitService.checkAvailableOrThrow(RateLimitPolicyEnum.LOGIN_EMAIL, normalized);
 
+    try {
       UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(normalized,
                                                                                                       password);
       Authentication authenticated = authenticationManager.authenticate(token);
@@ -60,9 +63,11 @@ public class SecurityService {
       return userService.readUser(userDetails.getId());
     }
     catch (DisabledException | LockedException e) {
+      rateLimitService.consume(RateLimitPolicyEnum.LOGIN_EMAIL, normalized);
       throw new DisabledUserException(email);
     }
     catch (BadCredentialsException e) {
+      rateLimitService.consume(RateLimitPolicyEnum.LOGIN_EMAIL, normalized);
       throw new InvalidCredentialsException();
     }
   }
@@ -83,6 +88,7 @@ public class SecurityService {
   }
 
   public void sendActivationEmail(String email) {
+    rateLimitService.consumeOrThrow(RateLimitPolicyEnum.EMAIL_ADDRESS, StringUtils.normalizeEmail(email));
     UserDto user = userService.readUser(email).orElseThrow(() -> new UserNotFoundException(email));
 
     if (user.enabled()) {
@@ -93,6 +99,7 @@ public class SecurityService {
   }
 
   public void sendForgottenPasswordEmail(String email) {
+    rateLimitService.consumeOrThrow(RateLimitPolicyEnum.EMAIL_ADDRESS, StringUtils.normalizeEmail(email));
     UserWithPasswordDto user = userService.readOptionalUserWithPassword(email)
                                           .orElseThrow(() -> new UserNotFoundException(email));
     String jwt = passwordResetTokenService.createJwt(user.id(), user.passwordVersion());

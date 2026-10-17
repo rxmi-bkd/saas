@@ -29,6 +29,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
@@ -48,7 +49,8 @@ public class SecurityConfiguration {
                                                  AuthenticationEntryPoint authenticationEntryPoint,
                                                  AccessDeniedHandler accessDeniedHandler,
                                                  LogoutSuccessHandler logoutSuccessHandler,
-                                                 UserDetailsService userDetailsService) {
+                                                 UserDetailsService userDetailsService,
+                                                 RateLimitFilter rateLimitFilter) {
 
     return http.csrf(csrfConfigurer(csrfEnabled))
                .logout(logoutConfigurer(LOGOUT, logoutSuccessHandler))
@@ -58,6 +60,8 @@ public class SecurityConfiguration {
                .securityContext(securityContextConfigurer(securityContextRepository))
                .exceptionHandling(exceptionHandlingConfigurer(authenticationEntryPoint, accessDeniedHandler))
                .authorizeHttpRequests(authorizeHttpRequestsConfigurer())
+               // so it runs early in the security chain, before the authentication and authorization steps. That makes throttled requests cheap, because they never reach a BCrypt check or a database lookup.
+               .addFilterBefore(rateLimitFilter, LogoutFilter.class)
                .build();
   }
 
