@@ -3,14 +3,13 @@ package org.bkd.saas.shared;
 import java.util.Locale;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StringUtils {
   public static final int PASSWORD_MIN_LENGTH = 8;
   public static final int PASSWORD_MAX_LENGTH = 24;
 
-  public static String normalizeEmail(@NonNull String email) {
-    return email.strip().toLowerCase(Locale.ROOT);
+  public static String normalizeEmail(String email) {
+    return email == null ? null : email.strip().toLowerCase(Locale.ROOT);
   }
 }

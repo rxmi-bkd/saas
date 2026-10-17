@@ -3,7 +3,6 @@ package org.bkd.saas.user.service;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.bkd.saas.shared.StringUtils;
 import org.bkd.saas.user.db.AppUserEntity;
 import org.bkd.saas.user.db.UserRepository;
 import org.bkd.saas.user.dto.UserDto;
@@ -30,14 +29,13 @@ public class UserService {
 
   @Transactional
   public UserDto createUser(String email, String password) {
-    String normalized = StringUtils.normalizeEmail(email);
-    boolean isEmailUsed = userRepository.findByEmail(normalized).isPresent();
+    boolean isEmailUsed = userRepository.findByEmail(email).isPresent();
 
     if (isEmailUsed) {
-      throw new EmailAlreadyUsedException(normalized);
+      throw new EmailAlreadyUsedException(email);
     }
 
-    AppUserEntity user = new AppUserEntity(normalized);
+    AppUserEntity user = new AppUserEntity(email);
     setPassword(user, password);
     user = userRepository.save(user);
     userEventPublisher.publishUserCreatedEvent(user.getId(), user.getEmail());
@@ -56,13 +54,11 @@ public class UserService {
   }
 
   public Optional<UserDto> readUser(String email) {
-    String normalized = StringUtils.normalizeEmail(email);
-    return userRepository.findByEmail(normalized).map(userMapper::toUserDto);
+    return userRepository.findByEmail(email).map(userMapper::toUserDto);
   }
 
   public Optional<UserWithPasswordDto> readOptionalUserWithPassword(String email) {
-    String normalized = StringUtils.normalizeEmail(email);
-    return userRepository.findByEmail(normalized).map(userMapper::toUserWithPasswordDto);
+    return userRepository.findByEmail(email).map(userMapper::toUserWithPasswordDto);
   }
 
   public UserWithPasswordDto readUserWithPassword(UUID userId) {

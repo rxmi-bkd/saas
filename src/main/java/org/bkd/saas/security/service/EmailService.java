@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.bkd.saas.notification.dto.ChannelEnum;
 import org.bkd.saas.notification.dto.NotificationDto;
 import org.bkd.saas.notification.service.NotificationService;
-import org.bkd.saas.shared.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,18 +15,16 @@ public class EmailService {
   private final NotificationService notificationService;
 
   public void sendActivationEmail(UUID userId, String userEmail) {
-    String email = StringUtils.normalizeEmail(userEmail);
     String jwt = activationTokenService.createJwt(userId);
     notificationService.sendNotification(ChannelEnum.EMAIL,
-                                         new NotificationDto(email,
+                                         new NotificationDto(userEmail,
                                                              "Activate your account",
                                                              "Use this token to activate your account: " + jwt));
   }
 
   public void sendForgottenPasswordEmail(String userEmail, String jwt) {
-    String email = StringUtils.normalizeEmail(userEmail);
     notificationService.sendNotification(ChannelEnum.EMAIL,
-                                         new NotificationDto(email,
+                                         new NotificationDto(userEmail,
                                                              "Forgot your password ?",
                                                              "Use this token to reset your password: " + jwt));
   }
