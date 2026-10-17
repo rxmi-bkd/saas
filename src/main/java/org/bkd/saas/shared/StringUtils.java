@@ -1,5 +1,6 @@
 package org.bkd.saas.shared;
 
+import java.util.Locale;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -10,6 +11,6 @@ public class StringUtils {
   public static final int PASSWORD_MAX_LENGTH = 24;
 
   public static String normalizeEmail(@NonNull String email) {
-    return email.trim().toLowerCase();
+    return email.strip().toLowerCase(Locale.ROOT);
   }
 }
