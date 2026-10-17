@@ -4,6 +4,7 @@ import static org.bkd.saas.security.rest.Routes.LOGOUT;
 import static org.bkd.saas.shared.rest.Routes.PUBLIC_BASE_PATH;
 import static org.bkd.saas.user.exception.UserNotFoundException.ERROR_MSG;
 
+import org.bkd.saas.security.filter.RateLimitFilter;
 import org.bkd.saas.security.mapper.UserDetailsMapper;
 import org.bkd.saas.user.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
