@@ -19,7 +19,7 @@ public class RateLimitService {
   private final Cache<String, Bucket> buckets;
 
   public RateLimitService(@Value("${app.security.rate-limit.enabled}") boolean enabled,
-                          @Value("${app.security.rate-limit.max-tracked-keys}") long maxTrackedKeys) {
+                          @Value("${app.security.rate-limit.bucket-max-size}") long bucketMaxSize) {
 
     this.enabled = enabled;
 
@@ -28,7 +28,7 @@ public class RateLimitService {
                                    .max(Duration::compareTo)
                                    .orElseThrow();
 
-    this.buckets = Caffeine.newBuilder().maximumSize(maxTrackedKeys).expireAfterAccess(longestPeriod).build();
+    this.buckets = Caffeine.newBuilder().maximumSize(bucketMaxSize).expireAfterAccess(longestPeriod).build();
   }
 
   public void consumeOrThrow(RateLimitPolicyEnum policy, String key) {
