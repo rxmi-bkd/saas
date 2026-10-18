@@ -43,9 +43,8 @@ public class SecurityService {
   private final RateLimitService rateLimitService;
 
   public UserDto login(String email, String password, HttpServletRequest request, HttpServletResponse response) {
-    rateLimitService.checkAvailableOrThrow(RateLimitPolicyEnum.LOGIN_FAILURES_BY_EMAIL, email);
-
     try {
+      rateLimitService.checkAvailableOrThrow(RateLimitPolicyEnum.LOGIN_FAILURES_BY_EMAIL, email);
       UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(email, password);
       Authentication authenticated = authenticationManager.authenticate(token);
       UserDetailsDto userDetails = (UserDetailsDto) authenticated.getPrincipal();
@@ -97,8 +96,10 @@ public class SecurityService {
 
   public void sendForgottenPasswordEmail(String email) {
     rateLimitService.consumeOrThrow(RateLimitPolicyEnum.SEND_EMAIL_BY_RECIPIENT, email);
+
     UserWithPasswordDto user = userService.readOptionalUserWithPassword(email)
                                           .orElseThrow(() -> new UserNotFoundException(email));
+
     String jwt = passwordResetTokenService.createJwt(user.id(), user.passwordVersion());
     emailService.sendForgottenPasswordEmail(user.email(), jwt);
   }

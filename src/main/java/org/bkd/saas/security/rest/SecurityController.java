@@ -31,6 +31,7 @@ public class SecurityController {
   public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequest request_,
                                        HttpServletRequest request,
                                        HttpServletResponse response) {
+
     UserDto user = securityService.login(request_.email(), request_.password(), request, response);
     return ResponseEntity.ok().body(user);
   }

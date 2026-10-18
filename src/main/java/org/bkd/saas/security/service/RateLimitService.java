@@ -63,7 +63,6 @@ public class RateLimitService {
   }
 
   private Bucket bucket(RateLimitPolicyEnum policy, String key) {
-
     Bandwidth limit = Bandwidth.builder()
                                .capacity(policy.getCapacity())
                                .refillIntervally(policy.getCapacity(), policy.getPeriod())
