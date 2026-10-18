@@ -8,7 +8,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = SaasApplication.class)
 @ActiveProfiles("local")
-public abstract class AbstractIntegrationTests {
+public abstract class AbstractIntegrationTest {
   @LocalServerPort
   private int port;
 
