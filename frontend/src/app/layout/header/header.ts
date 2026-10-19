@@ -17,9 +17,9 @@ export class Header {
 
   protected readonly isAdmin = this.authenticationService.isAdmin;
 
+  protected readonly ROUTE_URLS = ROUTE_URLS;
+
   protected async logout(): Promise<void> {
     await this.authenticationService.logout();
   }
-
-  protected readonly ROUTE_URLS = ROUTE_URLS;
 }
