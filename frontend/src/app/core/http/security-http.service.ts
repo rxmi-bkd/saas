@@ -9,22 +9,32 @@ export class SecurityHttpService {
   private readonly http = inject(HttpClient);
 
   login(email: string, password: string): Observable<User> {
-    return this.http.post<User>(`${PUBLIC_API}/security/login`, { email, password });
+    const url = `${PUBLIC_API}/security/login`;
+    const body = { email, password };
+    return this.http.post<User>(url, body);
   }
 
   enableUser(jwt: string): Observable<void> {
-    return this.http.post<void>(`${PUBLIC_API}/enable-user`, { jwt });
+    const url = `${PUBLIC_API}/enable-user`;
+    const body = { jwt };
+    return this.http.post<void>(url, body);
   }
 
   sendActivationEmail(email: string): Observable<void> {
-    return this.http.post<void>(`${PUBLIC_API}/security/send-activation-email`, { email });
+    const url = `${PUBLIC_API}/security/send-activation-email`;
+    const body = { email };
+    return this.http.post<void>(url, body);
   }
 
   sendForgottenPasswordEmail(email: string): Observable<void> {
-    return this.http.post<void>(`${PUBLIC_API}/security/send-forgotten-password-email`, { email });
+    const url = `${PUBLIC_API}/security/send-forgotten-password-email`;
+    const body = { email };
+    return this.http.post<void>(url, body);
   }
 
   resetPassword(jwt: string, newPassword: string): Observable<void> {
-    return this.http.post<void>(`${PUBLIC_API}/security/reset-password`, { jwt, newPassword });
+    const url = `${PUBLIC_API}/security/reset-password`;
+    const body = { jwt, newPassword };
+    return this.http.post<void>(url, body);
   }
 }
