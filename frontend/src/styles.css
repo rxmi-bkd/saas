@@ -1,1 +1,68 @@
 @import 'tailwindcss';
+
+/*
+ * Neobrutalism theme.
+ * Anything declared in @theme becomes a Tailwind utility, e.g.
+ *   --color-main  -> bg-main, text-main, border-main
+ *   --shadow-brutal -> shadow-brutal
+ */
+@theme {
+  --color-main: #ffdc58;
+  --color-accent: #ff6b9d;
+  --color-info: #7dd3fc;
+  --color-success: #86efac;
+  --color-danger: #ff5c5c;
+  --color-paper: #fff8e7;
+  --color-ink: #000000;
+
+  --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-brutal: 4px 4px 0 0 #000;
+  --shadow-brutal-lg: 8px 8px 0 0 #000;
+}
+
+@layer base {
+  body {
+    @apply bg-paper text-ink font-sans;
+  }
+
+  h1 {
+    @apply text-4xl font-black tracking-tight;
+  }
+
+  a {
+    @apply font-bold underline decoration-2 underline-offset-4;
+  }
+}
+
+/* Reusable building blocks: use them as plain class names in any template. */
+@layer components {
+  .brutal-card {
+    @apply border-2 border-ink bg-white p-6 shadow-brutal;
+  }
+
+  .brutal-btn {
+    @apply inline-block cursor-pointer border-2 border-ink bg-main px-4 py-2 font-bold no-underline shadow-brutal transition-all;
+  }
+  .brutal-btn:hover:not(:disabled) {
+    @apply translate-x-0.5 translate-y-0.5 shadow-none;
+  }
+  .brutal-btn:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  .brutal-input {
+    @apply w-full border-2 border-ink bg-white px-3 py-2 font-medium shadow-brutal outline-none;
+  }
+  .brutal-input:focus {
+    @apply bg-info;
+  }
+
+  .brutal-label {
+    @apply flex flex-col gap-2 font-bold;
+  }
+
+  .brutal-error {
+    @apply border-2 border-ink bg-danger px-2 py-1 text-sm font-bold;
+  }
+}

@@ -1,40 +1,43 @@
-<div>
-  <h1>Login</h1>
+<div class="brutal-card mx-auto mt-12 max-w-md">
+  <h1 class="mb-6">Login</h1>
 
-  <form [formRoot]="loginForm">
-    <label>
+  <form [formRoot]="loginForm" class="flex flex-col gap-6">
+    <label class="brutal-label">
       Email
       <input
+        class="brutal-input"
         type="email"
         autocomplete="email"
         [formField]="loginForm.email"
       />
       @if (loginForm.email().touched()) {
         @for (error of loginForm.email().errors(); track error.kind) {
-          <span>{{ error.message }}</span>
+          <span class="brutal-error">{{ error.message }}</span>
         }
       }
     </label>
 
-    <label>
+    <label class="brutal-label">
       Password
       <input
+        class="brutal-input"
         type="password"
         autocomplete="current-password"
         [formField]="loginForm.password"
       />
       @if (loginForm.password().touched()) {
         @for (error of loginForm.password().errors(); track error.kind) {
-          <span>{{ error.message }}</span>
+          <span class="brutal-error">{{ error.message }}</span>
         }
       }
     </label>
 
     @for (error of loginForm().errors(); track error.kind) {
-      <p>{{ error.message }}</p>
+      <p class="brutal-error">{{ error.message }}</p>
     }
 
     <button
+      class="brutal-btn"
       type="submit"
       [disabled]="loginForm().submitting()"
     >
