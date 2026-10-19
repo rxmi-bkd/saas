@@ -14,6 +14,11 @@ export class SecurityHttp {
     return this.http.post<User>(url, body);
   }
 
+  logout(): Observable<void> {
+    const url = `${PUBLIC_API}/security/logout`;
+    return this.http.post<void>(url, null);
+  }
+
   enableUser(jwt: string): Observable<void> {
     const url = `${PUBLIC_API}/enable-user`;
     const body = { jwt };

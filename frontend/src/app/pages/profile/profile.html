@@ -1,1 +1,11 @@
 <p>profile</p>
+@if (user(); as user) {
+  <dl>
+    <dt>Email</dt>
+    <dd>{{ user.email }}</dd>
+    <dt>Role</dt>
+    <dd>{{ user.role }}</dd>
+    <dt>Member since</dt>
+    <dd>{{ user.createdAt | date: 'mediumDate' }}</dd>
+  </dl>
+}

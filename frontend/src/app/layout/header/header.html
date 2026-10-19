@@ -1,0 +1,23 @@
+<header>
+  <a [routerLink]="ROUTE_URLS.home">SaaS</a>
+  <nav>
+    @if (isAuthenticated()) {
+      <li>
+        <a [routerLink]="ROUTE_URLS.profile">Profile</a>
+      </li>
+
+      @if (isAdmin()) {
+        <li>
+          <a [routerLink]="ROUTE_URLS.admin">Admin</a>
+        </li>
+      }
+      <li>
+        <button type="button" (click)="logout()">Logout</button>
+      </li>
+    } @else {
+      <li>
+        <a [routerLink]="ROUTE_URLS.login">Login</a>
+      </li>
+    }
+  </nav>
+</header>

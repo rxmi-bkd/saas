@@ -1,1 +1,44 @@
-<p>login</p>
+<div>
+  <h1>Login</h1>
+
+  <form [formRoot]="loginForm">
+    <label>
+      Email
+      <input
+        type="email"
+        autocomplete="email"
+        [formField]="loginForm.email"
+      />
+      @if (loginForm.email().touched()) {
+        @for (error of loginForm.email().errors(); track error.kind) {
+          <span>{{ error.message }}</span>
+        }
+      }
+    </label>
+
+    <label>
+      Password
+      <input
+        type="password"
+        autocomplete="current-password"
+        [formField]="loginForm.password"
+      />
+      @if (loginForm.password().touched()) {
+        @for (error of loginForm.password().errors(); track error.kind) {
+          <span>{{ error.message }}</span>
+        }
+      }
+    </label>
+
+    @for (error of loginForm().errors(); track error.kind) {
+      <p>{{ error.message }}</p>
+    }
+
+    <button
+      type="submit"
+      [disabled]="loginForm().submitting()"
+    >
+      Log in
+    </button>
+  </form>
+</div>
