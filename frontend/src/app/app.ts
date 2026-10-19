@@ -6,8 +6,5 @@ import { RouterOutlet } from '@angular/router';
   imports: [RouterOutlet],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: './app.css',
 })
-export class App {
-  protected readonly title = signal('frontend');
-}
+export class App {}

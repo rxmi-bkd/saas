@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../model/user.model';
 import { PUBLIC_API } from './api.constants';
 
 @Injectable({ providedIn: 'root' })
-export class SecurityHttpService {
+export class SecurityHttp {
   private readonly http = inject(HttpClient);
 
   login(email: string, password: string): Observable<User> {
