@@ -13,20 +13,24 @@ import { finalize, interval, map, Observable, Subscription, take } from 'rxjs';
 import { Button } from '../button/button';
 import { Variant } from '../variant';
 
+const MIN_SECONDS = 10;
+
 type CooldownAction = () => Observable<boolean>;
 
 /**
  * Button that runs an `action` when clicked, then disables itself and shows a
- * countdown (`Ns`) next to it, e.g. for "resend email" actions.
+ * countdown next to it, e.g. for "resend email" actions.
  *
  * `action` returns an Observable<boolean> saying whether it succeeded. The button
  * is disabled while the action runs. If it emits `true`, the cooldown starts and
  * the button stays disabled until the countdown reaches 0. If it emits `false` or
  * errors, no cooldown starts and the button is usable again right away. Errors are
- * not handled here: the caller should catch them inside `action` if needed.
+ * silently ignored here: the caller should handle them inside `action` (e.g. with
+ * `catchError`) if it needs to report them.
  *
  * Inputs:
- * - `seconds` (required): cooldown length; rounded up, `<= 0` means no cooldown.
+ * - `seconds` (required): cooldown length; rounded up, and raised to 10 if smaller
+ *   (or not a valid number).
  * - `action` (required): the function to run on click.
  * - `variant`: button style, defaults to `'primary'`.
  * - `disabled`: disables the button regardless of the cooldown.
@@ -67,17 +71,22 @@ export class CooldownButton {
         finalize(() => this.pending.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe({ next: (success) => success && this.start() });
+      .subscribe({
+        next: (success) => {
+          if (success) this.start();
+        },
+        error: () => {},
+      });
   }
 
   private start(): void {
     this.countdown?.unsubscribe();
-    const seconds = Math.ceil(this.seconds());
-    if (seconds <= 0) return;
+    const seconds = Math.ceil(Math.max(this.seconds(), MIN_SECONDS));
+    this.remaining.set(seconds);
     this.countdown = interval(1000)
       .pipe(
-        take(seconds + 1),
-        map((tick) => seconds - tick),
+        take(seconds),
+        map((tick) => seconds - tick - 1),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((value) => this.remaining.set(value));
