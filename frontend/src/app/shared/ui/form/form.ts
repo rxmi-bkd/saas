@@ -10,7 +10,7 @@ import { Card } from '../card/card';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Form<T> {
-  readonly heading = input.required<string>();
+  readonly header = input.required<string>();
   readonly submitLabel = input.required<string>();
   readonly form = input.required<FieldTree<T>>();
 }
