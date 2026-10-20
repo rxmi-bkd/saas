@@ -1,0 +1,6 @@
+<app-card class="mx-auto mt-24 flex flex-col items-center gap-6">
+  <span app-badge [variant]="variant()">{{ code() }}</span>
+  <h1>{{ heading() }}</h1>
+  <p class="font-medium"><ng-content /></p>
+  <a app-button [routerLink]="ROUTE_URLS.home">Back to home</a>
+</app-card>
