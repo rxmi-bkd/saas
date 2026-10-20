@@ -8,5 +8,5 @@ export function authenticationGuard() {
   const authenticationService = inject(AuthenticationService);
   return authenticationService.isAuthenticated()
     ? true
-    : router.createUrlTree([ROUTE_URLS.login]);
+    : router.createUrlTree([ROUTE_URLS.signIn]);
 }

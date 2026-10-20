@@ -21,7 +21,7 @@ export const routes: Routes = [
     canActivate: [guestGuard],
     children: [
       {
-        path: ROUTE_PATHS.login,
+        path: ROUTE_PATHS.signIn,
         component: SignIn,
       },
       {

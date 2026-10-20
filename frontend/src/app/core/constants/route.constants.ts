@@ -1,6 +1,6 @@
 export const ROUTE_PATHS = {
   home: '',
-  login: 'login',
+  signIn: 'sign-in',
   signUp: 'sign-up',
   profile: 'profile',
   admin: 'admin',
@@ -9,7 +9,7 @@ export const ROUTE_PATHS = {
 
 export const ROUTE_URLS = {
   home: '/',
-  login: `/${ROUTE_PATHS.login}`,
+  signIn: `/${ROUTE_PATHS.signIn}`,
   signUp: `/${ROUTE_PATHS.signUp}`,
   profile: `/${ROUTE_PATHS.profile}`,
   admin: `/${ROUTE_PATHS.admin}`,
