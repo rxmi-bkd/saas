@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../model/user.model';
-import { API, PUBLIC_API } from './api.constants';
+import { API, PUBLIC_API } from '../constants/api.constants';
 
 @Injectable({ providedIn: 'root' })
 export class UserHttp {

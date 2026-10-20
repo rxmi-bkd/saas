@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../service/authentication.service';
-import { ROUTE_URLS } from '../router/route.constants';
+import { ROUTE_URLS } from '../constants/route.constants';
 
 export function adminGuard() {
   const router = inject(Router);

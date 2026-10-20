@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../core/service/authentication.service';
-import { ROUTE_URLS } from '../../core/router/route.constants';
+import { ROUTE_URLS } from '../../core/constants/route.constants';
 
 @Component({
   selector: 'app-header',

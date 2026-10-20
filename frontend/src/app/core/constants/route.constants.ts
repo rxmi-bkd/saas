@@ -4,7 +4,7 @@ export const ROUTE_PATHS = {
   profile: 'profile',
   admin: 'admin',
   accessDenied: 'access-denied',
-} as const;
+};
 
 export const ROUTE_URLS = {
   home: '/',
@@ -12,4 +12,4 @@ export const ROUTE_URLS = {
   profile: `/${ROUTE_PATHS.profile}`,
   admin: `/${ROUTE_PATHS.admin}`,
   accessDenied: `/${ROUTE_PATHS.accessDenied}`,
-} as const;
+};

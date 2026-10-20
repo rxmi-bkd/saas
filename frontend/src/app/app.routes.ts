@@ -8,7 +8,7 @@ import { AccessDenied } from './pages/access-denied/access-denied';
 import { guestGuard } from './core/guard/guest.guard';
 import { authenticationGuard } from './core/guard/authentication.guard';
 import { adminGuard } from './core/guard/role.guard';
-import { ROUTE_PATHS } from './core/router/route.constants';
+import { ROUTE_PATHS } from './core/constants/route.constants';
 
 export const routes: Routes = [
   {
