@@ -5,33 +5,35 @@ import {
   signal,
 } from '@angular/core';
 
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { email, form, required } from '@angular/forms/signals';
 
-import { AuthenticationService } from '../../core/service/authentication.service';
-import { ROUTE_URLS } from '../../core/constants/route.constants';
+import { AuthenticationService } from '../../../../core/service/authentication.service';
+import { ROUTE_URLS } from '../../../../core/constants/route.constants';
 import {
   ERROR_MESSAGES,
   FIELD_NAMES,
-} from '../../core/constants/error-message.constants';
-import { LoginForm } from '../../core/model/login.model';
-import { Form } from '../../shared/ui/form/form';
-import { Input } from '../../shared/ui/input/input';
+} from '../../../../core/constants/error-message.constants';
+import { SignInFormModel } from '../../../../core/model/login.model';
+import { Form } from '../../../../shared/ui/form/form';
+import { Input } from '../../../../shared/ui/input/input';
 
 @Component({
-  selector: 'app-login',
-  imports: [Form, Input],
-  templateUrl: './login.html',
+  selector: 'app-sign-in-form',
+  imports: [Form, Input, RouterLink],
+  templateUrl: './sign-in-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Login {
+export class SignInForm {
+  protected readonly ROUTE_URLS = ROUTE_URLS;
+
   private readonly router = inject(Router);
   private readonly authenticationService = inject(AuthenticationService);
 
-  private readonly model = signal<LoginForm>({ email: '', password: '' });
+  private readonly model = signal<SignInFormModel>({ email: '', password: '' });
 
-  protected readonly loginForm = form(
+  protected readonly signInForm = form(
     this.model,
     (schema) => {
       required(schema.email, {
@@ -54,7 +56,7 @@ export class Login {
             return undefined;
           } catch {
             return {
-              kind: 'login',
+              kind: 'sign-in',
               message: ERROR_MESSAGES.invalidCredentials,
             };
           }

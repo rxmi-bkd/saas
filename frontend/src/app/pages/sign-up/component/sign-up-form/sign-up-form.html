@@ -1,0 +1,22 @@
+<app-form
+  heading="Sign up"
+  submitLabel="Sign up"
+  [form]="signUpForm"
+>
+  <app-input
+    label="Email"
+    type="email"
+    [formField]="signUpForm.email"
+  />
+
+  <app-input
+    label="Password"
+    type="password"
+    [formField]="signUpForm.password"
+  />
+
+</app-form>
+
+<div class="flex justify-center">
+  <a class="mt-6" [routerLink]="ROUTE_URLS.login">Already have an account? Sign in</a>
+</div>

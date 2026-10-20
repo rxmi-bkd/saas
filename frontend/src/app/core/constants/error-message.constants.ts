@@ -2,6 +2,7 @@ export const ERROR_MESSAGES = {
   required: (field: string) => `${field} is required`,
   invalid: (field: string) => `${field} is invalid`,
   invalidCredentials: 'Invalid email or password',
+  signUpFailed: 'Unable to create your account',
 };
 
 export const FIELD_NAMES = {
