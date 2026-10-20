@@ -7,21 +7,17 @@ import {
 
 import { Router } from '@angular/router';
 
-import {
-  email,
-  form,
-  FormField,
-  FormRoot,
-  required,
-} from '@angular/forms/signals';
+import { email, form, FormField, required } from '@angular/forms/signals';
 
 import { AuthenticationService } from '../../core/service/authentication.service';
 import { ROUTE_URLS } from '../../core/router/route.constants';
 import { LoginForm } from '../../core/model/login.model';
+import { Form } from '../../shared/ui/form';
+import { TextField } from '../../shared/ui/text-field';
 
 @Component({
   selector: 'app-login',
-  imports: [FormRoot, FormField],
+  imports: [FormField, Form, TextField],
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
