@@ -1,0 +1,6 @@
+<button app-button type="button" [variant]="variant()" [disabled]="disabled() || pending() || remaining() > 0" (click)="onClick()">
+  <ng-content />
+</button>
+@if (remaining() > 0) {
+  <span>{{ remaining() }}s</span>
+}
