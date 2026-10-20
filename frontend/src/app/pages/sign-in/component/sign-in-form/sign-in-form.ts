@@ -15,7 +15,7 @@ import {
   ERROR_MESSAGES,
   FIELD_NAMES,
 } from '../../../../core/constants/error-message.constants';
-import { SignInFormModel } from '../../../../core/model/login.model';
+import { SignInFormModel } from '../../../../core/model/sign-in.model';
 import { Form } from '../../../../shared/ui/form/form';
 import { Input } from '../../../../shared/ui/input/input';
 
