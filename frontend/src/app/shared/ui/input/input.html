@@ -1,0 +1,19 @@
+<div>
+  <label class="brutal-label">
+    {{ label() }}
+
+    <input
+      class="brutal-input"
+      [type]="type()"
+      [placeholder]="placeholder()"
+      [formField]="formField()"
+    />
+
+  </label>
+
+  @if (formField()().touched()) {
+    @for (error of formField()().errors(); track error.kind) {
+      <span class="brutal-error">{{ error.message }}</span>
+    }
+  }
+</div>

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-card',
-  template: `<ng-content />`,
+  templateUrl: './card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'brutal-card block' },
 })

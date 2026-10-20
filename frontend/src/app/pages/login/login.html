@@ -4,17 +4,15 @@
   submitLabel="Log in"
   [form]="loginForm"
 >
-  <app-text-field
+  <app-input
     label="Email"
     type="email"
-    autocomplete="email"
     [formField]="loginForm.email"
   />
 
-  <app-text-field
+  <app-input
     label="Password"
     type="password"
-    autocomplete="current-password"
     [formField]="loginForm.password"
   />
 </app-form>

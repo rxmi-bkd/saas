@@ -7,7 +7,7 @@ import {
 
 import { Router } from '@angular/router';
 
-import { email, form, FormField, required } from '@angular/forms/signals';
+import { email, form, required } from '@angular/forms/signals';
 
 import { AuthenticationService } from '../../core/service/authentication.service';
 import { ROUTE_URLS } from '../../core/constants/route.constants';
@@ -16,12 +16,12 @@ import {
   FIELD_NAMES,
 } from '../../core/constants/error-message.constants';
 import { LoginForm } from '../../core/model/login.model';
-import { Form } from '../../shared/ui/form';
-import { TextField } from '../../shared/ui/text-field';
+import { Form } from '../../shared/ui/form/form';
+import { Input } from '../../shared/ui/input/input';
 
 @Component({
   selector: 'app-login',
-  imports: [FormField, Form, TextField],
+  imports: [Form, Input],
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

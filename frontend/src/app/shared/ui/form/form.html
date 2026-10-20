@@ -1,0 +1,17 @@
+<app-card>
+  <h1 class="mb-6">{{ heading() }}</h1>
+
+  <form [formRoot]="form()" class="flex flex-col gap-6">
+    <ng-content />
+
+    <button app-button [disabled]="form()().submitting()">
+      {{ submitLabel() }}
+    </button>
+
+    @for (error of form()().errors(); track error.kind) {
+      <p class="brutal-error">{{ error.message }}</p>
+    }
+
+  </form>
+
+</app-card>
