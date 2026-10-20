@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { StatusPage } from '../../shared/ui/status-page/status-page';
+import { StatusPage } from '../../layout/status-page/status-page';
 
 @Component({
   selector: 'app-access-denied',

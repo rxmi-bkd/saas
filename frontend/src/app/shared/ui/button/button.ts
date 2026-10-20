@@ -1,17 +1,9 @@
-import { computed, Directive, input } from '@angular/core';
-import { Variant, VARIANT_CLASSES } from '../variants';
+import { Directive } from '@angular/core';
+import { VariantStyle } from '../variant';
 
 @Directive({
   selector: 'button[app-button], a[app-button]',
-  host: {
-    class: 'brutal-btn',
-    '[class]': 'variantClass()',
-  },
+  hostDirectives: [{ directive: VariantStyle, inputs: ['variant'] }],
+  host: { class: 'brutal-btn' },
 })
-export class Button {
-  readonly variant = input<Variant>('primary');
-
-  protected readonly variantClass = computed(
-    () => VARIANT_CLASSES[this.variant()],
-  );
-}
+export class Button {}

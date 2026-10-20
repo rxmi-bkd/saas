@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Badge } from '../badge/badge';
-import { Button } from '../button/button';
-import { Card } from '../card/card';
-import { Variant } from '../variants';
-import { ROUTE_URLS } from '../../../core/constants/route.constants';
+import { Badge } from '../../shared/ui/badge/badge';
+import { Button } from '../../shared/ui/button/button';
+import { Card } from '../../shared/ui/card/card';
+import { Variant } from '../../shared/ui/variant';
+import { ROUTE_URLS } from '../../core/constants/route.constants';
 
 @Component({
   selector: 'app-status-page',

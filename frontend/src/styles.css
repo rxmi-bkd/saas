@@ -65,4 +65,8 @@
   .brutal-error {
     @apply border-2 border-ink bg-danger px-2 py-1 text-sm font-bold shadow-brutal;
   }
+
+  .brutal-title {
+    @apply text-4xl font-black tracking-tight;
+  }
 }

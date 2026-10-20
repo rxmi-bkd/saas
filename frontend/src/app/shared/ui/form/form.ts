@@ -11,6 +11,6 @@ import { Card } from '../card/card';
 })
 export class Form<T> {
   readonly header = input.required<string>();
-  readonly submitLabel = input.required<string>();
+  readonly label = input.required<string>();
   readonly form = input.required<FieldTree<T>>();
 }
