@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { Home } from './pages/home/home';
-import { SignIn } from './pages/sign-in/sign-in.component';
+import { SignIn } from './pages/sign-in/sign-in';
 import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { EnableAccount } from './pages/enable-account/enable-account';
 import { SignUp } from './pages/sign-up/sign-up';
