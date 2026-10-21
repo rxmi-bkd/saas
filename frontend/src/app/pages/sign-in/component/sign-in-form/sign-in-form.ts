@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
 import { Router, RouterLink } from '@angular/router';
 
@@ -11,11 +6,8 @@ import { email, form, required } from '@angular/forms/signals';
 
 import { AuthenticationService } from '../../../../core/service/authentication.service';
 import { ROUTE_URLS } from '../../../../core/constants/route.constants';
-import {
-  ERROR_MESSAGES,
-  FIELD_NAMES,
-} from '../../../../core/constants/error-message.constants';
-import { SignInFormModel } from '../../../../core/model/sign-in.model';
+import { ERROR_MESSAGES, FIELD_NAMES } from '../../../../core/constants/error-message.constants';
+import { SignInRequest } from '../../../../core/model/sign-in.model';
 import { Form } from '../../../../shared/ui/form/form';
 import { Input } from '../../../../shared/ui/input/input';
 
@@ -31,7 +23,7 @@ export class SignInForm {
   private readonly router = inject(Router);
   private readonly authenticationService = inject(AuthenticationService);
 
-  private readonly model = signal<SignInFormModel>({ email: '', password: '' });
+  private readonly model = signal<SignInRequest>({ email: '', password: '' });
 
   protected readonly signInForm = form(
     this.model,

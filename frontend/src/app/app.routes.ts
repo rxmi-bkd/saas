@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { Home } from './pages/home/home';
 import { SignIn } from './pages/sign-in/sign-in.component';
+import { ForgotPassword } from './pages/forgot-password/forgot-password';
+import { EnableAccount } from './pages/enable-account/enable-account';
 import { SignUp } from './pages/sign-up/sign-up';
 import { Profile } from './pages/profile/profile';
 import { Admin } from './pages/admin/admin';
@@ -27,6 +29,14 @@ export const routes: Routes = [
       {
         path: ROUTE_PATHS.signUp,
         component: SignUp,
+      },
+      {
+        path: ROUTE_PATHS.forgotPassword,
+        component: ForgotPassword,
+      },
+      {
+        path: ROUTE_PATHS.enableAccount,
+        component: EnableAccount,
       },
     ],
   },

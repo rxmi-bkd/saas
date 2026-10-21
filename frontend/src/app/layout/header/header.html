@@ -1,9 +1,5 @@
-<header
-  class="flex items-center justify-between border-b-4 border-ink bg-main px-6 py-4"
->
-  <a [routerLink]="ROUTE_URLS.home" class="text-2xl font-black no-underline">
-    SaaS
-  </a>
+<header class="flex items-center justify-between border-b-4 border-ink bg-main px-6 py-4">
+  <a [routerLink]="ROUTE_URLS.home" class="text-2xl font-black no-underline"> SaaS </a>
   <nav>
     <ul class="flex items-center gap-4">
       @if (isAuthenticated()) {
@@ -17,9 +13,7 @@
           </li>
         }
         <li>
-          <button type="button" class="brutal-btn bg-white" (click)="logout()">
-            Logout
-          </button>
+          <button type="button" class="brutal-btn bg-white" (click)="logout()">Logout</button>
         </li>
       } @else {
         <li>

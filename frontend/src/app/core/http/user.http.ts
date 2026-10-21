@@ -19,10 +19,7 @@ export class UserHttp {
     return this.http.post<User>(url, body);
   }
 
-  updateUserPassword(
-    oldPassword: string,
-    newPassword: string,
-  ): Observable<void> {
+  updateUserPassword(oldPassword: string, newPassword: string): Observable<void> {
     const url = `${API}/users/password`;
     const body = { oldPassword, newPassword };
     return this.http.put<void>(url, body);

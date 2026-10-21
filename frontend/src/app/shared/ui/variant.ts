@@ -15,7 +15,5 @@ const VARIANT_CLASSES: Record<Variant, string> = {
 export class VariantStyle {
   readonly variant = input<Variant>('primary');
 
-  protected readonly variantClass = computed(
-    () => VARIANT_CLASSES[this.variant()],
-  );
+  protected readonly variantClass = computed(() => VARIANT_CLASSES[this.variant()]);
 }

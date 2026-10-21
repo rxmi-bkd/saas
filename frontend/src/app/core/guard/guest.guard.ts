@@ -6,7 +6,5 @@ import { ROUTE_URLS } from '../constants/route.constants';
 export function guestGuard() {
   const router = inject(Router);
   const authenticationService = inject(AuthenticationService);
-  return !authenticationService.isAuthenticated()
-    ? true
-    : router.createUrlTree([ROUTE_URLS.home]);
+  return !authenticationService.isAuthenticated() ? true : router.createUrlTree([ROUTE_URLS.home]);
 }

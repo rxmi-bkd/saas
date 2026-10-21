@@ -1,11 +1,6 @@
 import { provideHttpClient, withXsrfConfiguration } from '@angular/common/http';
 
-import {
-  ApplicationConfig,
-  inject,
-  provideAppInitializer,
-  provideBrowserGlobalErrorListeners,
-} from '@angular/core';
+import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
 
 import { provideRouter } from '@angular/router';
 

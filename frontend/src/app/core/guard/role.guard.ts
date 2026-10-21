@@ -6,7 +6,5 @@ import { ROUTE_URLS } from '../constants/route.constants';
 export function adminGuard() {
   const router = inject(Router);
   const authenticationService = inject(AuthenticationService);
-  return authenticationService.isAdmin()
-    ? true
-    : router.createUrlTree([ROUTE_URLS.accessDenied]);
+  return authenticationService.isAdmin() ? true : router.createUrlTree([ROUTE_URLS.accessDenied]);
 }

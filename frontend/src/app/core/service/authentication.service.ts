@@ -29,6 +29,10 @@ export class AuthenticationService {
     this._user.set(user);
   }
 
+  async sendForgottenPasswordEmail(email: string): Promise<void> {
+    await firstValueFrom(this.securityHttp.sendForgottenPasswordEmail(email));
+  }
+
   async logout(): Promise<void> {
     try {
       await firstValueFrom(this.securityHttp.logout());

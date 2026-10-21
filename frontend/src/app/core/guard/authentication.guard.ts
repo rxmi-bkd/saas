@@ -6,7 +6,5 @@ import { ROUTE_URLS } from '../constants/route.constants';
 export function authenticationGuard() {
   const router = inject(Router);
   const authenticationService = inject(AuthenticationService);
-  return authenticationService.isAuthenticated()
-    ? true
-    : router.createUrlTree([ROUTE_URLS.signIn]);
+  return authenticationService.isAuthenticated() ? true : router.createUrlTree([ROUTE_URLS.signIn]);
 }

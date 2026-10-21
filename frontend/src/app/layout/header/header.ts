@@ -12,8 +12,7 @@ import { ROUTE_URLS } from '../../core/constants/route.constants';
 export class Header {
   private readonly authenticationService = inject(AuthenticationService);
 
-  protected readonly isAuthenticated =
-    this.authenticationService.isAuthenticated;
+  protected readonly isAuthenticated = this.authenticationService.isAuthenticated;
 
   protected readonly isAdmin = this.authenticationService.isAdmin;
 

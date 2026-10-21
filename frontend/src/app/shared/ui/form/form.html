@@ -1,7 +1,7 @@
 <app-card>
   <p class="brutal-title mb-6">{{ header() }}</p>
   <form [formRoot]="form()" class="flex flex-col gap-6">
-    <ng-content/>
+    <ng-content />
     <button app-button [disabled]="form()().submitting()">
       {{ label() }}
     </button>
