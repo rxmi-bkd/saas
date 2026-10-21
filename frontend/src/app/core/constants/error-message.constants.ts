@@ -1,6 +1,8 @@
 export const ERROR_MESSAGES = {
   required: (field: string) => `${field} is required`,
   invalid: (field: string) => `${field} is invalid`,
+  minLength: (field: string, length: number) => `${field} must be at least ${length} characters`,
+  maxLength: (field: string, length: number) => `${field} must be at most ${length} characters`,
   invalidCredentials: 'Invalid email or password',
   invalidSignInRequest: 'Please check your email and password',
   disabledAccount: 'Your account is disabled or not yet activated',
@@ -11,4 +13,3 @@ export const ERROR_MESSAGES = {
   invalidSignUpRequest: 'Please check your email and password',
   emailAlreadyUsed: 'An account with this email already exists',
 };
-
