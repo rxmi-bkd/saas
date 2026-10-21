@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 
 import { email, form, required } from '@angular/forms/signals';
 
 import { AuthenticationService } from '../../../../core/service/authentication.service';
 import { ROUTE_URLS } from '../../../../core/constants/route.constants';
-import { ERROR_MESSAGES, FIELD_NAMES } from '../../../../core/constants/error-message.constants';
+import { ERROR_MESSAGES } from '../../../../core/constants/error-message.constants';
 import { SignInRequest } from '../../../../core/model/sign-in.model';
 import { Form } from '../../../../shared/ui/form/form';
 import { Input } from '../../../../shared/ui/input/input';
@@ -29,13 +30,13 @@ export class SignInForm {
     this.model,
     (schema) => {
       required(schema.email, {
-        message: ERROR_MESSAGES.required("email"),
+        message: ERROR_MESSAGES.required('email'),
       });
       email(schema.email, {
-        message: ERROR_MESSAGES.invalid("email"),
+        message: ERROR_MESSAGES.invalid('email'),
       });
       required(schema.password, {
-        message: ERROR_MESSAGES.required("password"),
+        message: ERROR_MESSAGES.required('password'),
       });
     },
     {
@@ -46,14 +47,32 @@ export class SignInForm {
             await this.authenticationService.login(email, password);
             await this.router.navigateByUrl(ROUTE_URLS.home);
             return undefined;
-          } catch {
+          } catch (error) {
             return {
               kind: 'sign-in',
-              message: ERROR_MESSAGES.invalidCredentials,
+              message: this.mapErrorToMessage(error),
             };
           }
         },
       },
     },
   );
+
+  private mapErrorToMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      switch (error.status) {
+        case 400:
+          return ERROR_MESSAGES.invalidSignInRequest;
+        case 401:
+          return ERROR_MESSAGES.invalidCredentials;
+        case 403:
+          return ERROR_MESSAGES.disabledAccount;
+        case 429:
+          return ERROR_MESSAGES.tooManyAttempts;
+        default:
+          return ERROR_MESSAGES.serverError;
+      }
+    }
+    return ERROR_MESSAGES.serverError;
+  }
 }

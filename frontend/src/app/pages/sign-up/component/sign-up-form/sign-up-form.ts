@@ -6,7 +6,7 @@ import { email, form, required } from '@angular/forms/signals';
 
 import { UserService } from '../../../../core/service/user.service';
 import { ROUTE_URLS } from '../../../../core/constants/route.constants';
-import { ERROR_MESSAGES, FIELD_NAMES } from '../../../../core/constants/error-message.constants';
+import { ERROR_MESSAGES } from '../../../../core/constants/error-message.constants';
 import { SignUpRequest } from '../../../../core/model/sign-up.model';
 import { Form } from '../../../../shared/ui/form/form';
 import { Input } from '../../../../shared/ui/input/input';
@@ -29,13 +29,13 @@ export class SignUpForm {
     this.model,
     (schema) => {
       required(schema.email, {
-        message: ERROR_MESSAGES.required("email"),
+        message: ERROR_MESSAGES.required('email'),
       });
       email(schema.email, {
-        message: ERROR_MESSAGES.invalid("email"),
+        message: ERROR_MESSAGES.invalid('email'),
       });
       required(schema.password, {
-        message: ERROR_MESSAGES.required("password"),
+        message: ERROR_MESSAGES.required('password'),
       });
     },
     {
