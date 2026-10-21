@@ -29,13 +29,13 @@ export class SignUpForm {
     this.model,
     (schema) => {
       required(schema.email, {
-        message: ERROR_MESSAGES.required(FIELD_NAMES.email),
+        message: ERROR_MESSAGES.required("email"),
       });
       email(schema.email, {
-        message: ERROR_MESSAGES.invalid(FIELD_NAMES.email),
+        message: ERROR_MESSAGES.invalid("email"),
       });
       required(schema.password, {
-        message: ERROR_MESSAGES.required(FIELD_NAMES.password),
+        message: ERROR_MESSAGES.required("password"),
       });
     },
     {

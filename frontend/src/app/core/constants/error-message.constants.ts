@@ -6,7 +6,3 @@ export const ERROR_MESSAGES = {
   signUpFailed: 'Unable to create your account',
 };
 
-export const FIELD_NAMES = {
-  email: 'Email',
-  password: 'Password',
-};
