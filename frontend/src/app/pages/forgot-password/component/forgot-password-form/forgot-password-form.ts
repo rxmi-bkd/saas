@@ -46,10 +46,6 @@ export class ForgotPasswordForm {
             this.sent.set(true);
             return undefined;
           } catch (error) {
-            if (error instanceof HttpErrorResponse && error.status === 404) {
-              this.sent.set(true);
-              return undefined;
-            }
             return {
               kind: 'forgot-password',
               message: this.mapErrorToMessage(error),
@@ -65,6 +61,8 @@ export class ForgotPasswordForm {
       switch (error.status) {
         case 400:
           return ERROR_MESSAGES.invalid('email');
+        case 404:
+          return ERROR_MESSAGES.accountNotFound;
         case 429:
           return ERROR_MESSAGES.tooManyAttempts;
         default:
