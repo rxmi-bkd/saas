@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 
 import { email, form, required } from '@angular/forms/signals';
@@ -46,14 +47,30 @@ export class SignUpForm {
             await this.userService.createUser(email, password);
             await this.router.navigateByUrl(ROUTE_URLS.enableAccount);
             return undefined;
-          } catch {
+          } catch (error) {
             return {
               kind: 'sign-up',
-              message: ERROR_MESSAGES.signUpFailed,
+              message: this.mapErrorToMessage(error),
             };
           }
         },
       },
     },
   );
+
+  private mapErrorToMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      switch (error.status) {
+        case 400:
+          return ERROR_MESSAGES.invalidSignUpRequest;
+        case 409:
+          return ERROR_MESSAGES.emailAlreadyUsed;
+        case 429:
+          return ERROR_MESSAGES.tooManyAttempts;
+        default:
+          return ERROR_MESSAGES.serverError;
+      }
+    }
+    return ERROR_MESSAGES.serverError;
+  }
 }

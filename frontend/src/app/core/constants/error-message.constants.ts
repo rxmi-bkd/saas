@@ -8,6 +8,7 @@ export const ERROR_MESSAGES = {
   serverError: 'Something went wrong on our side, please try again later',
   networkError: 'Unable to reach the server, please check your connection',
   forgotPasswordFailed: 'Unable to send the reset email, please try again',
-  signUpFailed: 'Unable to create your account',
+  invalidSignUpRequest: 'Please check your email and password',
+  emailAlreadyUsed: 'An account with this email already exists',
 };
 
