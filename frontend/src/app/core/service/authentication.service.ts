@@ -37,6 +37,10 @@ export class AuthenticationService {
     await firstValueFrom(this.securityHttp.sendForgottenPasswordEmail(email));
   }
 
+  async resetPassword(jwt: string, newPassword: string): Promise<void> {
+    await firstValueFrom(this.securityHttp.resetPassword(jwt, newPassword));
+  }
+
   async logout(): Promise<void> {
     try {
       await firstValueFrom(this.securityHttp.logout());

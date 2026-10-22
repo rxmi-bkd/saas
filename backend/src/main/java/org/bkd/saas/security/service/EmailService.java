@@ -12,6 +12,7 @@ import java.util.UUID;
 @Service
 public class EmailService {
   private static final String ENABLE_ACCOUNT_PATH = "/enable-account";
+  private static final String RESET_PASSWORD_PATH = "/reset-password";
   private static final String TOKEN_QUERY_PARAM = "token";
 
   private final ActivationTokenService activationTokenService;
@@ -28,12 +29,7 @@ public class EmailService {
 
   public void sendActivationEmail(UUID userId, String userEmail) {
     String jwt = activationTokenService.createJwt(userId);
-
-    String url = UriComponentsBuilder.fromUriString(frontendBaseUrl)
-                                               .path(ENABLE_ACCOUNT_PATH)
-                                               .queryParam(TOKEN_QUERY_PARAM, jwt)
-                                               .build()
-                                               .toUriString();
+    String url = buildFrontendUrl(ENABLE_ACCOUNT_PATH, jwt);
 
     notificationService.sendNotification(ChannelEnum.EMAIL,
                                          new NotificationDto(userEmail,
@@ -42,9 +38,19 @@ public class EmailService {
   }
 
   public void sendForgottenPasswordEmail(String userEmail, String jwt) {
+    String url = buildFrontendUrl(RESET_PASSWORD_PATH, jwt);
+
     notificationService.sendNotification(ChannelEnum.EMAIL,
                                          new NotificationDto(userEmail,
                                                              "Forgot your password ?",
-                                                             "Use this token to reset your password: " + jwt));
+                                                             "Click this link to reset your password: " + url));
+  }
+
+  private String buildFrontendUrl(String path, String jwt) {
+    return UriComponentsBuilder.fromUriString(frontendBaseUrl)
+                               .path(path)
+                               .queryParam(TOKEN_QUERY_PARAM, jwt)
+                               .build()
+                               .toUriString();
   }
 }
