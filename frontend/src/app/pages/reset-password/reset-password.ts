@@ -31,4 +31,12 @@ export class ResetPassword implements OnInit {
       this.state.set('invalid');
     }
   }
+
+  protected onReset(): void {
+    this.state.set('reset');
+  }
+
+  protected onInvalidToken(): void {
+    this.state.set('invalid');
+  }
 }
