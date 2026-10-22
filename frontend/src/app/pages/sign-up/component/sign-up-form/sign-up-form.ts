@@ -21,8 +21,6 @@ import { Input } from '../../../../shared/ui/input/input';
 })
 export class SignUpForm {
   protected readonly ROUTE_URLS = ROUTE_URLS;
-  protected readonly PASSWORD_MIN_LENGTH = PASSWORD_MIN_LENGTH;
-  protected readonly PASSWORD_MAX_LENGTH = PASSWORD_MAX_LENGTH;
 
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
