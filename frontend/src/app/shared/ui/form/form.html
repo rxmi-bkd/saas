@@ -2,9 +2,15 @@
   <p class="brutal-title mb-6">{{ header() }}</p>
   <form [formRoot]="form()" class="flex flex-col gap-6">
     <ng-content />
-    <button app-button [disabled]="form()().submitting()">
-      {{ label() }}
-    </button>
+    @if (cooldown(); as seconds) {
+      <app-cooldown-button type="submit" [seconds]="seconds" [action]="submitWithCooldown">
+        {{ label() }}
+      </app-cooldown-button>
+    } @else {
+      <button app-button [disabled]="form()().submitting()">
+        {{ label() }}
+      </button>
+    }
     @for (error of form()().errors(); track error.kind) {
       <p class="brutal-error">{{ error.message }}</p>
     }

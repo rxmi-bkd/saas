@@ -1,9 +1,9 @@
 <button
   app-button
-  type="button"
+  type="submit"
   [variant]="variant()"
   [disabled]="disabled() || pending() || remaining() > 0"
-  (click)="onClick()"
+  (click)="onClick($event)"
 >
   <ng-content />
 </button>
