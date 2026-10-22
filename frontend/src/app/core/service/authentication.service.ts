@@ -29,6 +29,10 @@ export class AuthenticationService {
     this._user.set(user);
   }
 
+  async enableUser(jwt: string): Promise<void> {
+    await firstValueFrom(this.securityHttp.enableUser(jwt));
+  }
+
   async sendForgottenPasswordEmail(email: string): Promise<void> {
     await firstValueFrom(this.securityHttp.sendForgottenPasswordEmail(email));
   }

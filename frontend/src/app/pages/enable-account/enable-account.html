@@ -1,5 +1,27 @@
 <div class="grid place-items-center gap-6 text-center">
-  <h1>Check your email</h1>
-  <p>Your account has been created. Click the link we sent you by email to enable your account.</p>
-  <a [routerLink]="ROUTE_URLS.signIn">Back to sign in</a>
+  @switch (state()) {
+    @case ('loading') {
+      <h1>Enabling your account…</h1>
+    }
+    @case ('enabled') {
+      <h1>Account enabled</h1>
+      <p>Your account is enabled. You can now sign in.</p>
+      <a [routerLink]="ROUTE_URLS.signIn">Go to sign in</a>
+    }
+    @case ('invalid') {
+      <h1>Invalid or expired link</h1>
+      <p>This activation link is invalid or has expired.</p>
+      <a [routerLink]="ROUTE_URLS.signIn">Back to sign in</a>
+    }
+    @case ('error') {
+      <h1>Something went wrong</h1>
+      <p>We could not enable your account. Please try again later.</p>
+      <a [routerLink]="ROUTE_URLS.signIn">Back to sign in</a>
+    }
+    @case ('pending') {
+      <h1>Check your email</h1>
+      <p>Your account has been created. Click the link we sent you by email to enable your account.</p>
+      <a [routerLink]="ROUTE_URLS.signIn">Back to sign in</a>
+    }
+  }
 </div>
