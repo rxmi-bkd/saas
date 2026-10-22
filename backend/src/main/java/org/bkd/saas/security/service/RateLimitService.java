@@ -6,12 +6,13 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 import io.github.bucket4j.EstimationProbe;
-import java.time.Duration;
-import java.util.Arrays;
 import org.bkd.saas.security.dto.RateLimitPolicyEnum;
 import org.bkd.saas.security.exception.TooManyRequestsException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.util.Arrays;
 
 @Service
 public class RateLimitService {
@@ -32,27 +33,23 @@ public class RateLimitService {
   }
 
   public void consumeOrThrow(RateLimitPolicyEnum policy, String key) {
-    if (!enabled) {
-      return;
-    }
+    if (enabled) {
+      ConsumptionProbe probe = bucket(policy, key).tryConsumeAndReturnRemaining(1);
 
-    ConsumptionProbe probe = bucket(policy, key).tryConsumeAndReturnRemaining(1);
-
-    if (!probe.isConsumed()) {
-      throw new TooManyRequestsException(retryAfterSeconds(probe.getNanosToWaitForRefill()));
+      if (!probe.isConsumed()) {
+        throw new TooManyRequestsException(retryAfterSeconds(probe.getNanosToWaitForRefill()));
+      }
     }
   }
 
   public void checkAvailableOrThrow(RateLimitPolicyEnum policy, String key) {
-    if (!enabled) {
-      return;
-    }
+    if (enabled) {
+      Bucket bucket = bucket(policy, key);
 
-    Bucket bucket = bucket(policy, key);
-
-    if (bucket.getAvailableTokens() < 1) {
-      EstimationProbe probe = bucket.estimateAbilityToConsume(1);
-      throw new TooManyRequestsException(retryAfterSeconds(probe.getNanosToWaitForRefill()));
+      if (bucket.getAvailableTokens() < 1) {
+        EstimationProbe probe = bucket.estimateAbilityToConsume(1);
+        throw new TooManyRequestsException(retryAfterSeconds(probe.getNanosToWaitForRefill()));
+      }
     }
   }
 
