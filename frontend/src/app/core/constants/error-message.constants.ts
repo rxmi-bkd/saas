@@ -11,6 +11,7 @@ export const ERROR_MESSAGES = {
   networkError: 'Unable to reach the server, please check your connection',
   accountNotFound: 'No account found for this email',
   forgotPasswordFailed: 'Unable to send the reset email, please try again',
+  invalidResetPasswordRequest: 'Please check your new password',
   invalidSignUpRequest: 'Please check your email and password',
   emailAlreadyUsed: 'An account with this email already exists',
 };
