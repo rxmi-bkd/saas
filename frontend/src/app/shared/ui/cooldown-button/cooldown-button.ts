@@ -57,8 +57,7 @@ export class CooldownButton {
   protected readonly remaining = signal(0);
   protected readonly pending = signal(false);
 
-  protected onClick(event: Event): void {
-    event.preventDefault();
+  protected onClick(): void {
     this.pending.set(true);
     this.action()()
       .pipe(
