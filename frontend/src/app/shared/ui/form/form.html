@@ -3,7 +3,7 @@
   <form [formRoot]="form()" class="flex flex-col gap-6">
     <ng-content />
     @if (cooldown(); as seconds) {
-      <app-cooldown-button type="submit" [seconds]="seconds" [action]="submitWithCooldown">
+      <app-cooldown-button [seconds]="seconds" [action]="submitWithCooldown">
         {{ label() }}
       </app-cooldown-button>
     } @else {
