@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ROUTE_URLS } from '../../core/constants/route.constants';
 import { ResetPasswordForm } from './component/reset-password-form/reset-password-form';
 
-type ResetPasswordState = 'pending' | 'reset' | 'invalid';
+type ResetPasswordState = 'pending' | 'reset';
 
 @Component({
   selector: 'app-reset-password',
@@ -27,16 +27,10 @@ export class ResetPassword implements OnInit {
     if (token) {
       this.token.set(token);
       await this.router.navigate([], { replaceUrl: true, queryParams: {} });
-    } else {
-      this.state.set('invalid');
     }
   }
 
   protected onReset(): void {
     this.state.set('reset');
-  }
-
-  protected onInvalidToken(): void {
-    this.state.set('invalid');
   }
 }

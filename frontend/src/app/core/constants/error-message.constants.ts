@@ -12,6 +12,7 @@ export const ERROR_MESSAGES = {
   accountNotFound: 'No account found for this email',
   forgotPasswordFailed: 'Unable to send the reset email, please try again',
   invalidResetPasswordRequest: 'Please check your new password',
+  invalidResetToken: 'This reset link is invalid or has expired',
   invalidSignUpRequest: 'Please check your email and password',
   emailAlreadyUsed: 'An account with this email already exists',
 };

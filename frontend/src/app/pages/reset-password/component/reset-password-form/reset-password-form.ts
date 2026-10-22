@@ -20,7 +20,6 @@ import { Input } from '../../../../shared/ui/input/input';
 export class ResetPasswordForm {
   readonly token = input.required<string>();
   readonly reset = output<void>();
-  readonly invalidToken = output<void>();
 
   private readonly authenticationService = inject(AuthenticationService);
 
@@ -47,10 +46,6 @@ export class ResetPasswordForm {
             this.reset.emit();
             return undefined;
           } catch (error) {
-            if (error instanceof HttpErrorResponse && error.status === 401) {
-              this.invalidToken.emit();
-              return undefined;
-            }
             return {
               kind: 'reset-password',
               message: this.mapErrorToMessage(error),
@@ -66,6 +61,8 @@ export class ResetPasswordForm {
       switch (error.status) {
         case 400:
           return ERROR_MESSAGES.invalidResetPasswordRequest;
+        case 401:
+          return ERROR_MESSAGES.invalidResetToken;
         case 429:
           return ERROR_MESSAGES.tooManyAttempts;
         default:
