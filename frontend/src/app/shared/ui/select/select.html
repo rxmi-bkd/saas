@@ -1,0 +1,15 @@
+<label class="brutal-label">
+  @if (label()) {
+    {{ label() }}
+  }
+  <select class="brutal-input" [formField]="formField()">
+    @for (option of options(); track option.value) {
+      <option [value]="option.value">{{ option.label }}</option>
+    }
+  </select>
+</label>
+@if (formField()().touched()) {
+  @for (error of formField()().errors(); track error.kind) {
+    <span class="brutal-error block mt-2">{{ error.message }}</span>
+  }
+}

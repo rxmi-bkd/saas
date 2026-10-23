@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { TranslocoService } from '@jsverse/transloco';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 
 export const LANGUAGES = ['en', 'fr'] as const;
 export type Language = (typeof LANGUAGES)[number];
@@ -17,7 +17,7 @@ export class LanguageService {
   private readonly document = inject(DOCUMENT);
 
   readonly languages = LANGUAGES;
-  readonly current = toSignal(this.transloco.langChanges$, { requireSync: true });
+  readonly current = toSignal(this.transloco.langChanges$ as Observable<Language>, { requireSync: true });
 
   async init(): Promise<void> {
     await this.use(this.initialLanguage());
