@@ -19,7 +19,6 @@ export class LanguageService {
   readonly languages = LANGUAGES;
   readonly current = toSignal(this.transloco.langChanges$, { requireSync: true });
 
-  /** Loads the stored (or browser) language before the first render. */
   async init(): Promise<void> {
     await this.use(this.initialLanguage());
   }
