@@ -16,6 +16,7 @@ import { provideTransloco } from '@jsverse/transloco';
 
 import { routes } from './app.routes';
 import { AuthenticationService } from './core/service/authentication.service';
+import { LanguageService } from './core/service/language.service';
 import { TranslocoHttpLoader } from './core/service/transloco-loader';
 import { LANGUAGES } from './core/constants/language.constants';
 
@@ -41,6 +42,7 @@ export const appConfig: ApplicationConfig = {
       },
       loader: TranslocoHttpLoader,
     }),
+    provideAppInitializer(() => inject(LanguageService).init()),
     provideAppInitializer(() => inject(AuthenticationService).refresh()),
   ],
 };

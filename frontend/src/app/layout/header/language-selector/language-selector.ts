@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@ang
 
 import { form } from '@angular/forms/signals';
 
-import { TranslocoService } from '@jsverse/transloco';
-
 import { Language, LANGUAGES } from '../../../core/constants/language.constants';
 import { LanguageForm } from '../../../core/model/language.model';
 import { Select } from '../../../shared/ui/select/select';
+import { TranslocoService } from '@jsverse/transloco';
+import { LanguageService } from '../../../core/service/language.service';
 
 const LANGUAGE_LABELS: Record<Language, string> = {
   en: 'English',
@@ -20,6 +20,7 @@ const LANGUAGE_LABELS: Record<Language, string> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LanguageSelector {
+  private readonly languageService = inject(LanguageService);
   private readonly translocoService = inject(TranslocoService);
 
   protected readonly options = LANGUAGES.map((language) => ({
@@ -35,7 +36,7 @@ export class LanguageSelector {
     effect(() => {
       const { language } = this.model();
       if (language !== this.translocoService.getActiveLang()) {
-        this.translocoService.setActiveLang(language);
+        this.languageService.use(language);
       }
     });
   }
