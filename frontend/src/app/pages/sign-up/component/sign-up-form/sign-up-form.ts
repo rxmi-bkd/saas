@@ -26,7 +26,7 @@ export class SignUpForm {
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
 
-  private readonly errors = inject(ErrorMessageService);
+  private readonly errorMessageService = inject(ErrorMessageService);
 
   private readonly model = signal<SignUpRequest>({ email: '', password: '' });
 
@@ -34,19 +34,19 @@ export class SignUpForm {
     this.model,
     (schema) => {
       required(schema.email, {
-        message: () => this.errors.required('email'),
+        message: () => this.errorMessageService.required('email'),
       });
       email(schema.email, {
-        message: () => this.errors.invalid('email'),
+        message: () => this.errorMessageService.invalid('email'),
       });
       required(schema.password, {
-        message: () => this.errors.required('password'),
+        message: () => this.errorMessageService.required('password'),
       });
       minLength(schema.password, PASSWORD_MIN_LENGTH, {
-        message: () => this.errors.minLength('password', PASSWORD_MIN_LENGTH),
+        message: () => this.errorMessageService.minLength('password', PASSWORD_MIN_LENGTH),
       });
       maxLength(schema.password, PASSWORD_MAX_LENGTH, {
-        message: () => this.errors.maxLength('password', PASSWORD_MAX_LENGTH),
+        message: () => this.errorMessageService.maxLength('password', PASSWORD_MAX_LENGTH),
       });
     },
     {
@@ -72,15 +72,15 @@ export class SignUpForm {
     if (error instanceof HttpErrorResponse) {
       switch (error.status) {
         case 400:
-          return this.errors.invalidSignUpRequest();
+          return this.errorMessageService.invalidSignUpRequest();
         case 409:
-          return this.errors.emailAlreadyUsed();
+          return this.errorMessageService.emailAlreadyUsed();
         case 429:
-          return this.errors.tooManyAttempts();
+          return this.errorMessageService.tooManyAttempts();
         default:
-          return this.errors.serverError();
+          return this.errorMessageService.serverError();
       }
     }
-    return this.errors.serverError();
+    return this.errorMessageService.serverError();
   }
 }
