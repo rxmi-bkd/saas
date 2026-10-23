@@ -24,7 +24,6 @@ export class LanguageService {
   }
 
   async use(language: Language): Promise<void> {
-    // Load first so the UI never flashes raw keys while the file is fetched.
     await firstValueFrom(this.transloco.load(language));
     this.transloco.setActiveLang(language);
     this.document.documentElement.lang = language;

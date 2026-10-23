@@ -12,16 +12,13 @@ import { TranslocoPipe } from '@jsverse/transloco';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Header {
-  private readonly authenticationService = inject(AuthenticationService);
-
-  protected readonly isAuthenticated = this.authenticationService.isAuthenticated;
-
-  protected readonly isAdmin = this.authenticationService.isAdmin;
-
   private readonly languageService = inject(LanguageService);
+  private readonly authenticationService = inject(AuthenticationService);
 
   protected readonly language = this.languageService.current;
   protected readonly languages = this.languageService.languages;
+  protected readonly isAdmin = this.authenticationService.isAdmin;
+  protected readonly isAuthenticated = this.authenticationService.isAuthenticated;
 
   protected readonly ROUTE_URLS = ROUTE_URLS;
 
