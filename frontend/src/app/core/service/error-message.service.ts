@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 
-import { TranslocoService } from '@jsverse/transloco';
+import { LanguageService } from './language.service';
 
 type FieldName = 'email' | 'password';
 
 @Injectable({ providedIn: 'root' })
 export class ErrorMessageService {
-  private readonly translocoService = inject(TranslocoService);
+  private readonly languageService = inject(LanguageService);
 
   required = (field: FieldName) => this.fieldError('required', field);
   invalid = (field: FieldName) => this.fieldError('invalid', field);
@@ -27,10 +27,10 @@ export class ErrorMessageService {
   emailAlreadyUsed = () => this.translate('emailAlreadyUsed');
 
   private fieldError(key: string, field: FieldName, length?: number): string {
-    return this.translate(key, { field: this.translocoService.translate(`field.${field}`), length });
+    return this.translate(key, { field: this.languageService.translate(`field.${field}`), length });
   }
 
   private translate(key: string, params?: Record<string, unknown>): string {
-    return this.translocoService.translate(`error.${key}`, params);
+    return this.languageService.translate(`error.${key}`, params);
   }
 }

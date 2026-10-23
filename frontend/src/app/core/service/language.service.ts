@@ -15,6 +15,14 @@ export class LanguageService {
     if (stored) this.translocoService.setActiveLang(stored);
   }
 
+  current(): Language {
+    return this.translocoService.getActiveLang() as Language;
+  }
+
+  translate(key: string, params?: Record<string, unknown>): string {
+    return this.translocoService.translate(key, params);
+  }
+
   use(language: Language): void {
     this.translocoService.setActiveLang(language);
     this.storeLanguage(language);
