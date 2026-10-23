@@ -1,15 +1,16 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { ROUTE_URLS } from '../../core/constants/route.constants';
+import { StatusMessage } from '../../shared/ui/status-message/status-message';
 import { AuthenticationService } from '../../core/service/authentication.service';
 
 type EnableAccountState = 'pending' | 'loading' | 'enabled' | 'invalid' | 'error';
 
 @Component({
   selector: 'app-enable-account',
-  imports: [RouterLink],
+  imports: [StatusMessage],
   templateUrl: './enable-account.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

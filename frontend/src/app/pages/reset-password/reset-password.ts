@@ -1,15 +1,16 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { ROUTE_URLS } from '../../core/constants/route.constants';
+import { StatusMessage } from '../../shared/ui/status-message/status-message';
 import { ResetPasswordForm } from './component/reset-password-form/reset-password-form';
 
 type ResetPasswordState = 'pending' | 'reset';
 
 @Component({
   selector: 'app-reset-password',
-  imports: [ResetPasswordForm, RouterLink],
+  imports: [ResetPasswordForm, StatusMessage],
   templateUrl: './reset-password.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
