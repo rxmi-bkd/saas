@@ -5,13 +5,6 @@ import { TranslocoService } from '@jsverse/transloco';
 
 type FieldName = 'email' | 'password';
 
-/**
- * User-facing error messages, translated with Transloco.
- *
- * Each method reads the active language, so when it is called from a reactive
- * context (e.g. a signal-forms validator `message` function) the result is
- * recomputed when the language changes.
- */
 @Injectable({ providedIn: 'root' })
 export class ErrorMessageService {
   private readonly transloco = inject(TranslocoService);

@@ -23,8 +23,7 @@ export class ForgotPasswordForm {
   protected readonly ROUTE_URLS = ROUTE_URLS;
 
   private readonly authenticationService = inject(AuthenticationService);
-
-  private readonly errors = inject(ErrorMessageService);
+  private readonly errorMessageService = inject(ErrorMessageService);
 
   private readonly model = signal<ForgotPasswordRequest>({ email: '' });
 
@@ -34,10 +33,10 @@ export class ForgotPasswordForm {
     this.model,
     (schema) => {
       required(schema.email, {
-        message: () => this.errors.required('email'),
+        message: () => this.errorMessageService.required('email'),
       });
       email(schema.email, {
-        message: () => this.errors.invalid('email'),
+        message: () => this.errorMessageService.invalid('email'),
       });
     },
     {
@@ -63,15 +62,15 @@ export class ForgotPasswordForm {
     if (error instanceof HttpErrorResponse) {
       switch (error.status) {
         case 400:
-          return this.errors.invalid('email');
+          return this.errorMessageService.invalid('email');
         case 404:
-          return this.errors.accountNotFound();
+          return this.errorMessageService.accountNotFound();
         case 429:
-          return this.errors.tooManyAttempts();
+          return this.errorMessageService.tooManyAttempts();
         default:
-          return this.errors.serverError();
+          return this.errorMessageService.serverError();
       }
     }
-    return this.errors.serverError();
+    return this.errorMessageService.serverError();
   }
 }
