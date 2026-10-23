@@ -28,7 +28,12 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.css"]
+            "styles": [
+              "src/styles.css"
+            ],
+            "polyfills": [
+              "@angular/localize/init"
+            ]
           },
           "configurations": {
             "production": {
@@ -44,9 +49,21 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "localize": true
             },
             "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "localize": [
+                "en-US"
+              ]
+            },
+            "fr": {
+              "localize": [
+                "fr"
+              ],
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
@@ -65,6 +82,9 @@
             },
             "development": {
               "buildTarget": "frontend:build:development"
+            },
+            "fr": {
+              "buildTarget": "frontend:build:fr"
             }
           },
           "defaultConfiguration": "development"
@@ -75,7 +95,21 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular/build:extract-i18n"
+        }
+      },
+      "i18n": {
+        "sourceLocale": "en-US",
+        "locales": {
+          "fr": {
+            "translation": "src/locale/messages.fr.json"
           }
         }
       }

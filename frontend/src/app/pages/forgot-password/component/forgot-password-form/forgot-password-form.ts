@@ -31,10 +31,10 @@ export class ForgotPasswordForm {
     this.model,
     (schema) => {
       required(schema.email, {
-        message: ERROR_MESSAGES.required('email'),
+        message: ERROR_MESSAGES.required($localize`:@@field.email:email`),
       });
       email(schema.email, {
-        message: ERROR_MESSAGES.invalid('email'),
+        message: ERROR_MESSAGES.invalid($localize`:@@field.email:email`),
       });
     },
     {
@@ -60,7 +60,7 @@ export class ForgotPasswordForm {
     if (error instanceof HttpErrorResponse) {
       switch (error.status) {
         case 400:
-          return ERROR_MESSAGES.invalid('email');
+          return ERROR_MESSAGES.invalid($localize`:@@field.email:email`);
         case 404:
           return ERROR_MESSAGES.accountNotFound;
         case 429:

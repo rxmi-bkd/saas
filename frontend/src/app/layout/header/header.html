@@ -4,20 +4,20 @@
     <ul class="flex items-center gap-4">
       @if (isAuthenticated()) {
         <li>
-          <a [routerLink]="ROUTE_URLS.profile">Profile</a>
+          <a [routerLink]="ROUTE_URLS.profile" i18n>Profile</a>
         </li>
 
         @if (isAdmin()) {
           <li>
-            <a [routerLink]="ROUTE_URLS.admin">Admin</a>
+            <a [routerLink]="ROUTE_URLS.admin" i18n>Admin</a>
           </li>
         }
         <li>
-          <button type="button" class="brutal-btn bg-white" (click)="logout()">Logout</button>
+          <button type="button" class="brutal-btn bg-white" (click)="logout()" i18n>Logout</button>
         </li>
       } @else {
         <li>
-          <a [routerLink]="ROUTE_URLS.signIn" class="brutal-btn bg-white">Sign In</a>
+          <a [routerLink]="ROUTE_URLS.signIn" class="brutal-btn bg-white" i18n>Sign In</a>
         </li>
       }
     </ul>

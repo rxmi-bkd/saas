@@ -31,13 +31,13 @@ export class ResetPasswordForm {
     this.model,
     (schema) => {
       required(schema.newPassword, {
-        message: ERROR_MESSAGES.required('password'),
+        message: ERROR_MESSAGES.required($localize`:@@field.password:password`),
       });
       minLength(schema.newPassword, PASSWORD_MIN_LENGTH, {
-        message: ERROR_MESSAGES.minLength('password', PASSWORD_MIN_LENGTH),
+        message: ERROR_MESSAGES.minLength($localize`:@@field.password:password`, PASSWORD_MIN_LENGTH),
       });
       maxLength(schema.newPassword, PASSWORD_MAX_LENGTH, {
-        message: ERROR_MESSAGES.maxLength('password', PASSWORD_MAX_LENGTH),
+        message: ERROR_MESSAGES.maxLength($localize`:@@field.password:password`, PASSWORD_MAX_LENGTH),
       });
     },
     {

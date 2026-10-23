@@ -1,36 +1,48 @@
 @switch (state()) {
   @case ('loading') {
-    <p>Enabling your account ...</p>
+    <p i18n>Enabling your account ...</p>
   }
   @case ('enabled') {
     <app-status-message
       heading="Account enabled"
+      i18n-heading
       description="Your account is enabled. You can now sign in."
+      i18n-description
       linkLabel="Go to sign in"
+      i18n-linkLabel
       [linkUrl]="ROUTE_URLS.signIn"
     />
   }
   @case ('invalid') {
     <app-status-message
       heading="Invalid or expired link"
+      i18n-heading
       description="This activation link is invalid or has expired."
+      i18n-description
       linkLabel="Back to sign in"
+      i18n-linkLabel
       [linkUrl]="ROUTE_URLS.signIn"
     />
   }
   @case ('error') {
     <app-status-message
       heading="Something went wrong"
+      i18n-heading
       description="We could not enable your account. Please try again later."
+      i18n-description
       linkLabel="Back to sign in"
+      i18n-linkLabel
       [linkUrl]="ROUTE_URLS.signIn"
     />
   }
   @case ('pending') {
     <app-status-message
       heading="Check your email"
+      i18n-heading
       description="Your account has been created. Click the link we sent you by email to enable your account."
+      i18n-description
       linkLabel="Back to sign in"
+      i18n-linkLabel
       [linkUrl]="ROUTE_URLS.signIn"
     />
   }

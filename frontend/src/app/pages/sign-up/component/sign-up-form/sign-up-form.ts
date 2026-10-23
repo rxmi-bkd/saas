@@ -31,19 +31,19 @@ export class SignUpForm {
     this.model,
     (schema) => {
       required(schema.email, {
-        message: ERROR_MESSAGES.required('email'),
+        message: ERROR_MESSAGES.required($localize`:@@field.email:email`),
       });
       email(schema.email, {
-        message: ERROR_MESSAGES.invalid('email'),
+        message: ERROR_MESSAGES.invalid($localize`:@@field.email:email`),
       });
       required(schema.password, {
-        message: ERROR_MESSAGES.required('password'),
+        message: ERROR_MESSAGES.required($localize`:@@field.password:password`),
       });
       minLength(schema.password, PASSWORD_MIN_LENGTH, {
-        message: ERROR_MESSAGES.minLength('password', PASSWORD_MIN_LENGTH),
+        message: ERROR_MESSAGES.minLength($localize`:@@field.password:password`, PASSWORD_MIN_LENGTH),
       });
       maxLength(schema.password, PASSWORD_MAX_LENGTH, {
-        message: ERROR_MESSAGES.maxLength('password', PASSWORD_MAX_LENGTH),
+        message: ERROR_MESSAGES.maxLength($localize`:@@field.password:password`, PASSWORD_MAX_LENGTH),
       });
     },
     {

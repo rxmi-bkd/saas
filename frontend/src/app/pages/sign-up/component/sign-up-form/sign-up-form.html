@@ -1,9 +1,9 @@
-<app-form header="Sign up" label="Sign up" [form]="signUpForm">
-  <app-input label="Email" type="email" [formField]="signUpForm.email" />
+<app-form header="Sign up" i18n-header label="Sign up" i18n-label [form]="signUpForm">
+  <app-input label="Email" i18n-label type="email" [formField]="signUpForm.email" />
 
-  <app-input label="Password" type="password" [formField]="signUpForm.password" />
+  <app-input label="Password" i18n-label type="password" [formField]="signUpForm.password" />
 </app-form>
 
 <div class="flex justify-center">
-  <a class="mt-6" [routerLink]="ROUTE_URLS.signIn">Already have an account ? Sign in</a>
+  <a class="mt-6" [routerLink]="ROUTE_URLS.signIn" i18n>Already have an account ? Sign in</a>
 </div>

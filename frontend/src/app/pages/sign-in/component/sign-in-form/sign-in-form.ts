@@ -30,13 +30,13 @@ export class SignInForm {
     this.model,
     (schema) => {
       required(schema.email, {
-        message: ERROR_MESSAGES.required('email'),
+        message: ERROR_MESSAGES.required($localize`:@@field.email:email`),
       });
       email(schema.email, {
-        message: ERROR_MESSAGES.invalid('email'),
+        message: ERROR_MESSAGES.invalid($localize`:@@field.email:email`),
       });
       required(schema.password, {
-        message: ERROR_MESSAGES.required('password'),
+        message: ERROR_MESSAGES.required($localize`:@@field.password:password`),
       });
     },
     {

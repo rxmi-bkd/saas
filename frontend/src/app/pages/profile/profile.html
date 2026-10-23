@@ -1,11 +1,11 @@
 <p>profile</p>
 @if (user(); as user) {
   <dl class="brutal-card">
-    <dt>Email</dt>
+    <dt i18n>Email</dt>
     <dd>{{ user.email }}</dd>
-    <dt>Role</dt>
+    <dt i18n>Role</dt>
     <dd>{{ user.role }}</dd>
-    <dt>Member since</dt>
+    <dt i18n>Member since</dt>
     <dd>{{ user.createdAt | date: 'mediumDate' }}</dd>
   </dl>
 }
