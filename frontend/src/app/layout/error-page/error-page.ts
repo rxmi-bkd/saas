@@ -7,12 +7,12 @@ import { Variant } from '../../shared/ui/variant';
 import { ROUTE_URLS } from '../../core/constants/route.constants';
 
 @Component({
-  selector: 'app-status-page',
-  templateUrl: './status-page.html',
+  selector: 'app-error-page',
+  templateUrl: './error-page.html',
   imports: [Card, Badge, Button, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StatusPage {
+export class ErrorPage {
   readonly code = input.required<string>();
   readonly heading = input.required<string>();
   readonly variant = input<Variant>('primary');
