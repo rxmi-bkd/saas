@@ -2,5 +2,5 @@
   <span app-badge [variant]="variant()">{{ code() }}</span>
   <h1>{{ heading() }}</h1>
   <p class="font-medium"><ng-content /></p>
-  <a app-button [routerLink]="ROUTE_URLS.home">Back to home</a>
+  <a app-button [routerLink]="ROUTE_URLS.home">{{ 'errorPage.backToHome' | transloco }}</a>
 </app-card>

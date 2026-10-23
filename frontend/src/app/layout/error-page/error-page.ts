@@ -5,11 +5,12 @@ import { Button } from '../../shared/ui/button/button';
 import { Card } from '../../shared/ui/card/card';
 import { Variant } from '../../shared/ui/variant';
 import { ROUTE_URLS } from '../../core/constants/route.constants';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-error-page',
   templateUrl: './error-page.html',
-  imports: [Card, Badge, Button, RouterLink],
+  imports: [Card, Badge, Button, RouterLink, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErrorPage {

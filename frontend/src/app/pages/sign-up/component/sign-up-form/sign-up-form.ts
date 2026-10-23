@@ -8,14 +8,15 @@ import { email, form, maxLength, minLength, required } from '@angular/forms/sign
 import { UserService } from '../../../../core/service/user.service';
 import { ROUTE_URLS } from '../../../../core/constants/route.constants';
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '../../../../core/constants/password.constants';
-import { ERROR_MESSAGES } from '../../../../core/constants/error-message.constants';
+import { ErrorMessageService } from '../../../../core/service/error-message.service';
 import { SignUpRequest } from '../../../../core/model/sign-up.model';
 import { Form } from '../../../../shared/ui/form/form';
 import { Input } from '../../../../shared/ui/input/input';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-sign-up-form',
-  imports: [Form, Input, RouterLink],
+  imports: [Form, Input, RouterLink, TranslocoPipe],
   templateUrl: './sign-up-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -25,25 +26,27 @@ export class SignUpForm {
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
 
+  private readonly errors = inject(ErrorMessageService);
+
   private readonly model = signal<SignUpRequest>({ email: '', password: '' });
 
   protected readonly signUpForm = form(
     this.model,
     (schema) => {
       required(schema.email, {
-        message: ERROR_MESSAGES.required('email'),
+        message: () => this.errors.required('email'),
       });
       email(schema.email, {
-        message: ERROR_MESSAGES.invalid('email'),
+        message: () => this.errors.invalid('email'),
       });
       required(schema.password, {
-        message: ERROR_MESSAGES.required('password'),
+        message: () => this.errors.required('password'),
       });
       minLength(schema.password, PASSWORD_MIN_LENGTH, {
-        message: ERROR_MESSAGES.minLength('password', PASSWORD_MIN_LENGTH),
+        message: () => this.errors.minLength('password', PASSWORD_MIN_LENGTH),
       });
       maxLength(schema.password, PASSWORD_MAX_LENGTH, {
-        message: ERROR_MESSAGES.maxLength('password', PASSWORD_MAX_LENGTH),
+        message: () => this.errors.maxLength('password', PASSWORD_MAX_LENGTH),
       });
     },
     {
@@ -69,15 +72,15 @@ export class SignUpForm {
     if (error instanceof HttpErrorResponse) {
       switch (error.status) {
         case 400:
-          return ERROR_MESSAGES.invalidSignUpRequest;
+          return this.errors.invalidSignUpRequest();
         case 409:
-          return ERROR_MESSAGES.emailAlreadyUsed;
+          return this.errors.emailAlreadyUsed();
         case 429:
-          return ERROR_MESSAGES.tooManyAttempts;
+          return this.errors.tooManyAttempts();
         default:
-          return ERROR_MESSAGES.serverError;
+          return this.errors.serverError();
       }
     }
-    return ERROR_MESSAGES.serverError;
+    return this.errors.serverError();
   }
 }

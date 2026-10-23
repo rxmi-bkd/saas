@@ -1,11 +1,11 @@
 <p>profile</p>
 @if (user(); as user) {
   <dl class="brutal-card">
-    <dt>Email</dt>
+    <dt>{{ 'profile.email' | transloco }}</dt>
     <dd>{{ user.email }}</dd>
-    <dt>Role</dt>
+    <dt>{{ 'profile.role' | transloco }}</dt>
     <dd>{{ user.role }}</dd>
-    <dt>Member since</dt>
-    <dd>{{ user.createdAt | date: 'mediumDate' }}</dd>
+    <dt>{{ 'profile.memberSince' | transloco }}</dt>
+    <dd>{{ user.createdAt | date: 'mediumDate' : undefined : language() }}</dd>
   </dl>
 }

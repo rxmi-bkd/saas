@@ -7,14 +7,15 @@ import { email, form, required } from '@angular/forms/signals';
 
 import { AuthenticationService } from '../../../../core/service/authentication.service';
 import { ROUTE_URLS } from '../../../../core/constants/route.constants';
-import { ERROR_MESSAGES } from '../../../../core/constants/error-message.constants';
+import { ErrorMessageService } from '../../../../core/service/error-message.service';
 import { SignInRequest } from '../../../../core/model/sign-in.model';
 import { Form } from '../../../../shared/ui/form/form';
 import { Input } from '../../../../shared/ui/input/input';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-sign-in-form',
-  imports: [Form, Input, RouterLink],
+  imports: [Form, Input, RouterLink, TranslocoPipe],
   templateUrl: './sign-in-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -24,19 +25,21 @@ export class SignInForm {
   private readonly router = inject(Router);
   private readonly authenticationService = inject(AuthenticationService);
 
+  private readonly errors = inject(ErrorMessageService);
+
   private readonly model = signal<SignInRequest>({ email: '', password: '' });
 
   protected readonly signInForm = form(
     this.model,
     (schema) => {
       required(schema.email, {
-        message: ERROR_MESSAGES.required('email'),
+        message: () => this.errors.required('email'),
       });
       email(schema.email, {
-        message: ERROR_MESSAGES.invalid('email'),
+        message: () => this.errors.invalid('email'),
       });
       required(schema.password, {
-        message: ERROR_MESSAGES.required('password'),
+        message: () => this.errors.required('password'),
       });
     },
     {
@@ -62,17 +65,17 @@ export class SignInForm {
     if (error instanceof HttpErrorResponse) {
       switch (error.status) {
         case 400:
-          return ERROR_MESSAGES.invalidSignInRequest;
+          return this.errors.invalidSignInRequest();
         case 401:
-          return ERROR_MESSAGES.invalidCredentials;
+          return this.errors.invalidCredentials();
         case 403:
-          return ERROR_MESSAGES.disabledAccount;
+          return this.errors.disabledAccount();
         case 429:
-          return ERROR_MESSAGES.tooManyAttempts;
+          return this.errors.tooManyAttempts();
         default:
-          return ERROR_MESSAGES.serverError;
+          return this.errors.serverError();
       }
     }
-    return ERROR_MESSAGES.serverError;
+    return this.errors.serverError();
   }
 }

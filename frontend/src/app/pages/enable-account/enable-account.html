@@ -1,36 +1,36 @@
 @switch (state()) {
   @case ('loading') {
-    <p>Enabling your account ...</p>
+    <p>{{ 'enableAccount.loading' | transloco }}</p>
   }
   @case ('enabled') {
     <app-status-message
-      heading="Account enabled"
-      description="Your account is enabled. You can now sign in."
-      linkLabel="Go to sign in"
+      [heading]="'enableAccount.enabled.heading' | transloco"
+      [description]="'enableAccount.enabled.description' | transloco"
+      [linkLabel]="'enableAccount.enabled.link' | transloco"
       [linkUrl]="ROUTE_URLS.signIn"
     />
   }
   @case ('invalid') {
     <app-status-message
-      heading="Invalid or expired link"
-      description="This activation link is invalid or has expired."
-      linkLabel="Back to sign in"
+      [heading]="'enableAccount.invalid.heading' | transloco"
+      [description]="'enableAccount.invalid.description' | transloco"
+      [linkLabel]="'enableAccount.invalid.link' | transloco"
       [linkUrl]="ROUTE_URLS.signIn"
     />
   }
   @case ('error') {
     <app-status-message
-      heading="Something went wrong"
-      description="We could not enable your account. Please try again later."
-      linkLabel="Back to sign in"
+      [heading]="'enableAccount.error.heading' | transloco"
+      [description]="'enableAccount.error.description' | transloco"
+      [linkLabel]="'enableAccount.error.link' | transloco"
       [linkUrl]="ROUTE_URLS.signIn"
     />
   }
   @case ('pending') {
     <app-status-message
-      heading="Check your email"
-      description="Your account has been created. Click the link we sent you by email to enable your account."
-      linkLabel="Back to sign in"
+      [heading]="'enableAccount.pending.heading' | transloco"
+      [description]="'enableAccount.pending.description' | transloco"
+      [linkLabel]="'enableAccount.pending.link' | transloco"
       [linkUrl]="ROUTE_URLS.signIn"
     />
   }

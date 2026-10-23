@@ -1,11 +1,25 @@
 import { provideHttpClient, withXsrfConfiguration } from '@angular/common/http';
 
-import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+import {
+  ApplicationConfig,
+  inject,
+  isDevMode,
+  provideAppInitializer,
+  provideBrowserGlobalErrorListeners,
+} from '@angular/core';
 
 import { provideRouter } from '@angular/router';
 
+import { provideTransloco } from '@jsverse/transloco';
+
 import { routes } from './app.routes';
 import { AuthenticationService } from './core/service/authentication.service';
+import { LanguageService, LANGUAGES } from './core/service/language.service';
+import { TranslocoHttpLoader } from './core/service/transloco-loader';
+
+registerLocaleData(localeFr);
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,6 +31,17 @@ export const appConfig: ApplicationConfig = {
         headerName: 'X-XSRF-TOKEN',
       }),
     ),
+    provideTransloco({
+      config: {
+        availableLangs: [...LANGUAGES],
+        defaultLang: 'en',
+        fallbackLang: 'en',
+        reRenderOnLangChange: true,
+        prodMode: !isDevMode(),
+      },
+      loader: TranslocoHttpLoader,
+    }),
+    provideAppInitializer(() => inject(LanguageService).init()),
     provideAppInitializer(() => inject(AuthenticationService).refresh()),
   ],
 };

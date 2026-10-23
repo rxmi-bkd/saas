@@ -5,12 +5,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ROUTE_URLS } from '../../core/constants/route.constants';
 import { StatusMessage } from '../../shared/ui/status-message/status-message';
 import { AuthenticationService } from '../../core/service/authentication.service';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 type EnableAccountState = 'pending' | 'loading' | 'enabled' | 'invalid' | 'error';
 
 @Component({
   selector: 'app-enable-account',
-  imports: [StatusMessage],
+  imports: [StatusMessage, TranslocoPipe],
   templateUrl: './enable-account.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

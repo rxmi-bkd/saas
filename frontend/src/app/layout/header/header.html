@@ -4,22 +4,34 @@
     <ul class="flex items-center gap-4">
       @if (isAuthenticated()) {
         <li>
-          <a [routerLink]="ROUTE_URLS.profile">Profile</a>
+          <a [routerLink]="ROUTE_URLS.profile">{{ 'nav.profile' | transloco }}</a>
         </li>
 
         @if (isAdmin()) {
           <li>
-            <a [routerLink]="ROUTE_URLS.admin">Admin</a>
+            <a [routerLink]="ROUTE_URLS.admin">{{ 'nav.admin' | transloco }}</a>
           </li>
         }
         <li>
-          <button type="button" class="brutal-btn bg-white" (click)="logout()">Logout</button>
+          <button type="button" class="brutal-btn bg-white" (click)="logout()">{{ 'nav.logout' | transloco }}</button>
         </li>
       } @else {
         <li>
-          <a [routerLink]="ROUTE_URLS.signIn" class="brutal-btn bg-white">Sign In</a>
+          <a [routerLink]="ROUTE_URLS.signIn" class="brutal-btn bg-white">{{ 'nav.signIn' | transloco }}</a>
         </li>
       }
+      <li>
+        <select
+          class="brutal-input"
+          [attr.aria-label]="'nav.language' | transloco"
+          [value]="language()"
+          (change)="setLanguage($any($event.target).value)"
+        >
+          @for (lang of languages; track lang) {
+            <option [value]="lang">{{ lang.toUpperCase() }}</option>
+          }
+        </select>
+      </li>
     </ul>
   </nav>
 </header>

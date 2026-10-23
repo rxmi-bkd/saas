@@ -1,10 +1,10 @@
-<app-form header="Sign in" label="Sign in" [form]="signInForm">
-  <app-input label="Email" type="email" [formField]="signInForm.email" />
+<app-form [header]="'signIn.header' | transloco" [label]="'signIn.submit' | transloco" [form]="signInForm">
+  <app-input [label]="'label.email' | transloco" type="email" [formField]="signInForm.email" />
 
-  <app-input label="Password" type="password" [formField]="signInForm.password" />
+  <app-input [label]="'label.password' | transloco" type="password" [formField]="signInForm.password" />
 </app-form>
 
 <div class="flex justify-center gap-6">
-  <a class="mt-6" [routerLink]="ROUTE_URLS.signUp">No account yet ? Sign up</a>
-  <a class="mt-6" [routerLink]="ROUTE_URLS.forgotPassword">Forgot your password ?</a>
+  <a class="mt-6" [routerLink]="ROUTE_URLS.signUp">{{ 'signIn.noAccount' | transloco }}</a>
+  <a class="mt-6" [routerLink]="ROUTE_URLS.forgotPassword">{{ 'signIn.forgotPassword' | transloco }}</a>
 </div>
