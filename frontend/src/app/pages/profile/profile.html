@@ -6,6 +6,6 @@
     <dt>{{ 'profile.role' | transloco }}</dt>
     <dd>{{ user.role }}</dd>
     <dt>{{ 'profile.memberSince' | transloco }}</dt>
-    <dd>{{ user.createdAt | date: 'mediumDate' : undefined : language() }}</dd>
+    <dd>{{ user.createdAt | date: 'mediumDate' }}</dd>
   </dl>
 }

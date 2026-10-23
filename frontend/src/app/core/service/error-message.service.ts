@@ -1,5 +1,4 @@
 import { inject, Injectable } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 import { TranslocoService } from '@jsverse/transloco';
 
@@ -7,8 +6,7 @@ type FieldName = 'email' | 'password';
 
 @Injectable({ providedIn: 'root' })
 export class ErrorMessageService {
-  private readonly transloco = inject(TranslocoService);
-  private readonly lang = toSignal(this.transloco.langChanges$, { requireSync: true });
+  private readonly translocoService = inject(TranslocoService);
 
   required = (field: FieldName) => this.fieldError('required', field);
   invalid = (field: FieldName) => this.fieldError('invalid', field);
@@ -29,11 +27,10 @@ export class ErrorMessageService {
   emailAlreadyUsed = () => this.translate('emailAlreadyUsed');
 
   private fieldError(key: string, field: FieldName, length?: number): string {
-    return this.translate(key, { field: this.transloco.translate(`field.${field}`), length });
+    return this.translate(key, { field: this.translocoService.translate(`field.${field}`), length });
   }
 
   private translate(key: string, params?: Record<string, unknown>): string {
-    this.lang();
-    return this.transloco.translate(`error.${key}`, params);
+    return this.translocoService.translate(`error.${key}`, params);
   }
 }
