@@ -3,6 +3,7 @@ import { Home } from './pages/home/home';
 import { SignIn } from './pages/sign-in/sign-in';
 import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { ResetPassword } from './pages/reset-password/reset-password';
+import { PasswordUpdated } from './pages/password-updated/password-updated';
 import { EnableAccount } from './pages/enable-account/enable-account';
 import { SignUp } from './pages/sign-up/sign-up';
 import { Profile } from './pages/profile/profile';
@@ -38,6 +39,10 @@ export const routes: Routes = [
       {
         path: ROUTE_PATHS.resetPassword,
         component: ResetPassword,
+      },
+      {
+        path: ROUTE_PATHS.passwordUpdated,
+        component: PasswordUpdated,
       },
       {
         path: ROUTE_PATHS.enableAccount,
