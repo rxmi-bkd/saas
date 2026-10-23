@@ -24,8 +24,7 @@ export class SignInForm {
 
   private readonly router = inject(Router);
   private readonly authenticationService = inject(AuthenticationService);
-
-  private readonly errors = inject(ErrorMessageService);
+  private readonly errorMessageService = inject(ErrorMessageService);
 
   private readonly model = signal<SignInRequest>({ email: '', password: '' });
 
@@ -33,13 +32,13 @@ export class SignInForm {
     this.model,
     (schema) => {
       required(schema.email, {
-        message: () => this.errors.required('email'),
+        message: () => this.errorMessageService.required('email'),
       });
       email(schema.email, {
-        message: () => this.errors.invalid('email'),
+        message: () => this.errorMessageService.invalid('email'),
       });
       required(schema.password, {
-        message: () => this.errors.required('password'),
+        message: () => this.errorMessageService.required('password'),
       });
     },
     {
@@ -65,17 +64,17 @@ export class SignInForm {
     if (error instanceof HttpErrorResponse) {
       switch (error.status) {
         case 400:
-          return this.errors.invalidSignInRequest();
+          return this.errorMessageService.invalidSignInRequest();
         case 401:
-          return this.errors.invalidCredentials();
+          return this.errorMessageService.invalidCredentials();
         case 403:
-          return this.errors.disabledAccount();
+          return this.errorMessageService.disabledAccount();
         case 429:
-          return this.errors.tooManyAttempts();
+          return this.errorMessageService.tooManyAttempts();
         default:
-          return this.errors.serverError();
+          return this.errorMessageService.serverError();
       }
     }
-    return this.errors.serverError();
+    return this.errorMessageService.serverError();
   }
 }

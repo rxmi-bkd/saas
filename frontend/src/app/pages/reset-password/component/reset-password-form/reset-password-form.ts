@@ -25,8 +25,7 @@ export class ResetPasswordForm {
 
   private readonly router = inject(Router);
   private readonly authenticationService = inject(AuthenticationService);
-
-  private readonly errors = inject(ErrorMessageService);
+  private readonly errorMessageService = inject(ErrorMessageService);
 
   private readonly model = signal<ResetPasswordRequest>({ newPassword: '' });
 
@@ -34,13 +33,13 @@ export class ResetPasswordForm {
     this.model,
     (schema) => {
       required(schema.newPassword, {
-        message: () => this.errors.required('password'),
+        message: () => this.errorMessageService.required('password'),
       });
       minLength(schema.newPassword, PASSWORD_MIN_LENGTH, {
-        message: () => this.errors.minLength('password', PASSWORD_MIN_LENGTH),
+        message: () => this.errorMessageService.minLength('password', PASSWORD_MIN_LENGTH),
       });
       maxLength(schema.newPassword, PASSWORD_MAX_LENGTH, {
-        message: () => this.errors.maxLength('password', PASSWORD_MAX_LENGTH),
+        message: () => this.errorMessageService.maxLength('password', PASSWORD_MAX_LENGTH),
       });
     },
     {
@@ -65,15 +64,15 @@ export class ResetPasswordForm {
     if (error instanceof HttpErrorResponse) {
       switch (error.status) {
         case 400:
-          return this.errors.invalidResetPasswordRequest();
+          return this.errorMessageService.invalidResetPasswordRequest();
         case 401:
-          return this.errors.invalidResetToken();
+          return this.errorMessageService.invalidResetToken();
         case 429:
-          return this.errors.tooManyAttempts();
+          return this.errorMessageService.tooManyAttempts();
         default:
-          return this.errors.serverError();
+          return this.errorMessageService.serverError();
       }
     }
-    return this.errors.serverError();
+    return this.errorMessageService.serverError();
   }
 }

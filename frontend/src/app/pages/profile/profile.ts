@@ -12,8 +12,8 @@ import { TranslocoPipe } from '@jsverse/transloco';
 })
 export class Profile {
   private readonly authenticationService = inject(AuthenticationService);
+  private readonly languageService = inject(LanguageService);
 
-  protected readonly language = inject(LanguageService).current;
-
+  protected readonly language = this.languageService.current;
   protected readonly user = this.authenticationService.user;
 }
