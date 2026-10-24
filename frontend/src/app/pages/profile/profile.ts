@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { AuthenticationService } from '../../core/service/authentication.service';
+import { LanguageService } from '../../core/service/language.service';
 import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
@@ -11,5 +12,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
 })
 export class Profile {
   private readonly authenticationService = inject(AuthenticationService);
+  protected readonly lang = inject(LanguageService).lang;
   protected readonly user = this.authenticationService.user;
 }

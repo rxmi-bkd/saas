@@ -1,4 +1,7 @@
 import { inject, Injectable } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+
+import { firstValueFrom } from 'rxjs';
 
 import { TranslocoService } from '@jsverse/transloco';
 
@@ -10,20 +13,35 @@ const STORAGE_KEY = 'language';
 export class LanguageService {
   private readonly translocoService = inject(TranslocoService);
 
-  init(): void {
-    const stored = this.readStoredLanguage();
-    if (stored) this.translocoService.setActiveLang(stored);
+  init() {
+    const language = this.readStoredLanguage() ?? this.current();
+    this.translocoService.setActiveLang(language);
+    return firstValueFrom(this.translocoService.load(language));
   }
 
+  /**
+   * Active language as a signal: updates on every language change.
+   * Use it where the code must re-run on a switch: templates (`date: ... : lang()`),
+   * computed(), effect(), form validators.
+   */
+  readonly lang = toSignal(this.translocoService.langChanges$, { initialValue: this.translocoService.getActiveLang() });
+
+  /**
+   * Active language read once, NOT reactive: a template or computed() using it
+   * won't update on a language switch. Use it in event handlers, submit actions
+   * or one-off initialisation. Prefer `lang()` when unsure.
+   */
   current(): Language {
     return this.translocoService.getActiveLang() as Language;
   }
 
   translate(key: string, params?: Record<string, unknown>): string {
+    this.lang();
     return this.translocoService.translate(key, params);
   }
 
-  use(language: Language): void {
+  async use(language: Language): Promise<void> {
+    await firstValueFrom(this.translocoService.load(language));
     this.translocoService.setActiveLang(language);
     this.storeLanguage(language);
   }
