@@ -11,20 +11,22 @@ const STORAGE_KEY = 'language';
 
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
-  private readonly translocoService = inject(TranslocoService);
+  private readonly translationService = inject(TranslocoService);
 
   init() {
     const language = this.readStoredLanguage() ?? this.current();
-    this.translocoService.setActiveLang(language);
-    return firstValueFrom(this.translocoService.load(language));
+    this.translationService.setActiveLang(language);
+    return firstValueFrom(this.translationService.load(language));
   }
+
+  private langInitialValue = { initialValue: this.translationService.getActiveLang() };
 
   /**
    * Active language as a signal: updates on every language change.
    * Use it where the code must re-run on a switch: templates (`date: ... : lang()`),
    * computed(), effect(), form validators.
    */
-  readonly lang = toSignal(this.translocoService.langChanges$, { initialValue: this.translocoService.getActiveLang() });
+  readonly lang = toSignal(this.translationService.langChanges$, this.langInitialValue);
 
   /**
    * Active language read once, NOT reactive: a template or computed() using it
@@ -32,17 +34,17 @@ export class LanguageService {
    * or one-off initialisation. Prefer `lang()` when unsure.
    */
   current(): Language {
-    return this.translocoService.getActiveLang() as Language;
+    return this.translationService.getActiveLang() as Language;
   }
 
   translate(key: string, params?: Record<string, unknown>): string {
     this.lang();
-    return this.translocoService.translate(key, params);
+    return this.translationService.translate(key, params);
   }
 
   async use(language: Language): Promise<void> {
-    await firstValueFrom(this.translocoService.load(language));
-    this.translocoService.setActiveLang(language);
+    await firstValueFrom(this.translationService.load(language));
+    this.translationService.setActiveLang(language);
     this.storeLanguage(language);
   }
 
